@@ -12,8 +12,8 @@ export const state = {
 export function shell(content, active = "discover") {
   const isHome = active === "discover" && location.pathname === "/";
   const nav = isHome
-    ? [["discover", "/", "Discover"], ["student", "/student", "For students"], ["organiser", "/organiser", "For organisers"]]
-    : [["discover", "/", "Discover"], ["student", "/student", "Student"], ["organiser", "/organiser", "Organiser"], ["create", "/organiser/create", "Create"], ["profile", "/profile", "Profile"]];
+    ? [["discover", "/", "Discover"], ["student", "/student/", "For students"], ["organiser", "/organiser/", "For organisers"]]
+    : [["discover", "/", "Discover"], ["student", "/student/", "Student"], ["organiser", "/organiser/", "Organiser"], ["create", "/organiser/create/", "Create"], ["profile", "/profile/", "Profile"]];
   document.documentElement.dataset.theme = state.theme;
   return `
     <header class="topbar ${isHome ? "home-topbar" : ""}">
@@ -24,7 +24,7 @@ export function shell(content, active = "discover") {
         </nav>
         <div class="top-actions">
           <button class="icon-btn" data-action="theme" title="Toggle theme"><i class="fa-solid ${state.theme === "dark" ? "fa-sun" : "fa-moon"}"></i></button>
-          <a class="btn ${isHome ? "secondary" : "primary"}" href="/auth" data-link>${state.session ? "Account" : "Sign in"}</a>
+          <a class="btn ${isHome ? "secondary" : "primary"}" href="/auth/" data-link>${state.session ? "Account" : "Sign in"}</a>
         </div>
       </div>
     </header>
@@ -42,7 +42,7 @@ export function hero(competitions = []) {
         <p class="lede">Vertex replaces scattered forms, chats, drive folders, and manual result sheets with a structured competition workspace for students and organisers.</p>
         <div class="hero-actions">
           <a class="btn primary" href="#discovery">Browse competitions</a>
-          <a class="btn secondary" href="/organiser" data-link>Organiser workspace</a>
+          <a class="btn secondary" href="/organiser/" data-link>Organiser workspace</a>
         </div>
       </div>
       <aside class="operations-sheet" aria-label="Vertex operations preview">
@@ -121,7 +121,7 @@ export function competitionCard(item, index = 0) {
       <div class="competition-deadline">
         <span>${daysLeft} days left</span>
         <b>${formatDate(item.registration_deadline)}</b>
-        <a class="btn primary compact" href="/competition/${item.slug}" data-link>Open</a>
+        <a class="btn primary compact" href="/competition/${item.slug}/" data-link>Open</a>
       </div>
     </article>
   `;
@@ -138,7 +138,7 @@ export function competitionDetail(item, role = "participant") {
           <h1>${item.name}</h1>
           <p class="lede">${item.description}</p>
         </div>
-        ${role === "participant" ? `<button class="btn primary" data-action="register" data-id="${item.id}">Register</button>` : `<a class="btn primary" href="/organiser/create" data-link>Edit setup</a>`}
+        ${role === "participant" ? `<button class="btn primary" data-action="register" data-id="${item.id}">Register</button>` : `<a class="btn primary" href="/organiser/create/" data-link>Edit setup</a>`}
       </div>
       <div class="stat-grid">
         ${infoMetric("Prize", item.prize)}
@@ -219,7 +219,7 @@ function meetingsView(item, editable) {
   return `
     ${toolHeader("Jitsi meetings", "Meetings")}
     ${editable ? `<form class="form-grid two" data-form="meeting"><input class="field" name="name" placeholder="meeting-name"><select class="select" name="audience"><option>All participants</option><option>Top 30</option><option>Specific teams</option></select><button class="btn primary">Create meeting</button></form>` : ""}
-    <div class="table-row meeting-row"><span>orientation</span><span>/${item.slug}/meeting/orientation</span><a class="btn primary compact" href="/${item.slug}/meeting/orientation" data-link>Join</a></div>
+    <div class="table-row meeting-row"><span>orientation</span><span>/${item.slug}/meeting/orientation</span><a class="btn primary compact" href="/${item.slug}/meeting/orientation/" data-link>Join</a></div>
   `;
 }
 
@@ -283,7 +283,7 @@ export function organiserHome(competitions) {
   return shell(`
     <section class="workspace-hero organiser-hero">
       <div><span class="eyebrow">Organiser workspace</span><h1>Create the competition, then run every operational step.</h1><p class="lede">Set structure, deadlines, teams, meetings, submissions, scoring, results, and certificate rules from one workspace.</p></div>
-      <a class="btn primary" href="/organiser/create" data-link>New competition</a>
+      <a class="btn primary" href="/organiser/create/" data-link>New competition</a>
     </section>
     <section class="section"><div class="section-head"><h2>Managed competitions</h2></div><div class="competition-list">${competitions.map((item) => competitionCard(item)).join("")}</div></section>
   `, "organiser");

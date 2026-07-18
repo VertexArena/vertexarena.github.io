@@ -43,11 +43,11 @@ function wireGlobalEvents() {
       localStorage.setItem("vertex:theme", state.theme);
       renderRoute();
     }
-    if (action === "notify") navigate("/profile");
+    if (action === "notify") navigate("/profile/");
     if (action === "register") {
       if (!state.session) {
         toast("Sign in required before registration.");
-        navigate("/auth");
+        navigate("/auth/");
         return;
       }
       await registerForCompetition(event.target.closest("[data-id]").dataset.id, "individual", "");
@@ -121,14 +121,14 @@ async function handleSubmit(event) {
       await signIn(data.email, data.password);
       state.session = await getSession();
       toast("Signed in.");
-      navigate("/student");
+      navigate("/student/");
       return;
     }
     if (form.dataset.form === "signup") {
       await signUp(data.email, data.password, data);
       state.session = await getSession();
       toast("Account created.");
-      navigate("/profile");
+      navigate("/profile/");
       return;
     }
     if (form.dataset.form === "create-competition") {
@@ -149,7 +149,7 @@ async function handleSubmit(event) {
         end_at: new Date(data.end_at).toISOString()
       });
       toast("Competition created.");
-      navigate(`/organiser/competition/${competition.slug || slugify(data.name)}`);
+      navigate(`/organiser/competition/${competition.slug || slugify(data.name)}/`);
       return;
     }
     await insertTable(form.dataset.form.replace("-", "_"), data);
