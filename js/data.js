@@ -107,21 +107,20 @@ export const mockTeams = [
 ];
 
 export async function fetchCompetitions(filters = {}) {
-  if (!supabaseClient) return filterLocal(mockCompetitions, filters);
+  if (!supabaseClient) return [];
   let query = supabaseClient.from("competitions").select("*").order("created_at", { ascending: false });
   if (filters.field && filters.field !== "All") query = query.eq("field", filters.field);
   if (filters.team && filters.team !== "all") query = query.eq("team_mode", filters.team);
   if (filters.search) query = query.ilike("name", `%${filters.search}%`);
   const { data, error } = await query;
-  if (error) return mockCompetitions;
-  return data?.length ? data.map(normalizeCompetition) : mockCompetitions;
+  if (error) return [];
+  return data?.length ? data.map(normalizeCompetition) : [];
 }
 
 export async function getCompetition(slug) {
-  const local = mockCompetitions.find((item) => item.slug === slug || item.id === slug);
-  if (!supabaseClient) return local;
+  if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.from("competitions").select("*").eq("slug", slug).maybeSingle();
-  if (error || !data) return local;
+  if (error || !data) return null;
   return normalizeCompetition(data);
 }
 
@@ -138,10 +137,7 @@ export async function createCompetition(payload) {
     banner_gradient: payload.banner_gradient || "#005fe0",
     status: "registration_open"
   };
-  if (!supabaseClient) {
-    mockCompetitions.unshift({ ...record, id: record.slug, participant_count: 0, team_count: 0 });
-    return record;
-  }
+  if (!supabaseClient) return { ...record, id: record.slug, participant_count: 0, team_count: 0 };
   const { data, error } = await supabaseClient.from("competitions").insert(record).select().single();
   if (error) throw error;
   return normalizeCompetition(data);

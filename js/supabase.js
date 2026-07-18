@@ -35,6 +35,13 @@ export async function signUp(email, password, profile) {
   return data;
 }
 
+export async function getProfile(userId) {
+  if (!supabaseClient || !userId) return null;
+  const { data, error } = await supabaseClient.from("profiles").select("*").eq("id", userId).maybeSingle();
+  if (error) return null;
+  return data;
+}
+
 export async function signOut() {
   if (!supabaseClient) return;
   await supabaseClient.auth.signOut();

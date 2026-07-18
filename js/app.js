@@ -1,15 +1,18 @@
 import { addRoute, initRouter, navigate, renderRoute } from "./router.js";
 import { createCompetition, fetchCompetitions, getCompetition, insertTable, registerForCompetition, slugify } from "./data.js";
-import { getSession, signIn, signOut, signUp, subscribeTo } from "./supabase.js";
-import { authView, competitionDetail, createCompetitionView, discovery, meetingPage, notFound, organiserHome, profileView, shell, signInView, signUpView, state, studentHome, toast, toolView } from "./ui.js";
+import { getProfile, getSession, signIn, signOut, signUp, subscribeTo } from "./supabase.js";
+import { accountType, achievementsView, authView, competitionDetail, createCompetitionView, discovery, meetingPage, notFound, organisationHome, organiserHome, profileView, shell, signInView, signUpView, state, studentHome, toast, toolView } from "./ui.js";
 import { enableCertificateDragging } from "./certificates.js";
 
 async function boot() {
   state.session = await getSession();
+  state.profile = await loadProfile();
   wireGlobalEvents();
   addRoute("/", async () => shell(discovery(await fetchCompetitions(state.filters)), "discover"));
   addRoute("/student", async () => studentHome(await fetchCompetitions()));
+  addRoute("/student/achievements", async () => achievementsView());
   addRoute("/organiser", async () => organiserHome(await fetchCompetitions()));
+  addRoute("/organisation", async () => organisationHome(await fetchCompetitions()));
   addRoute("/organiser/create", async () => createCompetitionView());
   addRoute("/auth", async () => authView());
   addRoute("/signin", async () => signInView());
@@ -26,6 +29,19 @@ async function boot() {
   initRouter(document.getElementById("app"), async () => notFound());
   registerServiceWorker();
   subscribeRealtime();
+}
+
+async function loadProfile() {
+  const user = state.session?.user;
+  if (!user) return null;
+  return await getProfile(user.id) || user.user_metadata || null;
+}
+
+function defaultRouteForRole() {
+  const role = accountType();
+  if (role === "organiser") return "/organiser";
+  if (role === "organisation") return "/organisation";
+  return "/student";
 }
 
 function wireGlobalEvents() {
@@ -49,8 +65,17 @@ function wireGlobalEvents() {
     if (action === "signout") {
       await signOut();
       state.session = null;
+      state.profile = null;
       toast("Signed out.");
       navigate("/");
+    }
+    if (action === "toggle-password") {
+      const input = event.target.closest(".password-field")?.querySelector("input");
+      if (input) {
+        const showing = input.type === "text";
+        input.type = showing ? "password" : "text";
+        event.target.textContent = showing ? "Show" : "Hide";
+      }
     }
     if (action === "register") {
       if (!state.session) {
@@ -131,15 +156,17 @@ async function handleSubmit(event) {
     if (form.dataset.form === "signin") {
       await signIn(data.email, data.password);
       state.session = await getSession();
+      state.profile = await loadProfile();
       toast("Signed in.");
-      navigate("/student");
+      navigate(defaultRouteForRole());
       return;
     }
     if (form.dataset.form === "signup") {
       await signUp(data.email, data.password, data);
       state.session = await getSession();
+      state.profile = await loadProfile();
       toast("Account created.");
-      navigate("/profile");
+      navigate(defaultRouteForRole());
       return;
     }
     if (form.dataset.form === "create-competition") {
