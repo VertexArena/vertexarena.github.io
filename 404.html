@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Vertex</title>
+    <script>
+      (function () {
+        var path = location.pathname + location.search + location.hash;
+        sessionStorage.setItem("vertex:redirect", path);
+        location.replace("/");
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

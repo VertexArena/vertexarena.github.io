@@ -1,0 +1,18 @@
+{
+  "name": "Vertex",
+  "short_name": "Vertex",
+  "description": "Competition discovery, registration, submissions, communication, results, and certificates for students.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "/assets/logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
