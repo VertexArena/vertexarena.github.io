@@ -11,10 +11,14 @@ export const state = {
 
 export function shell(content, active = "discover") {
   const isHome = active === "discover" && location.pathname === "/";
-  const nav = isHome
-    ? [["discover", "/", "Discover"], ["student", "/student/", "For students"], ["organiser", "/organiser/", "For organisers"]]
-    : [["discover", "/", "Discover"], ["student", "/student/", "Student"], ["organiser", "/organiser/", "Organiser"], ["create", "/organiser/create/", "Create"], ["profile", "/profile/", "Profile"]];
+  const isAuthed = Boolean(state.session);
+  const nav = isAuthed
+    ? [["discover", "/", "Discover"], ["student", "/student", "Student"], ["organiser", "/organiser", "Organiser"], ["create", "/organisercreate", "Create"], ["profile", "/profile", "Profile"]]
+    : [["discover", "/", "Discover"], ["student", "/student", "For students"], ["organiser", "/organiser", "For organisers"]];
   document.documentElement.dataset.theme = state.theme;
+  const authActions = isAuthed
+    ? `${!isHome ? '<button class="icon-btn" data-action="notify" title="Notifications"><i class="fa-solid fa-bell"></i></button>' : ''}<button class="btn secondary compact" data-action="signout">Sign out</button>`
+    : `<a class="btn secondary compact" href="/signin" data-link>Sign in</a><a class="btn primary compact" href="/signup" data-link>Create account</a>`;
   return `
     <header class="topbar ${isHome ? "home-topbar" : ""}">
       <div class="topbar-inner">
@@ -24,11 +28,24 @@ export function shell(content, active = "discover") {
         </nav>
         <div class="top-actions">
           <button class="icon-btn" data-action="theme" title="Toggle theme"><i class="fa-solid ${state.theme === "dark" ? "fa-sun" : "fa-moon"}"></i></button>
-          <a class="btn ${isHome ? "secondary" : "primary"}" href="/auth/" data-link>${state.session ? "Account" : "Sign in"}</a>
+          ${authActions}
         </div>
       </div>
     </header>
     <main class="container page-enter">${content}</main>
+  `;
+}
+
+function authShell(content, mode) {
+  document.documentElement.dataset.theme = state.theme;
+  return `
+    <main class="auth-scene ${mode}">
+      <a class="auth-brand" href="/" data-link><img src="/assets/logo.png" alt=""><span>VERTEX</span></a>
+      <button class="icon-btn auth-theme" data-action="theme" title="Toggle theme"><i class="fa-solid ${state.theme === "dark" ? "fa-sun" : "fa-moon"}"></i></button>
+      <section class="auth-panel page-enter">
+        ${content}
+      </section>
+    </main>
   `;
 }
 
@@ -42,10 +59,10 @@ export function hero(competitions = []) {
         <p class="lede">Vertex replaces scattered forms, chats, drive folders, and manual result sheets with a structured competition workspace for students and organisers.</p>
         <div class="hero-actions">
           <a class="btn primary" href="#discovery">Browse competitions</a>
-          <a class="btn secondary" href="/organiser/" data-link>Organiser workspace</a>
+          <a class="btn secondary" href="/organiser" data-link>Organiser workspace</a>
         </div>
       </div>
-      <aside class="operations-sheet" aria-label="Vertex operations preview">
+      <aside class="operations-sheet" data-tilt aria-label="Vertex operations preview">
         <div class="sheet-head">
           <div>
             <span class="eyebrow">Current round</span>
@@ -121,7 +138,7 @@ export function competitionCard(item, index = 0) {
       <div class="competition-deadline">
         <span>${daysLeft} days left</span>
         <b>${formatDate(item.registration_deadline)}</b>
-        <a class="btn primary compact" href="/competition/${item.slug}/" data-link>Open</a>
+        <a class="btn primary compact" href="/competition/${item.slug}" data-link>Open</a>
       </div>
     </article>
   `;
@@ -138,7 +155,7 @@ export function competitionDetail(item, role = "participant") {
           <h1>${item.name}</h1>
           <p class="lede">${item.description}</p>
         </div>
-        ${role === "participant" ? `<button class="btn primary" data-action="register" data-id="${item.id}">Register</button>` : `<a class="btn primary" href="/organiser/create/" data-link>Edit setup</a>`}
+        ${role === "participant" ? `<button class="btn primary" data-action="register" data-id="${item.id}">Register</button>` : `<a class="btn primary" href="/organisercreate/" data-link>Edit setup</a>`}
       </div>
       <div class="stat-grid">
         ${infoMetric("Prize", item.prize)}
@@ -219,7 +236,7 @@ function meetingsView(item, editable) {
   return `
     ${toolHeader("Jitsi meetings", "Meetings")}
     ${editable ? `<form class="form-grid two" data-form="meeting"><input class="field" name="name" placeholder="meeting-name"><select class="select" name="audience"><option>All participants</option><option>Top 30</option><option>Specific teams</option></select><button class="btn primary">Create meeting</button></form>` : ""}
-    <div class="table-row meeting-row"><span>orientation</span><span>/${item.slug}/meeting/orientation</span><a class="btn primary compact" href="/${item.slug}/meeting/orientation/" data-link>Join</a></div>
+    <div class="table-row meeting-row"><span>orientation</span><span>/${item.slug}/meeting/orientation</span><a class="btn primary compact" href="/${item.slug}/meeting/orientation" data-link>Join</a></div>
   `;
 }
 
@@ -280,26 +297,46 @@ function comingSoon(title, body) {
 }
 
 export function organiserHome(competitions) {
+  const signedOut = !state.session;
   return shell(`
-    <section class="workspace-hero organiser-hero">
-      <div><span class="eyebrow">Organiser workspace</span><h1>Create the competition, then run every operational step.</h1><p class="lede">Set structure, deadlines, teams, meetings, submissions, scoring, results, and certificate rules from one workspace.</p></div>
-      <a class="btn primary" href="/organiser/create/" data-link>New competition</a>
+    <section class="workspace-hero organiser-hero ${signedOut ? "signed-out" : ""}">
+      <div><span class="eyebrow">Organiser workspace</span><h1>${signedOut ? "Run competitions with fewer moving parts." : "Create the competition, then run every operational step."}</h1><p class="lede">${signedOut ? "Schools can publish competitions, collect registrations, brief participants, host meetings, review submissions, release results, and generate certificates from one place." : "Set structure, deadlines, teams, meetings, submissions, scoring, results, and certificate rules from one workspace."}</p></div>
+      ${signedOut ? '<div class="hero-actions"><a class="btn primary" href="/signup" data-link>Create organiser account</a><a class="btn secondary" href="/signin" data-link>Sign in</a></div>' : '<a class="btn primary" href="/organiser/create" data-link>New competition</a>'}
     </section>
-    <section class="section"><div class="section-head"><h2>Managed competitions</h2></div><div class="competition-list">${competitions.map((item) => competitionCard(item)).join("")}</div></section>
+    ${signedOut ? organiserPreview() : `<section class="section"><div class="section-head"><h2>Managed competitions</h2></div><div class="competition-list">${competitions.map((item) => competitionCard(item)).join("")}</div></section>`}
   `, "organiser");
 }
 
-export function studentHome(competitions) {
-  return shell(`
-    <section class="workspace-hero student-hero">
-      <div><span class="eyebrow">Student workspace</span><h1>Track registrations, submissions, results, and certificates.</h1><p class="lede">Your active competitions stay separate from public discovery.</p></div>
+function organiserPreview() {
+  return `
+    <section class="section preview-grid">
+      <div class="preview-panel"><span>01</span><h3>Structure rounds</h3><p>Choose direct winners or multi-round advancement with clear cutoffs.</p></div>
+      <div class="preview-panel"><span>02</span><h3>Operate live</h3><p>Announcements, Q&A, meetings, teams, submissions, and judging stay together.</p></div>
+      <div class="preview-panel"><span>03</span><h3>Release outcomes</h3><p>Schedule leaderboards and generate certificate downloads from templates.</p></div>
     </section>
-    <section class="stat-grid">${infoMetric("Upcoming", "2 registered")}${infoMetric("In progress", "1 active")}${infoMetric("Achievements", "7 earned")}</section>
-    <section class="section"><div class="section-head"><h2>Next actions</h2></div><div class="competition-list">${competitions.slice(0, 2).map((item) => competitionCard(item)).join("")}</div></section>
+  `;
+}
+
+export function studentHome(competitions) {
+  const signedOut = !state.session;
+  return shell(`
+    <section class="workspace-hero student-hero ${signedOut ? "signed-out" : ""}">
+      <div><span class="eyebrow">Student workspace</span><h1>${signedOut ? "Find competitions before making an account." : "Track registrations, submissions, results, and certificates."}</h1><p class="lede">${signedOut ? "Browse public competitions freely. Sign in when you want to register, save events, join teams, ask questions, or submit work." : "Your active competitions stay separate from public discovery."}</p></div>
+      ${signedOut ? '<a class="btn primary" href="/signin" data-link>Sign in to register</a>' : ""}
+    </section>
+    ${signedOut ? `<section class="section"><div class="section-head"><h2>Open competitions</h2></div><div class="competition-list">${competitions.map((item) => competitionCard(item)).join("")}</div></section>` : `<section class="stat-grid">${infoMetric("Upcoming", "2 registered")}${infoMetric("In progress", "1 active")}${infoMetric("Achievements", "7 earned")}</section><section class="section"><div class="section-head"><h2>Next actions</h2></div><div class="competition-list">${competitions.slice(0, 2).map((item) => competitionCard(item)).join("")}</div></section>`}
   `, "student");
 }
 
 export function createCompetitionView() {
+  if (!state.session) {
+    return shell(`
+      <section class="workspace-hero signed-out">
+        <div><span class="eyebrow">Organiser access</span><h1>Sign in before creating a competition.</h1><p class="lede">Competition setup writes organiser data, storage rules, timelines, and staff permissions. Create an organiser account or sign in to continue.</p></div>
+        <div class="hero-actions"><a class="btn primary" href="/signin" data-link>Sign in</a><a class="btn secondary" href="/signup" data-link>Create account</a></div>
+      </section>
+    `, "create");
+  }
   return shell(`
     <section class="form-page">
       <div><span class="eyebrow">Competition setup</span><h1>Define event structure.</h1><p class="lede">Start with essentials. Organiser tools become available after creation.</p></div>
@@ -325,23 +362,54 @@ export function createCompetitionView() {
   `, "create");
 }
 
-export function authView() {
-  return shell(`
-    <section class="form-page">
-      <div><span class="eyebrow">Account</span><h1>Sign in to manage competition work.</h1></div>
-      <div class="split-grid">
-        <form class="panel form-grid" data-form="signin"><h2>Sign in</h2><input class="field" type="email" name="email" placeholder="Email" required><input class="field" type="password" name="password" placeholder="Password" required><button class="btn primary">Sign in</button></form>
-        <form class="panel form-grid" data-form="signup"><h2>Create account</h2><div class="form-grid two"><input class="field" name="full_name" placeholder="Full name" required><input class="field" name="username" placeholder="@username" required><input class="field" type="email" name="email" placeholder="Email" required><input class="field" type="password" name="password" placeholder="Password" required><select class="select" name="account_type"><option>participant</option><option>organiser</option><option>organisation</option></select></div><textarea class="textarea" name="bio" placeholder="Bio"></textarea><button class="btn primary">Create account</button></form>
+export function signInView() {
+  return authShell(`
+    <div class="auth-copy">
+      <span class="eyebrow">Secure account</span>
+      <h1>Sign in to Vertex.</h1>
+      <p>Access registrations, submissions, judging tools, announcements, and certificates from your workspace.</p>
+    </div>
+    <form class="auth-card form-grid" data-form="signin">
+      <label><span>Email</span><input class="field" type="email" name="email" placeholder="you@example.com" required></label>
+      <label><span>Password</span><input class="field" type="password" name="password" placeholder="Password" required></label>
+      <button class="btn primary auth-submit">Sign in</button>
+      <p class="auth-switch">New to Vertex? <a href="/signup" data-link>Create account</a></p>
+    </form>
+  `, "signin");
+}
+
+export function signUpView() {
+  return authShell(`
+    <div class="auth-copy">
+      <span class="eyebrow">Join Vertex</span>
+      <h1>Create your account.</h1>
+      <p>Choose participant, organiser, or organisation. Usernames stay unique; full names appear on certificates.</p>
+    </div>
+    <form class="auth-card form-grid" data-form="signup">
+      <div class="form-grid two">
+        <label><span>Full name</span><input class="field" name="full_name" placeholder="Aarav Mehta" required></label>
+        <label><span>Username</span><input class="field" name="username" placeholder="@username" required></label>
+        <label><span>Email</span><input class="field" type="email" name="email" placeholder="you@example.com" required></label>
+        <label><span>Password</span><input class="field" type="password" name="password" placeholder="Password" required></label>
       </div>
-    </section>
-  `, "profile");
+      <label><span>Account type</span><select class="select" name="account_type"><option>participant</option><option>organiser</option><option>organisation</option></select></label>
+      <label><span>Bio</span><textarea class="textarea" name="bio" placeholder="Short profile for other participants and organisers"></textarea></label>
+      <button class="btn primary auth-submit">Create account</button>
+      <p class="auth-switch">Already have an account? <a href="/signin" data-link>Sign in</a></p>
+    </form>
+  `, "signup");
+}
+
+export function authView() {
+  return signInView();
 }
 
 export function profileView(profile) {
   const item = profile || { full_name: "Guest", username: "guest", account_type: "visitor", bio: "Sign in to register, manage teams, and receive notifications." };
+  const action = state.session ? '<button class="btn primary" data-action="push">Enable push</button>' : '<a class="btn primary" href="/signin" data-link>Sign in</a>';
   return shell(`
     <section class="detail-header">
-      <div class="detail-title"><div><span class="eyebrow">${item.account_type}</span><h1>${item.full_name}</h1><p class="lede">@${item.username}</p></div><button class="btn primary" data-action="push">Enable push</button></div>
+      <div class="detail-title"><div><span class="eyebrow">${item.account_type}</span><h1>${item.full_name}</h1><p class="lede">@${item.username}</p></div>${action}</div>
       <p class="body-copy">${item.bio || ""}</p>
     </section>
   `, "profile");

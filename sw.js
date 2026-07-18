@@ -1,4 +1,4 @@
-const CACHE_NAME = "vertex-v1";
+const CACHE_NAME = "vertex-v2";
 const CORE_ASSETS = [
   "/",
   "/index.html",
@@ -12,25 +12,7 @@ const CORE_ASSETS = [
   "/js/supabase.js",
   "/js/ui.js",
   "/js/certificates.js",
-  "/assets/logo.png",
-  "/student/",
-  "/organiser/",
-  "/organiser/create/",
-  "/auth/",
-  "/profile/",
-  "/not-found/",
-  "/competition/vertex-code-cup/",
-  "/competition/young-research-forum/",
-  "/competition/maths-sprint/",
-  "/competition/vertex-code-cup/leaderboard/top-100/",
-  "/competition/young-research-forum/leaderboard/top-100/",
-  "/competition/maths-sprint/leaderboard/final-results/",
-  "/organiser/competition/vertex-code-cup/",
-  "/organiser/competition/young-research-forum/",
-  "/organiser/competition/maths-sprint/",
-  "/vertex-code-cup/meeting/orientation/",
-  "/young-research-forum/meeting/orientation/",
-  "/maths-sprint/meeting/orientation/"
+  "/assets/logo.png"
 ];
 
 self.addEventListener("install", (event) => {

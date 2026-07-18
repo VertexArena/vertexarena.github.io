@@ -1,7 +1,7 @@
 import { addRoute, initRouter, navigate, renderRoute } from "./router.js";
 import { createCompetition, fetchCompetitions, getCompetition, insertTable, registerForCompetition, slugify } from "./data.js";
-import { getSession, signIn, signUp, subscribeTo } from "./supabase.js";
-import { authView, competitionDetail, createCompetitionView, discovery, meetingPage, notFound, organiserHome, profileView, shell, state, studentHome, toast, toolView } from "./ui.js";
+import { getSession, signIn, signOut, signUp, subscribeTo } from "./supabase.js";
+import { authView, competitionDetail, createCompetitionView, discovery, meetingPage, notFound, organiserHome, profileView, shell, signInView, signUpView, state, studentHome, toast, toolView } from "./ui.js";
 import { enableCertificateDragging } from "./certificates.js";
 
 async function boot() {
@@ -12,6 +12,8 @@ async function boot() {
   addRoute("/organiser", async () => organiserHome(await fetchCompetitions()));
   addRoute("/organiser/create", async () => createCompetitionView());
   addRoute("/auth", async () => authView());
+  addRoute("/signin", async () => signInView());
+  addRoute("/signup", async () => signUpView());
   addRoute("/profile", async () => profileView(state.profile || state.session?.user?.user_metadata));
   addRoute("/competition/:slug", async ({ slug }) => competitionDetail(await getCompetition(slug), "participant"));
   addRoute("/competition/:slug/leaderboard/:round", async ({ slug }) => {
@@ -43,11 +45,17 @@ function wireGlobalEvents() {
       localStorage.setItem("vertex:theme", state.theme);
       renderRoute();
     }
-    if (action === "notify") navigate("/profile/");
+    if (action === "notify") navigate("/profile");
+    if (action === "signout") {
+      await signOut();
+      state.session = null;
+      toast("Signed out.");
+      navigate("/");
+    }
     if (action === "register") {
       if (!state.session) {
         toast("Sign in required before registration.");
-        navigate("/auth/");
+        navigate("/signin");
         return;
       }
       await registerForCompetition(event.target.closest("[data-id]").dataset.id, "individual", "");
@@ -59,6 +67,9 @@ function wireGlobalEvents() {
     if (save) {
       event.preventDefault();
       save.querySelector("i").className = "fa-solid fa-bookmark";
+      save.classList.remove("saved-pop");
+      void save.offsetWidth;
+      save.classList.add("saved-pop");
       toast("Competition saved.");
     }
   });
@@ -121,14 +132,14 @@ async function handleSubmit(event) {
       await signIn(data.email, data.password);
       state.session = await getSession();
       toast("Signed in.");
-      navigate("/student/");
+      navigate("/student");
       return;
     }
     if (form.dataset.form === "signup") {
       await signUp(data.email, data.password, data);
       state.session = await getSession();
       toast("Account created.");
-      navigate("/profile/");
+      navigate("/profile");
       return;
     }
     if (form.dataset.form === "create-competition") {
@@ -149,7 +160,7 @@ async function handleSubmit(event) {
         end_at: new Date(data.end_at).toISOString()
       });
       toast("Competition created.");
-      navigate(`/organiser/competition/${competition.slug || slugify(data.name)}/`);
+      navigate(`/organiser/competition/${competition.slug || slugify(data.name)}`);
       return;
     }
     await insertTable(form.dataset.form.replace("-", "_"), data);
