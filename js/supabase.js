@@ -61,6 +61,19 @@ export async function upsertProfile(id, profile) {
   if (error) throw error;
 }
 
+export async function updateProfile(id, profile) {
+  const payload = {
+    full_name: profile.full_name,
+    username: profile.username?.replace(/^@/, "").toLowerCase(),
+    bio: profile.bio || "",
+    social_links: profile.social_links || [],
+    avatar_url: profile.avatar_url || null
+  };
+  const { data, error } = await supabaseClient.from("profiles").update(payload).eq("id", id).select().single();
+  if (error) throw error;
+  return data;
+}
+
 export async function uploadFile(bucket, path, file) {
   const { data, error } = await supabaseClient.storage.from(bucket).upload(path, file, { upsert: true });
   if (error) throw error;

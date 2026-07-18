@@ -1,7 +1,7 @@
 import { addRoute, initRouter, navigate, renderRoute } from "./router.js";
-import { createCompetition, fetchCompetitions, getCompetition, insertTable, registerForCompetition, slugify } from "./data.js";
-import { getProfile, getSession, signIn, signOut, signUp, subscribeTo } from "./supabase.js";
-import { accountType, achievementsView, authView, competitionDetail, createCompetitionView, discovery, meetingPage, notFound, organisationHome, organiserHome, profileView, shell, signInView, signUpView, state, studentHome, toast, toolView } from "./ui.js";
+import { createCompetition, fetchCompetitions, fetchManagedCompetitions, fetchOrganisationCompetitions, getCompetition, insertTable, registerForCompetition, slugify } from "./data.js";
+import { getProfile, getSession, signIn, signOut, signUp, subscribeTo, updateProfile, uploadFile } from "./supabase.js";
+import { accountType, achievementsView, authView, competitionDetail, createCompetitionView, discovery, meetingPage, notFound, organisationHome, organiserHome, profileView, shell, signInView, signUpView, socialLinkRow, state, studentHome, toast, toolView } from "./ui.js";
 import { enableCertificateDragging } from "./certificates.js";
 
 async function boot() {
@@ -11,8 +11,8 @@ async function boot() {
   addRoute("/", async () => shell(discovery(await fetchCompetitions(state.filters)), "discover"));
   addRoute("/student", async () => studentHome(await fetchCompetitions()));
   addRoute("/student/achievements", async () => achievementsView());
-  addRoute("/organiser", async () => organiserHome(await fetchCompetitions()));
-  addRoute("/organisation", async () => organisationHome(await fetchCompetitions()));
+  addRoute("/organiser", async () => organiserHome(await fetchManagedCompetitions(state.session?.user?.id)));
+  addRoute("/organisation", async () => organisationHome(await fetchOrganisationCompetitions(state.session?.user?.id)));
   addRoute("/organiser/create", async () => createCompetitionView());
   addRoute("/auth", async () => authView());
   addRoute("/signin", async () => signInView());
@@ -76,6 +76,15 @@ function wireGlobalEvents() {
         input.type = showing ? "password" : "text";
         event.target.textContent = showing ? "Show" : "Hide";
       }
+    }
+    if (action === "add-social") {
+      event.target.closest("form")?.querySelector("[data-social-list]")?.insertAdjacentHTML("beforeend", socialLinkRow());
+    }
+    if (action === "remove-social") {
+      const row = event.target.closest(".social-row");
+      const list = row?.parentElement;
+      row?.remove();
+      if (list && !list.children.length) list.insertAdjacentHTML("beforeend", socialLinkRow());
     }
     if (action === "register") {
       if (!state.session) {
@@ -167,6 +176,24 @@ async function handleSubmit(event) {
       state.profile = await loadProfile();
       toast("Account created.");
       navigate(defaultRouteForRole());
+      return;
+    }
+    if (form.dataset.form === "profile") {
+      const userId = state.session?.user?.id;
+      if (!userId) throw new Error("Sign in required.");
+      const social_links = [...form.querySelectorAll(".social-row")].map((row) => ({
+        label: row.querySelector('[name="social_label"]').value.trim(),
+        url: row.querySelector('[name="social_url"]').value.trim()
+      })).filter((link) => link.url);
+      let avatar_url = state.profile?.avatar_url || null;
+      const avatar = form.querySelector('[name="avatar"]').files[0];
+      if (avatar) {
+        if (avatar.size > 5 * 1024 * 1024) throw new Error("Profile picture must be 5 MB or smaller.");
+        avatar_url = await uploadFile("avatars", `${userId}/avatar`, avatar);
+      }
+      state.profile = await updateProfile(userId, { ...state.profile, ...data, social_links, avatar_url });
+      toast("Profile updated.");
+      renderRoute();
       return;
     }
     if (form.dataset.form === "create-competition") {

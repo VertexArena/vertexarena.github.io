@@ -18,15 +18,25 @@ function titleCase(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 export function shell(content, active = "discover") {
   const isHome = active === "discover" && location.pathname === "/";
   const role = accountType();
   const navByRole = {
     participant: [["discover", "/", "Discover"], ["student", "/student", "My competitions"], ["achievements", "/student/achievements", "Achievements"], ["profile", "/profile", "Profile"]],
-    organiser: [["organiser", "/organiser", "Organiser"], ["create", "/organiser/create", "Create"], ["discover", "/", "Discover"], ["profile", "/profile", "Profile"]],
-    organisation: [["organisation", "/organisation", "Organisation"], ["discover", "/", "Discover"], ["profile", "/profile", "Profile"]]
+    organiser: [["organiser", "/organiser", "Competitions"], ["create", "/organiser/create", "Create competition"], ["profile", "/profile", "Profile"]],
+    organisation: [["organisation", "/organisation", "Overview"], ["profile", "/profile", "Profile"]]
   };
   const nav = role ? navByRole[role] || navByRole.participant : [["discover", "/", "Discover"], ["student", "/student", "For students"], ["organiser", "/organiser", "For organisers"]];
+  const brandHref = role === "organiser" ? "/organiser" : role === "organisation" ? "/organisation" : "/";
   document.documentElement.dataset.theme = state.theme;
   document.documentElement.dataset.account = role || "logged-out";
   const authActions = role
@@ -35,7 +45,7 @@ export function shell(content, active = "discover") {
   return `
     <header class="topbar ${isHome ? "home-topbar" : ""}">
       <div class="topbar-inner">
-        <a class="brand" href="/" data-link><img src="/assets/logo.png" alt=""><span>VERTEX</span></a>
+        <a class="brand" href="${brandHref}" data-link><img src="/assets/logo.png" alt=""><span>VERTEX</span></a>
         <nav class="nav" aria-label="Main navigation">
           ${nav.map(([id, href, label]) => `<a href="${href}" data-link class="${active === id ? "active" : ""}">${label}</a>`).join("")}
         </nav>
@@ -145,7 +155,7 @@ export function competitionCard(item, index = 0) {
           <button class="bookmark" data-save="${item.slug}" title="Save"><i class="fa-${item.saved ? "solid" : "regular"} fa-bookmark"></i></button>
         </div>
         <div class="meta-line">
-          <span>${item.field}</span><span>${item.team_mode}</span><span>Ages ${item.age_min}-${item.age_max}</span><span>${item.organizer_name}</span>
+          <span>${item.field}</span><span>${titleCase(item.team_mode)}</span><span>Ages ${item.age_min}-${item.age_max}</span><span>${item.organizer_name || "Independent organiser"}</span>
         </div>
       </div>
       <div class="competition-deadline">
@@ -172,7 +182,7 @@ export function competitionDetail(item, role = "participant") {
       </div>
       <div class="stat-grid">
         ${infoMetric("Prize", item.prize)}
-        ${infoMetric("Format", item.team_mode)}
+        ${infoMetric("Format", titleCase(item.team_mode))}
         ${infoMetric("Deadline", formatDate(item.registration_deadline))}
       </div>
     </section>
@@ -248,8 +258,8 @@ function qaView(editable) {
 function meetingsView(item, editable) {
   return `
     ${toolHeader("Jitsi meetings", "Meetings")}
-    ${editable ? `<form class="form-grid two" data-form="meeting"><input class="field" name="name" placeholder="meeting-name"><select class="select" name="audience"><option>All participants</option><option>Top 30</option><option>Specific teams</option></select><button class="btn primary">Create meeting</button></form>` : ""}
-    <div class="table-row meeting-row"><span>orientation</span><span>/${item.slug}/meeting/orientation</span><a class="btn primary compact" href="/${item.slug}/meeting/orientation" data-link>Join</a></div>
+    ${editable ? `<form class="form-grid two" data-form="meeting"><input class="field" name="name" placeholder="Panel A"><select class="select" name="audience"><option>All participants</option><option>Top 30</option><option>Specific teams</option></select><button class="btn primary">Create meeting</button></form>` : ""}
+    <div class="table-row meeting-row"><span>Orientation</span><span>/${item.slug}/meeting/orientation</span><a class="btn primary compact" href="/${item.slug}/meeting/orientation" data-link>Join</a></div>
   `;
 }
 
@@ -313,7 +323,7 @@ export function organiserHome(competitions) {
   const isOrganiser = accountType() === "organiser";
   const signedOut = !state.session;
   return shell(`
-    <section class="workspace-hero organiser-hero ${!isOrganiser ? "signed-out" : ""}">
+    <section class="workspace-hero app-heading organiser-hero ${!isOrganiser ? "signed-out" : ""}">
       <div><span class="eyebrow">Organiser workspace</span><h1>${isOrganiser ? "Create the competition, then run every operational step." : "Run competitions with fewer moving parts."}</h1><p class="lede">${isOrganiser ? "Set structure, deadlines, teams, meetings, submissions, scoring, results, and certificate rules from one workspace." : "Schools can publish competitions, collect registrations, brief participants, host meetings, review submissions, release results, and generate certificates from one place."}</p></div>
       ${isOrganiser ? '<a class="btn primary" href="/organiser/create" data-link>New competition</a>' : signedOut ? '<div class="hero-actions"><a class="btn primary" href="/signup" data-link>Create organiser account</a><a class="btn secondary" href="/signin" data-link>Sign in</a></div>' : '<a class="btn secondary" href="/profile" data-link>View profile</a>'}
     </section>
@@ -335,7 +345,7 @@ export function studentHome(competitions) {
   const isParticipant = accountType() === "participant";
   const signedOut = !state.session;
   return shell(`
-    <section class="workspace-hero student-hero ${!isParticipant ? "signed-out" : ""}">
+    <section class="workspace-hero app-heading student-hero ${!isParticipant ? "signed-out" : ""}">
       <div><span class="eyebrow">Student workspace</span><h1>${isParticipant ? "Track registrations, submissions, results, and certificates." : "Find competitions before making an account."}</h1><p class="lede">${isParticipant ? "Your active competitions stay separate from public discovery." : "Browse public competitions freely. Sign in with a participant account when you want to register, save events, join teams, ask questions, or submit work."}</p></div>
       ${isParticipant ? "" : signedOut ? '<a class="btn primary" href="/signin" data-link>Sign in to register</a>' : '<a class="btn secondary" href="/profile" data-link>Switch account type</a>'}
     </section>
@@ -361,7 +371,7 @@ export function achievementsView() {
     ["Finalist", "Reached a final leaderboard", "Locked"]
   ];
   return shell(`
-    <section class="workspace-hero student-hero">
+    <section class="workspace-hero app-heading student-hero">
       <div><span class="eyebrow">Achievements</span><h1>Every milestone in one place.</h1><p class="lede">Vertex tracks participation, team activity, submissions, placements, and certificate eligibility across all competitions.</p></div>
     </section>
     <section class="achievement-board">
@@ -373,7 +383,7 @@ export function achievementsView() {
 export function organisationHome(competitions) {
   const isOrganisation = accountType() === "organisation";
   return shell(`
-    <section class="workspace-hero organisation-hero ${!isOrganisation ? "signed-out" : ""}">
+    <section class="workspace-hero app-heading organisation-hero ${!isOrganisation ? "signed-out" : ""}">
       <div><span class="eyebrow">Organisation account</span><h1>${isOrganisation ? "Read-only oversight for your institution." : "Organisation accounts act as institutional containers."}</h1><p class="lede">${isOrganisation ? "See competitions associated with your school or organisation, public profile details, and organisers connected to it." : "Create one when a school or organisation needs an official profile. Individual organisers manage event operations."}</p></div>
       ${isOrganisation ? "" : '<a class="btn primary" href="/signup" data-link>Create organisation account</a>'}
     </section>
@@ -394,7 +404,7 @@ export function createCompetitionView() {
     `, "create");
   }
   return shell(`
-    <section class="form-page">
+    <section class="form-page app-heading">
       <div><span class="eyebrow">Competition setup</span><h1>Define event structure.</h1><p class="lede">Start with essentials. Organiser tools become available after creation.</p></div>
       <form class="panel form-grid" data-form="create-competition">
         <div class="form-grid two">
@@ -402,7 +412,7 @@ export function createCompetitionView() {
           <label><span>Field</span><select class="select" name="field">${FIELDS.map((field) => `<option>${field}</option>`).join("")}</select></label>
           <label><span>Prize</span><input class="field" name="prize" required placeholder="INR 25,000 and certificates"></label>
           <label><span>Age range</span><input class="field" name="age" placeholder="12-18"></label>
-          <label><span>Team mode</span><select class="select" name="team_mode"><option>individual</option><option>team</option><option>both</option></select></label>
+          <label><span>Team mode</span><select class="select" name="team_mode"><option value="individual">Individual</option><option value="team">Team</option><option value="both">Individual and team</option></select></label>
           <label><span>Structure</span><select class="select" name="structure_id">${STRUCTURES.map((item) => `<option value="${item.id}">${item.name}</option>`).join("")}</select></label>
           <label><span>Registration deadline</span><input class="field" type="datetime-local" name="registration_deadline" required></label>
           <label><span>Start date</span><input class="field" type="datetime-local" name="start_at" required></label>
@@ -462,13 +472,45 @@ export function authView() {
 
 export function profileView(profile) {
   const item = profile || { full_name: "Guest", username: "guest", account_type: "visitor", bio: "Sign in to register, manage teams, and receive notifications." };
-  const action = state.session ? '<button class="btn primary" data-action="push">Enable push</button>' : '<a class="btn primary" href="/signin" data-link>Sign in</a>';
+  if (!state.session) {
+    return shell(`<section class="workspace-hero signed-out"><div><span class="eyebrow">Profile</span><h1>Sign in to manage your profile.</h1><p class="lede">Your name, username, biography, profile picture, and social links live here.</p></div><a class="btn primary" href="/signin" data-link>Sign in</a></section>`, "profile");
+  }
+  const links = Array.isArray(item.social_links) ? item.social_links : [];
+  const initials = (item.full_name || "V").split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
   return shell(`
-    <section class="detail-header">
-      <div class="detail-title"><div><span class="eyebrow">${item.account_type}</span><h1>${item.full_name}</h1><p class="lede">@${item.username}</p></div>${action}</div>
-      <p class="body-copy">${item.bio || ""}</p>
+    <section class="profile-page">
+      <header class="profile-heading app-heading">
+        <div><span class="eyebrow">${titleCase(item.account_type)} profile</span><h1>Profile and identity</h1><p>Update the details people see across Vertex.</p></div>
+        <button class="btn secondary compact" data-action="push"><i class="fa-regular fa-bell"></i> Enable push notifications</button>
+      </header>
+      <div class="profile-layout">
+        <aside class="profile-preview soft-surface">
+          <div class="avatar-preview">${item.avatar_url ? `<img src="${escapeHtml(item.avatar_url)}" alt="${escapeHtml(item.full_name)}">` : `<span>${initials}</span>`}</div>
+          <h2>${escapeHtml(item.full_name)}</h2>
+          <p class="profile-username">@${escapeHtml(item.username)}</p>
+          <span class="role-label">${titleCase(item.account_type)}</span>
+          <p class="profile-bio">${escapeHtml(item.bio || "Add a short biography so other people know who you are.")}</p>
+        </aside>
+        <form class="profile-form soft-surface" data-form="profile">
+          <div class="form-section-heading"><div><h2>Personal details</h2><p>Used on your profile and, for participants, on certificates.</p></div></div>
+          <label class="avatar-upload"><span>Profile picture</span><input class="field" type="file" name="avatar" accept="image/png,image/jpeg,image/webp"><small>PNG, JPG, or WebP. Maximum 5 MB.</small></label>
+          <div class="form-grid two">
+            <label><span>Full name</span><input class="field" name="full_name" value="${escapeHtml(item.full_name)}" required></label>
+            <label><span>Username</span><div class="prefix-field"><span>@</span><input class="field" name="username" value="${escapeHtml(item.username)}" required></div></label>
+          </div>
+          <label><span>Biography</span><textarea class="textarea" name="bio" maxlength="320" placeholder="Tell students and organisers about yourself or your institution.">${escapeHtml(item.bio)}</textarea></label>
+          <div class="form-section-heading social-heading"><div><h2>Social links</h2><p>Add relevant profiles or websites.</p></div><button class="btn secondary compact" type="button" data-action="add-social"><i class="fa-solid fa-plus"></i> Add link</button></div>
+          <div class="social-list" data-social-list>${links.length ? links.map((link) => socialLinkRow(link)).join("") : socialLinkRow({ label: "Website", url: "" })}</div>
+          <div class="form-actions"><button class="btn primary" type="submit">Save changes</button></div>
+        </form>
+      </div>
     </section>
   `, "profile");
+}
+
+export function socialLinkRow(link = {}) {
+  const normalized = typeof link === "string" ? { label: "Website", url: link } : link;
+  return `<div class="social-row"><label><span>Label</span><input class="field" name="social_label" value="${escapeHtml(normalized.label)}" placeholder="GitHub"></label><label><span>URL</span><input class="field" type="url" name="social_url" value="${escapeHtml(normalized.url)}" placeholder="https://example.com"></label><button class="icon-btn remove-social" type="button" data-action="remove-social" title="Remove social link"><i class="fa-solid fa-xmark"></i></button></div>`;
 }
 
 export function meetingPage(params) {

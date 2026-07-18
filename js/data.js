@@ -117,6 +117,28 @@ export async function fetchCompetitions(filters = {}) {
   return data?.length ? data.map(normalizeCompetition) : [];
 }
 
+export async function fetchManagedCompetitions(organiserId) {
+  if (!supabaseClient || !organiserId) return [];
+  const { data, error } = await supabaseClient
+    .from("competitions")
+    .select("*")
+    .eq("organiser_id", organiserId)
+    .order("created_at", { ascending: false });
+  if (error) return [];
+  return (data || []).map(normalizeCompetition);
+}
+
+export async function fetchOrganisationCompetitions(organisationId) {
+  if (!supabaseClient || !organisationId) return [];
+  const { data, error } = await supabaseClient
+    .from("competitions")
+    .select("*")
+    .eq("organisation_id", organisationId)
+    .order("created_at", { ascending: false });
+  if (error) return [];
+  return (data || []).map(normalizeCompetition);
+}
+
 export async function getCompetition(slug) {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.from("competitions").select("*").eq("slug", slug).maybeSingle();
