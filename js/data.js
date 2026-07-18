@@ -31,7 +31,7 @@ export const mockCompetitions = [
     age_max: 18,
     team_mode: "both",
     status: "registration_open",
-    banner_gradient: "linear-gradient(135deg, #2563eb, #0d9488)",
+    banner_gradient: "#005fe0",
     structure: STRUCTURES[1],
     categories: ["Junior", "Senior", "Best UI"],
     description: "Build a useful student tool in 48 hours, submit a working demo, and present to school mentors.",
@@ -53,7 +53,7 @@ export const mockCompetitions = [
     age_max: 19,
     team_mode: "team",
     status: "in_progress",
-    banner_gradient: "linear-gradient(135deg, #0f766e, #f59e0b)",
+    banner_gradient: "#0f766e",
     structure: STRUCTURES[2],
     categories: ["Environment", "Health", "Systems"],
     description: "Submit a research abstract, advance through peer review, and defend findings in live panels.",
@@ -75,7 +75,7 @@ export const mockCompetitions = [
     age_max: 16,
     team_mode: "individual",
     status: "registration_open",
-    banner_gradient: "linear-gradient(135deg, #1d4ed8, #7c3aed)",
+    banner_gradient: "#1f2937",
     structure: STRUCTURES[0],
     categories: ["Speed", "Proof"],
     description: "Fast-paced problem solving with live results and category prizes for precision and explanation.",
@@ -135,7 +135,7 @@ export async function createCompetition(payload) {
     slug: slugify(payload.name),
     organiser_id: session?.user?.id || payload.organiser_id || null,
     structure: STRUCTURES.find((item) => item.id === structureId) || STRUCTURES[0],
-    banner_gradient: payload.banner_gradient || "linear-gradient(135deg, #2563eb, #0d9488)",
+    banner_gradient: payload.banner_gradient || "#005fe0",
     status: "registration_open"
   };
   if (!supabaseClient) {

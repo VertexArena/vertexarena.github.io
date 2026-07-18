@@ -92,7 +92,7 @@ function wireGlobalEvents() {
     const toolButton = event.target.closest("[data-tool]");
     if (toolButton) {
       state.activeTool = toolButton.dataset.tool;
-      document.querySelectorAll("[data-tool]").forEach((button) => button.classList.toggle("primary", button === toolButton));
+      document.querySelectorAll("[data-tool]").forEach((button) => button.classList.toggle("active", button === toolButton));
       const slug = location.pathname.split("/").pop();
       getCompetition(slug).then((competition) => {
         const role = location.pathname.startsWith("/organiser") ? "organiser" : "participant";
