@@ -1,5 +1,5 @@
 const cfg=window.VERTEX_CONFIG;
-export const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+export const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY||cfg.SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 export const api={
  async session(){return(await db.auth.getSession()).data.session},async signIn(email,password){return db.auth.signInWithPassword({email,password})},async signUp({email,password,fullName,username,accountType}){return db.auth.signUp({email,password,options:{data:{full_name:fullName,username,account_type:accountType}}})},async signOut(){return db.auth.signOut()},async profile(id){return db.from('profiles').select('*').eq('id',id).maybeSingle()},
  async competitions(filters={}){let q=db.from('competitions').select('*,organisation:organisations(name,slug),competition_tags(tag:tags(name,slug))').eq('status','published').order('registration_deadline');if(filters.search)q=q.ilike('name',`%${filters.search}%`);if(filters.teamMode)q=q.eq('team_mode',filters.teamMode);return q},
