@@ -13,6 +13,7 @@ export const api={
  async organisedCompetitions(id){return db.from('competitions').select(competitionSelect).eq('created_by',id).order('created_at',{ascending:false})},
  async organisationCompetitions(id){return db.from('competitions').select(competitionSelect).eq('organisation_id',id).order('created_at',{ascending:false})},
  async organisationMembers(id){return db.from('profiles').select('id,full_name,username,avatar_url,account_type').eq('organisation_id',id).eq('account_type','organiser').order('full_name')},
+ async searchOrganisers(term){return db.from('profiles').select('id,full_name,username,avatar_url').eq('account_type','organiser').ilike('username',`%${term.replace(/^@/,'')}%`).limit(8)},
  async organisationInvites(){return db.from('organisation_invites').select('*,organisation:organisations(name),inviter:profiles!organisation_invites_invited_by_fkey(full_name,username)').eq('organiser_id',(await this.session()).user.id).eq('status','pending').order('created_at',{ascending:false})},
  async inviteOrganiser(username){return db.rpc('invite_organiser_to_organisation',{target_username:username.replace(/^@/,'')})},
  async acceptOrganisationInvite(inviteId){return db.rpc('accept_organisation_invite',{invite_id:inviteId})},
