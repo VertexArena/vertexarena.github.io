@@ -80,3 +80,13 @@ insert into storage.buckets(id,name,public,file_size_limit) values('banners','ba
 create policy "public media read" on storage.objects for select using(bucket_id in('banners','avatars'));create policy "authenticated media upload" on storage.objects for insert to authenticated with check(bucket_id in('banners','avatars','submissions','certificate-templates') and (storage.foldername(name))[1]=auth.uid()::text);create policy "owner media update" on storage.objects for update to authenticated using(owner_id=auth.uid()::text);create policy "owner private media read" on storage.objects for select to authenticated using(owner_id=auth.uid()::text or bucket_id in('banners','avatars'));
 
 do $$begin alter publication supabase_realtime add table public.announcements,public.questions,public.answers,public.leaderboards,public.leaderboard_entries,public.notifications;exception when duplicate_object then null;end$$;
+
+-- Minimum PostgREST privileges approved for Vertex web clients. RLS remains authoritative.
+alter table public.tags enable row level security;
+create policy "tags public read" on public.tags for select using(true);
+grant usage on schema public to anon, authenticated;
+grant select on public.competitions,public.organisations,public.competition_tags,public.tags,public.rounds,public.categories,public.competition_organisers,public.profiles to anon;
+grant select on public.competitions,public.organisations,public.competition_tags,public.tags,public.rounds,public.categories,public.competition_organisers,public.profiles,public.registrations,public.bookmarks,public.notifications,public.announcements,public.questions,public.answers to authenticated;
+grant update on public.profiles,public.competitions,public.notifications to authenticated;
+grant insert on public.competitions,public.registrations,public.bookmarks,public.announcements,public.questions,public.answers to authenticated;
+grant delete on public.bookmarks to authenticated;
