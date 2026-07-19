@@ -1,6 +1,7 @@
 -- Vertex feature migration: atomic creation and organisation membership.
 alter table public.competitions add column if not exists banner_style text not null default 'solid' check(banner_style in('solid','gradient'));
 alter table public.competitions add column if not exists banner_secondary_color text default '#7C3AED';
+alter table public.competitions add column if not exists banner_shape text not null default 'circle' check(banner_shape in('circle','orbit','grid','diagonal','none'));
 
 create table if not exists public.organisation_invites(
  id uuid primary key default gen_random_uuid(),
@@ -13,6 +14,7 @@ create table if not exists public.organisation_invites(
  unique(organisation_id,organiser_id)
 );
 alter table public.organisation_invites enable row level security;
+drop policy if exists "organisation invite participants read" on public.organisation_invites;
 create policy "organisation invite participants read" on public.organisation_invites for select using(
  organiser_id=auth.uid() or organisation_id=(select organisation_id from public.profiles where id=auth.uid() and account_type='organisation')
 );
@@ -94,8 +96,8 @@ begin
   final_slug:=public.vertex_slug(prefix||'-'||base_slug);
  end if;
  while exists(select 1 from public.competitions where competitions.slug=final_slug) loop final_slug:=public.vertex_slug(coalesce(prefix,creator.username)||'-'||base_slug||'-'||suffix);suffix:=suffix+1;end loop;
- insert into public.competitions(name,slug,description,organisation_id,created_by,status,team_mode,prize_summary,prize_details,age_min,age_max,banner_url,banner_color,banner_secondary_color,banner_style,structure_type,registration_deadline,start_at,end_at,certificate_release_at,scores_public)
- values(payload->>'name',final_slug,coalesce(payload->>'description',''),creator.organisation_id,creator.id,'draft',(payload->>'team_mode')::public.team_mode,payload->>'prize_summary',payload->>'prize_details',(payload->>'age_min')::int,(payload->>'age_max')::int,payload->>'banner_url',coalesce(payload->>'banner_color','#2563EB'),coalesce(payload->>'banner_secondary_color','#7C3AED'),coalesce(payload->>'banner_style','solid'),coalesce(payload->>'structure_type','direct'),(payload->>'registration_deadline')::timestamptz,(payload->>'start_at')::timestamptz,(payload->>'end_at')::timestamptz,(payload->>'certificate_release_at')::timestamptz,coalesce((payload->>'scores_public')::boolean,false))
+ insert into public.competitions(name,slug,description,organisation_id,created_by,status,team_mode,prize_summary,prize_details,age_min,age_max,banner_url,banner_color,banner_secondary_color,banner_style,banner_shape,structure_type,registration_deadline,start_at,end_at,certificate_release_at,scores_public)
+ values(payload->>'name',final_slug,coalesce(payload->>'description',''),creator.organisation_id,creator.id,'draft',(payload->>'team_mode')::public.team_mode,payload->>'prize_summary',payload->>'prize_details',(payload->>'age_min')::int,(payload->>'age_max')::int,payload->>'banner_url',coalesce(payload->>'banner_color','#2563EB'),coalesce(payload->>'banner_secondary_color','#7C3AED'),coalesce(payload->>'banner_style','solid'),coalesce(payload->>'banner_shape','circle'),coalesce(payload->>'structure_type','direct'),(payload->>'registration_deadline')::timestamptz,(payload->>'start_at')::timestamptz,(payload->>'end_at')::timestamptz,(payload->>'certificate_release_at')::timestamptz,coalesce((payload->>'scores_public')::boolean,false))
  returning competitions.id into comp_id;
  insert into public.competition_tags(competition_id,tag_id) select comp_id,t.id from public.tags t where t.slug in(select jsonb_array_elements_text(coalesce(payload->'tags','[]'::jsonb)));
  insert into public.categories(competition_id,name) select comp_id,value from jsonb_array_elements_text(coalesce(payload->'categories','[]'::jsonb)) where btrim(value)<>'';
@@ -124,3 +126,4 @@ revoke all on function public.create_competition_full(jsonb) from public;
 grant execute on function public.invite_organiser_to_organisation(text) to authenticated;
 grant execute on function public.accept_organisation_invite(uuid) to authenticated;
 grant execute on function public.create_competition_full(jsonb) to authenticated;
+notify pgrst, 'reload schema';
