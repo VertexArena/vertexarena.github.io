@@ -1,4 +1,4 @@
-const CACHE='vertex-shell-v3',SHELL=['/','/index.html','/css/style.css','/js/app.js','/js/api.js','/js/components.js','/js/auth-enhancements.js','/config.js','/assets/logo.png','/manifest.webmanifest'];
+const CACHE='vertex-shell-v4',SHELL=['/','/index.html','/css/style.css','/js/app.js','/js/api.js','/js/components.js','/js/auth-enhancements.js','/config.js','/assets/logo.png','/manifest.webmanifest'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;if(e.request.mode==='navigate')return e.respondWith(fetch(e.request).catch(()=>caches.match('/index.html')));if(new URL(e.request.url).origin===location.origin)e.respondWith(caches.match(e.request).then(h=>h||fetch(e.request)));});
