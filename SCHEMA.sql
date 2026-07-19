@@ -339,3 +339,65 @@ create policy "invited organisers read competition" on public.competitions for s
  exists(select 1 from public.competition_organisers co where co.competition_id=id and co.profile_id=auth.uid())
 );
 notify pgrst, 'reload schema';
+
+-- Fix meeting policy recursion without weakening assignment access.
+create or replace function public.is_meeting_organiser(mid uuid)
+returns boolean language sql stable security definer set search_path=public as $$
+ select public.is_comp_organiser(m.competition_id) from public.meetings m where m.id=mid
+$$;
+
+create or replace function public.can_read_meeting(mid uuid,cid uuid)
+returns boolean language sql stable security definer set search_path=public as $$
+ select public.is_comp_organiser(cid) or exists(
+  select 1 from public.meeting_assignments ma
+  where ma.meeting_id=mid and (
+   ma.participant_id=auth.uid()
+   or ma.team_id in(
+    select tm.team_id from public.team_members tm
+    where tm.participant_id=auth.uid() and tm.invite_status='accepted'
+   )
+  )
+ )
+$$;
+
+drop policy if exists "assigned meetings read" on public.meetings;
+create policy "assigned meetings read" on public.meetings for select
+using(public.can_read_meeting(id,competition_id));
+
+drop policy if exists "meeting assignments organiser manage" on public.meeting_assignments;
+create policy "meeting assignments organiser manage" on public.meeting_assignments for all
+using(public.is_meeting_organiser(meeting_id))
+with check(public.is_meeting_organiser(meeting_id));
+
+drop policy if exists "meeting assignments own read" on public.meeting_assignments;
+create policy "meeting assignments own read" on public.meeting_assignments for select using(
+ participant_id=auth.uid()
+ or team_id in(
+  select tm.team_id from public.team_members tm
+  where tm.participant_id=auth.uid() and tm.invite_status='accepted'
+ )
+);
+
+grant execute on function public.is_meeting_organiser(uuid) to authenticated;
+grant execute on function public.can_read_meeting(uuid,uuid) to authenticated;
+notify pgrst, 'reload schema';
+
+-- Round workspace creation and shared certificate preview access.
+drop policy if exists "submission boxes organiser insert" on public.submission_boxes;
+create policy "submission boxes organiser insert" on public.submission_boxes for insert
+with check(public.is_comp_organiser((select competition_id from public.rounds where id=round_id)));
+grant insert on public.submission_boxes to authenticated;
+
+create or replace function public.can_read_certificate_object(object_name text)
+returns boolean language sql stable security definer set search_path=public as $$
+ select exists(
+  select 1 from public.certificate_templates ct
+  where ct.image_path=object_name and public.is_comp_organiser(ct.competition_id)
+ )
+$$;
+grant execute on function public.can_read_certificate_object(text) to authenticated;
+
+drop policy if exists "competition organisers read certificate templates" on storage.objects;
+create policy "competition organisers read certificate templates" on storage.objects for select
+using(bucket_id='certificate-templates' and public.can_read_certificate_object(name));
+notify pgrst, 'reload schema';
