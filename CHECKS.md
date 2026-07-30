@@ -1,325 +1,293 @@
-# Milestone 1 Manual Verification
+# Milestone 1 Visual Verification
 
-Use the deployed GitHub Pages site unless a check explicitly calls for the local server. Start each viewport check in a fresh tab. The implemented Milestone 1 routes are `/`, `/discover`, `/discover/fields`, `/login`, `/signup`, and the custom 404 for invalid paths.
+Use the deployed site unless a check specifies the local server. The implemented Milestone 1 routes are `/`, `/discover`, `/discover/fields`, `/login`, `/signup`, and the custom 404 shown for invalid paths.
 
-## Global shell and identity
+## Global identity and breathing room
 
 - [ ] Route: every implemented route
   - Viewport: 1600 × 1000, 1366 × 768, 768 × 1024, 390 × 844, and 320 × 568
-  - Action: Open each route and compare the header, page heading, section boundaries, and footer.
-  - Expected: The same Geist typography, mono utility labels, thin convergence rails, square checkpoints, restrained blue accent, moderate radii, and shared borders appear consistently; no route resembles an unrelated card template.
+  - Action: Open each route and scroll from top to bottom.
+  - Expected: No horizontal scrolling, clipping, overlapping text, or content outside the viewport occurs.
 
-- [ ] Route: every implemented route
-  - Viewport: all five target sizes
-  - Action: Scroll from top to bottom, then pan horizontally if the browser permits.
-  - Expected: No horizontal page scrolling, clipping, overlapping text, cut-off focus ring, or content outside the viewport occurs.
+- [ ] Route: `/`, `/discover`, `/discover/fields`, `/login`, and `/signup`
+  - Viewport: 1366 × 768
+  - Action: Compare headings, supporting copy, section spacing, borders, and icon treatments.
+  - Expected: Pages share large confident typography, smaller supporting copy, generous whitespace, soft blue accents, quiet borders, and moderate radii without blueprint lines, diamonds, technical diagrams, or dense mono labels.
 
 - [ ] Route: `/`
-  - Viewport: 1366 × 768
-  - Action: Temporarily hide the `.brand` elements in browser developer tools.
-  - Expected: The rail-led navigation, indexed competition journey, connected feature stages, tight display typography, and accented endpoints still form a recognisable single visual system.
-
-- [ ] Route: `/`, `/discover`, and `/discover/fields`
-  - Viewport: 1366 × 768
-  - Action: Compare the hero journey, catalogue state, and field index.
-  - Expected: The motif changes to match each structure—journey rail, status endpoint, and indexed destination grid—rather than repeating decorative triangles.
+  - Viewport: 1600 × 1000
+  - Action: Temporarily hide the logo and `VERTEX` wordmark with browser developer tools.
+  - Expected: The living grid, open hero composition, spacious typography, restrained actions, and soft opportunity-focused surfaces still feel like one recognisable product.
 
 - [ ] Route: every implemented route
   - Viewport: 1366 × 768
-  - Action: Inspect all blue elements.
-  - Expected: Blue is used for primary actions, active navigation, focus, status/endpoints, and meaningful icons; large unrelated decorative regions do not compete for attention except the purposeful auth-route panel.
+  - Action: Inspect all uses of blue.
+  - Expected: Strong blue identifies actions, active navigation, focus, opportunity cues, and meaningful icons; decorative colour remains soft and does not resemble neon, AI gradients, or a control-room display.
 
-## Header, desktop navigation, and footer
+- [ ] Route: every implemented route
+  - Viewport: 1366 × 768
+  - Action: Look for rails, construction lines, numbered process markers, diamonds, coordinates, status codes, and slash-separated technical labels.
+  - Expected: None appear in the redesigned Milestone 1 surfaces.
+
+## Header and navigation
 
 - [ ] Route: `/`
   - Viewport: 1366 × 768 and 1600 × 1000
-  - Action: Inspect the header at the top of the page and while scrolling.
-  - Expected: The logo and `VERTEX` wordmark align left; Home, Discover, and Fields sit in the navigation; Log in and the theme switch align right; the sticky header remains stable and legible.
+  - Action: Inspect the header before and after scrolling.
+  - Expected: Logo and wordmark remain left-aligned; navigation, Log in, and theme toggle remain right-aligned; the header stays calm, stable, and readable over page content.
 
 - [ ] Route: `/`, then `/discover`, then `/discover/fields`
   - Viewport: 1366 × 768
-  - Action: Navigate using the desktop header links.
-  - Expected: The current route is indicated by text contrast and an accent rail extending beneath the correct link; only one item is current.
+  - Action: Navigate using Home, Discover, and Fields.
+  - Expected: The current destination uses accent text on a soft accent surface; no extending rail or industrial active marker appears; only one destination is current.
 
 - [ ] Route: `/discover/fields`
   - Viewport: 1366 × 768
-  - Action: Hover Home, Discover, and Fields one at a time.
-  - Expected: Each hover rail grows toward the destination without moving surrounding content; Fields remains visibly current after the pointer leaves.
-
-- [ ] Route: every route with a footer
-  - Viewport: 390 × 844 and 1366 × 768
-  - Action: Scroll to the footer.
-  - Expected: Desktop footer content shares one row; mobile footer content stacks with clear spacing; logo, tagline, and Discover link remain readable and tappable.
-
-- [ ] Route: `/login`, `/signup`, and `/randomgarbage`
-  - Viewport: 1366 × 768
-  - Action: Scroll to the end of each page.
-  - Expected: No footer is rendered on auth routes or the 404, preserving the full-height task/error layout.
-
-## Mobile navigation and header controls
+  - Action: Hover each desktop navigation link.
+  - Expected: Hover adds a quiet soft surface without shifting the header or competing with the current-route treatment.
 
 - [ ] Route: `/`
   - Viewport: 390 × 844 and 320 × 568
-  - Action: Inspect the closed mobile header.
-  - Expected: Logo/wordmark is on the left; the theme switch and hamburger form a tight group flush to the right page edge; neither control sits in the middle of the header.
+  - Action: Inspect the closed header.
+  - Expected: Logo/wordmark stays left; the theme toggle and hamburger form a balanced group flush right; neither control sits in the centre or overlaps the brand.
 
 - [ ] Route: `/`
   - Viewport: 320 × 568
-  - Action: Confirm the header at the narrowest supported width.
-  - Expected: The wordmark may hide, but the logo remains visible and the theme and menu controls remain fully inside the viewport with no overlap.
+  - Action: Inspect the narrowest header.
+  - Expected: The wordmark may hide, but the logo, complete theme scene, and hamburger remain fully visible and touch friendly.
 
 - [ ] Route: `/`
   - Viewport: 390 × 844
-  - Action: Tap the hamburger once.
-  - Expected: The button label changes from “Open navigation” to “Close navigation,” the icon becomes an X, body scrolling stops, and a full-height drawer enters from the right.
-
-- [ ] Route: `/`
-  - Viewport: 390 × 844
-  - Action: With the drawer open, inspect all links and tap Discover.
-  - Expected: Home, Discover, Fields, and Log in are at least 44px tall; the active route has an inset accent edge; tapping Discover closes the old view and renders `/discover` without a page reload.
+  - Action: Open and close the hamburger menu.
+  - Expected: The drawer enters from the right without flicker; the icon and accessible label switch between open and close states; body scrolling is disabled while open.
 
 - [ ] Route: `/discover`
-  - Viewport: 768 × 1024
-  - Action: Open the drawer, close it, and reopen it.
-  - Expected: Each transition completes without flicker; `aria-expanded` and the accessible name match the visible state; Discover is marked current.
+  - Viewport: 390 × 844
+  - Action: Open the drawer and inspect the active link.
+  - Expected: Discover uses the same soft accent selection as desktop; links have comfortable spacing and at least 44px touch height; no inset rail appears.
+
+## Theme toggle
+
+- [ ] Route: `/`
+  - Viewport: 1366 × 768 and 390 × 844
+  - Action: Inspect the toggle in light mode without interacting.
+  - Expected: A warm sun orb sits within a soft daylight-blue scene; subtle atmospheric rings surround it; small cloud forms sit low in the scene; the control is visually balanced inside a 44px touch target.
+
+- [ ] Route: `/`
+  - Viewport: 1366 × 768
+  - Action: Hover the light-mode toggle.
+  - Expected: The orb nudges slightly toward the right and rotates subtly; the control does not glow, enlarge, or shift nearby navigation.
+
+- [ ] Route: `/`
+  - Viewport: 1366 × 768
+  - Action: Activate the toggle and watch the complete transition.
+  - Expected: The orb crosses with a restrained spring; the moon surface slides into the orb; cloud forms leave downward; stars arrive from above; the scene changes to deep night; no individual layer visibly snaps.
+
+- [ ] Route: `/`
+  - Viewport: 1366 × 768
+  - Action: Hover the dark-mode toggle, then return to light mode.
+  - Expected: The moon nudges toward the left, and the reverse transition restores the complete daylight scene smoothly.
 
 - [ ] Route: `/`
   - Viewport: 390 × 844
-  - Action: Open the drawer, then press the browser Back button after navigating to Fields.
-  - Expected: History returns to `/`; the page and current-route marker update correctly; the drawer does not remain stuck open.
-
-## Theme switch and colour modes
-
-- [ ] Route: `/`
-  - Viewport: 390 × 844 and 1366 × 768
-  - Action: Inspect the theme control in light mode.
-  - Expected: It appears as a compact rectangular day/night track with a square thumb on the light endpoint, visible sun and moon cues, and a thin rail/checkpoint; it fits the Vertex geometry rather than looking like a generic icon button.
-
-- [ ] Route: `/`
-  - Viewport: 390 × 844 and 1366 × 768
-  - Action: Activate the theme switch once.
-  - Expected: Background, surfaces, borders, text, grid, and accent roles change together; the thumb moves to the dark endpoint; `aria-checked` becomes `true`; the accessible name becomes “Switch to light mode.”
+  - Action: Toggle theme repeatedly using touch with a short pause between activations.
+  - Expected: Every tap changes theme exactly once; the complete scene remains clipped inside its rounded container; no moon spots, rings, clouds, or stars escape the control.
 
 - [ ] Route: `/`
   - Viewport: any
-  - Action: Choose dark mode, refresh, navigate to `/discover`, close the tab, and reopen the site.
-  - Expected: Dark mode persists across refresh, route changes, and browser restart according to local-storage behaviour; no light-theme flash appears before paint.
+  - Action: Use keyboard Tab to focus the toggle, then press Space and Enter on separate attempts.
+  - Expected: A visible accent focus outline surrounds the control; each key changes the theme; `aria-checked` and the accessible name update to the new state.
 
 - [ ] Route: `/`
-  - Setup: Clear the `vertex-theme` local-storage item and set the operating system to dark mode.
   - Viewport: any
-  - Action: Open the site, then explicitly choose light mode and reload.
-  - Expected: Initial mode follows the system only before an explicit choice; the explicit light choice overrides the system on reload.
+  - Action: Select dark mode, reload, navigate to `/discover`, and reopen the site in a new tab.
+  - Expected: The chosen mode persists and appears before paint without a wrong-theme flash.
 
 - [ ] Route: every implemented route
   - Viewport: 1366 × 768
-  - Action: Inspect both themes for text, borders, switch icons, buttons, status labels, and focus rings.
-  - Expected: Essential content remains readable; inactive text remains distinguishable; accent-on-surface and white-on-accent controls have accessible contrast.
+  - Action: Compare light and dark themes.
+  - Expected: Background, surface, text, border, icon, active navigation, button, grid, and toggle colours remain balanced and readable in both modes.
 
-## Home page
+## Living opportunity grid
+
+- [ ] Route: `/`
+  - Viewport: 1600 × 1000 and 1366 × 768
+  - Action: Watch the hero background for at least 20 seconds without moving the pointer.
+  - Expected: The grid remains recognisable while its overall visibility breathes slowly; broad blue regions drift gently; selected intersections travel through a soft region; the animation loops without a noticeable jump.
+
+- [ ] Route: `/`
+  - Viewport: 1366 × 768
+  - Action: Move the pointer rapidly across the hero.
+  - Expected: The grid does not follow the pointer and no parallax or particle response occurs.
+
+- [ ] Route: `/`
+  - Viewport: 390 × 844 and 320 × 568
+  - Action: Watch the hero grid for 15 seconds.
+  - Expected: Motion remains subtle on mobile, does not cause scrolling or visible jank, and never reduces heading or button readability.
+
+- [ ] Route: `/`
+  - Viewport: 1366 × 768
+  - Action: Compare the grid in light and dark themes.
+  - Expected: Light regions are gentle in both modes; the dark grid gains slightly more depth without becoming sci-fi, glowing, or visually dominant.
+
+- [ ] Route: `/`
+  - Setup: Enable operating-system reduced motion.
+  - Viewport: 1366 × 768 and 390 × 844
+  - Action: Reload and observe the grid for 15 seconds.
+  - Expected: Breathing, drifting, and travelling motion stops; a simplified static grid and soft light remain; all content and controls still work.
+
+- [ ] Route: `/`
+  - Setup: Open browser performance tools on a mid-range device profile.
+  - Viewport: 390 × 844
+  - Action: Record 15 seconds while the grid animates and scroll the hero once.
+  - Expected: Animation is driven by opacity/transform with no repeated layout shifts; interaction remains responsive and no continuous long task is visible.
+
+## Homepage composition
 
 - [ ] Route: `/`
   - Viewport: 1600 × 1000 and 1366 × 768
   - Action: Inspect the first viewport without scrolling.
-  - Expected: The heading is left-led rather than generically centred; the line geometry converges toward a single blue vertex; the numbered Discover–Participate–Achieve rail reinforces the reading order without covering text.
+  - Expected: “Find your next challenge.” is the clear focal point; supporting copy and actions are compact; the secondary thought sits quietly at the far edge; the page feels exploratory rather than like an enterprise dashboard.
 
 - [ ] Route: `/`
   - Viewport: 390 × 844 and 320 × 568
-  - Action: Inspect the hero and scroll through its stage rail.
-  - Expected: Heading, copy, and actions reflow within the viewport; the three stages become a horizontal connected rail; no route geometry makes text unreadable.
+  - Action: Inspect the entire hero.
+  - Expected: The large heading wraps confidently, supporting copy remains smaller, both actions fit without clipping, and the secondary thought follows with enough separation.
 
 - [ ] Route: `/`
   - Viewport: 1366 × 768
-  - Action: Hover and activate “Explore competitions.”
-  - Expected: Hover raises the button by approximately 2px, deepens the accent, and moves the arrow right; active press compresses it; activation opens `/discover`.
+  - Action: Hover and press “Explore competitions.”
+  - Expected: The button rises by about 1px, deepens in blue, and moves the arrow slightly right; it has no heavy shadow, glow, or glass effect; activation opens `/discover`.
 
 - [ ] Route: `/`
   - Viewport: 1366 × 768
-  - Action: Hover and activate “Create account.”
-  - Expected: Hover adds an accent border/subtle accent surface without a heavy shadow; activation opens `/signup`.
+  - Action: Hover and press “Create account.”
+  - Expected: The border and soft surface strengthen gently, the button rises by about 1px, and activation opens `/signup`.
 
 - [ ] Route: `/`
   - Viewport: 1366 × 768 and 768 × 1024
-  - Action: Scroll to “Every action moves toward an outcome.”
-  - Expected: Desktop shows three related stages sharing boundaries; tablet/mobile stacks them as one sequence; indexes read `01 / ENTRY`, `02 / PROGRESS`, `03 / OUTCOME`; checkpoints align to the shared rail.
+  - Action: Scroll to “From curiosity to something worth celebrating.”
+  - Expected: The statement has generous surrounding space; three ideas use meaningful icon surfaces and concise copy without numbering, rails, shared construction borders, or process-diagram styling.
 
 - [ ] Route: `/`
-  - Viewport: 320 × 568
-  - Action: Scroll the complete page.
-  - Expected: Both hero buttons remain fully tappable, body copy remains readable, feature content stays in order, and no 48px desktop gap creates an empty screen-sized hole.
+  - Viewport: 390 × 844
+  - Action: Scroll through all three homepage ideas.
+  - Expected: They become one spacious vertical sequence; each icon remains close to its heading; gaps distinguish ideas without creating accidental empty screens.
 
-## Discovery catalogue
+- [ ] Route: `/`
+  - Viewport: 1366 × 768
+  - Action: Read all homepage labels and copy.
+  - Expected: No copy refers to competition infrastructure, systems, routes, entries, catalogue status codes, or platform architecture.
+
+## Discovery page
 
 - [ ] Route: `/discover`
   - Viewport: 1366 × 768 and 390 × 844
-  - Action: Open the route directly.
-  - Expected: The page title has a left rail and endpoint; field coverage labels form one shared strip rather than unrelated pills; the catalogue status appears as a connected empty-state region.
+  - Action: Open directly and inspect the page heading.
+  - Expected: “Discover” appears as a simple sentence-case eyebrow with no prefix line, slash label, rail, or endpoint; the title and copy have generous breathing room.
+
+- [ ] Route: `/discover`
+  - Viewport: 1366 × 768
+  - Action: Inspect the field coverage labels.
+  - Expected: Labels are calm rounded rectangles with readable text; All fields uses a soft accent treatment; the static labels do not appear to be enabled buttons.
 
 - [ ] Route: `/discover`
   - Viewport: 390 × 844 and 320 × 568
-  - Action: Scroll through the field labels and empty state.
-  - Expected: Labels wrap or remain within the viewport without horizontal scrolling; the diamond binocular marker sits above the copy on mobile and its connector remains visible.
+  - Action: Scroll through coverage labels and the empty state.
+  - Expected: Labels wrap within the viewport; the empty state stacks naturally; no horizontal scrolling or clipped radius occurs.
 
 - [ ] Route: `/discover`
   - Viewport: 1366 × 768
   - Action: Inspect the empty state.
-  - Expected: It explicitly reads `Catalogue status / Awaiting first entry`, explains what will populate the catalogue, exposes no dead Create/Publish control, and does not look like a floating rounded card.
+  - Expected: It uses one soft spacious container, a rounded binocular icon surface, an optimistic statement, and concise explanatory copy; there is no diamond, connector, status code, organiser-tool reference, or dead action.
 
-- [ ] Route: `/discover`
-  - Setup: Throttle the network to Slow 3G and reload.
-  - Viewport: 390 × 844
-  - Action: Observe from initial HTML through rendered route.
-  - Expected: The branded “Opening Vertex” boot state is visible without layout overflow, then the discovery layout replaces it without a 404 flash.
-
-## Field index
+## Field exploration page
 
 - [ ] Route: `/discover/fields`
   - Viewport: 1600 × 1000, 768 × 1024, and 390 × 844
-  - Action: Inspect the complete field list.
-  - Expected: It renders as three columns on wide desktop, two on tablet, and one on mobile; each item shares borders with neighbours and has a unique two-digit index, field icon, name, and destination arrow.
+  - Action: Inspect all field destinations.
+  - Expected: Destinations render in three, two, and one columns respectively; each uses a soft icon surface, field name, and arrow; no field number or decorative node appears.
 
 - [ ] Route: `/discover/fields`
-  - Viewport: 1366 × 768 with a mouse
+  - Viewport: 1366 × 768
   - Action: Hover Mathematics, Programming, and Innovation.
-  - Expected: The hovered item gains an inset accent edge and subtle accent surface; its checkpoint fills and arrow moves right; the item does not float or resize the grid.
+  - Expected: Each tile gains a subtle accent-tinted surface, slightly stronger border, 2px lift, and right-moving arrow without an inset rail or heavy shadow.
 
 - [ ] Route: `/discover/fields`
-  - Viewport: 390 × 844 touch device
+  - Viewport: 390 × 844
   - Action: Tap Mathematics.
-  - Expected: The URL becomes `/discover?field=mathematics`; the discovery page renders without reload or 404; no nonfunctional filter UI is added.
+  - Expected: The URL becomes `/discover?field=mathematics` and the discovery page renders without reload or any new functionality.
 
 - [ ] Route: `/discover/fields`
   - Viewport: 320 × 568
-  - Action: Tab to a field item and inspect the focus ring at the left and right viewport edges.
-  - Expected: The full 3px focus outline is visible and not clipped; Enter follows the field link.
+  - Action: Tab through the first and last visible field links.
+  - Expected: Focus outlines remain fully visible and unclipped; Enter follows each destination.
 
 ## Login and signup route previews
 
 - [ ] Route: `/login`
-  - Viewport: 1366 × 768 and 1600 × 1000
-  - Action: Open directly and inspect both panels.
-  - Expected: The blue panel contains the logo, a real route rail with three checkpoints, `Welcome back.`, and supporting copy; the light/dark surface panel contains `Access your workspace`, an information boundary, and the working Browse competitions action.
+  - Viewport: 1366 × 768
+  - Action: Inspect both panels.
+  - Expected: The blue panel uses soft regions of depth rather than a rotated grid or route diagram; “Welcome back.” remains dominant; the right panel is quiet and spacious.
 
 - [ ] Route: `/signup`
   - Viewport: 1366 × 768
-  - Action: Open directly and compare with `/login`.
-  - Expected: The same system is retained with signup-specific copy; no authentication form, fake input, or future Milestone 2 functionality is exposed.
+  - Action: Compare with `/login`.
+  - Expected: Signup-specific copy preserves the same calm optimistic identity; no form, fake input, authentication functionality, or future Milestone 2 interface appears.
 
 - [ ] Route: `/login` and `/signup`
   - Viewport: 390 × 844 and 320 × 568
-  - Action: Scroll from top to bottom.
-  - Expected: The visual panel stacks above the content panel; headings wrap without clipping; the route rail remains restrained; actions are fully visible and at least 44px tall.
-
-- [ ] Route: `/login`
-  - Viewport: any
-  - Action: Activate “Browse competitions,” then use the signup-route text link on `/signup` to return to `/login`.
-  - Expected: Browse competitions opens `/discover`; “View login route” opens `/login`; link names match their destinations and no dead control appears.
+  - Action: Scroll each route from top to bottom.
+  - Expected: The visual panel stacks above the content panel; headings wrap without clipping; the compass note and action remain readable and touch friendly.
 
 - [ ] Route: `/login`
   - Viewport: 1366 × 768
-  - Action: Toggle dark mode in the header, then inspect the right panel and information boundary.
-  - Expected: The right panel uses dark surface/text/border tokens; the fixed blue visual panel remains legible; the theme control remains visible against both regions.
+  - Action: Inspect the “Explore before you join” note.
+  - Expected: It uses one rounded soft surface and a compass icon; no diamond, connector, technical label, or system-status language appears.
 
-## Custom 404 and route recovery
-
-- [ ] Route: `/randomgarbage`
-  - Viewport: all five target sizes
-  - Action: Paste the URL into a new tab.
-  - Expected: The title is `Page not found - Vertex`; a branded `404`, “This path left the field.”, Return home, and Open discovery are visible; GitHub’s default 404 never appears.
-
-- [ ] Route: `/randomgarbage`
-  - Setup: WebGL available and reduced motion disabled.
-  - Viewport: 1366 × 768
-  - Action: Move the pointer slowly across the page.
-  - Expected: The particle field responds subtly without obscuring text or moving controls; it does not resemble an unrelated 3D scene.
-
-- [ ] Route: `/randomgarbage`
-  - Setup: Disable WebGL or block the Three.js CDN request.
-  - Viewport: 390 × 844 and 1366 × 768
-  - Action: Reload.
-  - Expected: The static dot fallback remains visible, the 404 content stays centred and legible, and both recovery actions work.
-
-- [ ] Route: `/randomgarbage`
-  - Setup: Enable operating-system reduced motion.
+- [ ] Route: `/login`
   - Viewport: any
-  - Action: Reload and use Return home.
-  - Expected: No animated WebGL scene starts; the static fallback appears; Return home renders `/` normally.
+  - Action: Activate Browse competitions and the login/signup route links.
+  - Expected: Existing destinations work exactly as before; no authentication behavior has been introduced or changed.
 
-- [ ] Route: `/discover`, `/discover/fields`, `/login`, and `/signup`
+## Footer, 404, loading, and accessibility
+
+- [ ] Route: every route with a footer
+  - Viewport: 1366 × 768 and 390 × 844
+  - Action: Scroll to the footer.
+  - Expected: The footer remains minimal and quiet; desktop content uses one row and mobile content stacks without crowding.
+
+- [ ] Route: `/randomgarbage`
+  - Viewport: 1366 × 768 and 390 × 844
+  - Action: Open directly and inspect the header, eyebrow, buttons, and typography.
+  - Expected: Global visual refinements apply consistently while the required Milestone 1 404 particle/WebGL treatment and recovery actions remain intact.
+
+- [ ] Route: `/randomgarbage`
+  - Setup: Enable reduced motion, then separately disable WebGL.
   - Viewport: any
-  - Action: Paste each nested URL in a new tab, reload it, then use browser Back/Forward.
-  - Expected: GitHub Pages recovery preserves the exact path; no visible custom-404 flash or redirect flicker occurs; Back/Forward renders the correct route.
-
-## Keyboard and visible accessibility
-
-- [ ] Route: `/`
-  - Viewport: 1366 × 768
-  - Action: Reload, press Tab once, then press Enter.
-  - Expected: “Skip to content” becomes visibly focused on the first Tab; Enter moves focus to the main region without navigating away.
-
-- [ ] Route: `/`
-  - Viewport: 1366 × 768
-  - Action: Continue tabbing through the header, hero actions, content links, and footer.
-  - Expected: Focus follows DOM order, every interactive item has a visible 3px accent outline, and no hidden mobile control receives focus.
-
-- [ ] Route: `/`
-  - Viewport: 390 × 844
-  - Action: Use only keyboard controls to focus and open the menu, move through drawer links, close it, and activate the theme switch.
-  - Expected: All controls are reachable; accessible names match visible state; focus is visible; theme and navigation states update without pointer input.
-
-- [ ] Route: every implemented route
-  - Setup: Browser zoom at 200%.
-  - Viewport: 1366 × 768
-  - Action: Navigate and scroll each route.
-  - Expected: Content reflows without two-dimensional scrolling, controls remain operable, and no text overlaps rail geometry or status markers.
-
-- [ ] Route: `/`
-  - Setup: Enable reduced motion.
-  - Viewport: 1366 × 768
-  - Action: Navigate, hover buttons, toggle theme, and open the mobile drawer at a narrow width.
-  - Expected: Nonessential reveals and smooth scrolling are removed; state changes complete almost immediately; all functionality remains available.
-
-## Loading, error, active, and unavailable states
+  - Action: Reload after each setup change.
+  - Expected: The static fallback remains readable and both recovery actions work.
 
 - [ ] Route: `/`
   - Setup: Throttle the network and disable cache.
   - Viewport: 390 × 844
   - Action: Reload.
-  - Expected: The loading state contains the Vertex logo and “Opening Vertex,” remains centred, and does not flash the wrong theme.
-
-- [ ] Route: any implemented route
-  - Setup: Block Google Fonts, Font Awesome, GSAP, and Three.js CDN requests one at a time.
-  - Viewport: 390 × 844 and 1366 × 768
-  - Action: Reload after each blocked request.
-  - Expected: System fallbacks keep text readable; core links, routing, theme, and menu remain functional; missing optional motion or icons does not block use.
-
-- [ ] Route: any implemented route
-  - Viewport: any
-  - Action: Review all controls in the current Milestone 1 shell.
-  - Expected: Every visible control works. No disabled control, fake form, placeholder action, or future-feature navigation is present; therefore no disabled-state styling is exposed at this milestone.
-
-- [ ] Route: `/`, `/discover`, and `/discover/fields`
-  - Viewport: any
-  - Action: Navigate among routes and observe current markers and status labels.
-  - Expected: Active navigation and selected catalogue coverage use both colour and structural edges; empty catalogue status uses text plus a checkpoint; no state relies on colour alone.
-
-## PWA metadata foundation
+  - Expected: The logo and “Opening Vertex” remain centred, the chosen theme is applied before paint, and the hero appears without layout overflow.
 
 - [ ] Route: `/`
-  - Setup: Use browser application/manifest tools or add the site to a supported mobile home screen.
-  - Viewport: mobile
-  - Action: Inspect the manifest identity and icon.
-  - Expected: Name and short name are Vertex; standalone display metadata is present; `assets/logo.png` is used; start URL and scope are `/`.
+  - Viewport: 1366 × 768
+  - Action: Reload and press Tab once, then Enter.
+  - Expected: Skip to content receives the first visible focus, and Enter moves focus to the main region.
 
-- [ ] Route: `/`
-  - Setup: Open browser developer tools and inspect the document head.
-  - Viewport: any
-  - Action: Check favicon, Apple touch icon, theme colour, manifest link, font imports, and initial theme script.
-  - Expected: All Milestone 1 metadata exists, uses the Vertex logo/palette, and the theme script runs before the stylesheet to prevent a wrong-theme flash.
+- [ ] Route: every implemented route
+  - Setup: Browser zoom at 200%.
+  - Viewport: 1366 × 768
+  - Action: Navigate and scroll each route.
+  - Expected: Content reflows without two-dimensional scrolling; large headings, theme details, icons, buttons, and focus outlines remain usable.
 
 ## Milestone boundary
 
 - [ ] Route: every implemented route
   - Viewport: any
-  - Action: Review navigation, page copy, and interactive elements.
-  - Expected: Only Milestone 1 shell routes and behaviours are present. There are no profiles, authentication forms, organiser tools, competition creation, registration, teams, submissions, judging, meetings, scoring, leaderboards, certificates, prize distribution, recommendations, achievements, push controls, or other future-milestone scaffolds.
+  - Action: Review all navigation, copy, and controls.
+  - Expected: Only Milestone 1 shell routes and existing behavior are present. No authentication forms, profiles, organiser tools, competition data, registration, teams, submissions, judging, meetings, scoring, leaderboards, certificates, prize distribution, recommendations, achievements, push controls, database changes, or future-milestone scaffolding appears.
