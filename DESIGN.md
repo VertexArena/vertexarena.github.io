@@ -20,17 +20,17 @@ The product remains trustworthy and organised, but organisation serves discovery
 
 ## Signature motif: the opportunity landscape
 
-The hero grid is the primary identity device. It represents a broad landscape of opportunities beneath the visible interface.
+The hero grid is the primary identity device. It represents a broad landscape of opportunities beneath the visible interface. The grid itself moves: its lines rise and fall together, its intersections participate, and soft illumination travels through the topology. A moving gradient behind static lines does not satisfy the motif.
 
 The grid must:
 
 - remain visibly geometric and easy to recognise;
-- pulse gently through opacity;
-- contain broad, soft regions of blue light;
-- allow selected intersections to brighten and travel slowly;
+- deform by only a few pixels so its topology gently ebbs without losing its structure;
+- contain broad, soft regions of blue light expressed through the line work;
+- allow intersections to brighten as illumination passes;
 - loop without a visible reset;
 - stay behind content and preserve readability;
-- use transform and opacity animation wherever practical;
+- use one low-power canvas capped for pixel density and animation rate;
 - become static and simpler under reduced motion.
 
 The grid is not a blueprint. Do not add measurements, nodes, routes, arrows, diamonds, labels, coordinates, or technical diagrams to it. Do not repeat the full motif throughout every page. Its strength comes from being the memorable opening moment.
@@ -94,7 +94,8 @@ Derived accent tints may create soft atmospheric light or active surfaces. They 
 - One large statement owns the first viewport. Supporting copy and actions remain compact.
 - Secondary thoughts may sit at the edge of a composition, but never compete with the primary message.
 - Related items may use a functional grid, but should have room between them instead of sharing dense construction lines.
-- Cards are used only where grouping or destination is real, such as a field link or empty-state container.
+- Cards are used only where grouping or destination is real: a selectable field group, an audience comparison, a closing decision, or an empty-state container.
+- The homepage moves from curiosity to context, journey, audience value, difference, and a final invitation. It must read as a story, not a feature inventory.
 - Avoid bento layouts, dashboard tiles, dense editorial dividers, and repeated status strips without functional need.
 
 ## Depth, borders, radii, and shadows
@@ -112,7 +113,7 @@ Derived accent tints may create soft atmospheric light or active surfaces. They 
 
 ### Header and navigation
 
-The header stays calm and translucent enough to preserve context while scrolling. Active navigation uses a soft accent surface and accent text, not an extending rail. Header actions remain right-aligned at every responsive width.
+The header stays calm and translucent enough to preserve context while scrolling. Active navigation uses a soft accent surface and accent text, not an extending rail. Header actions remain right-aligned at every responsive width. Discover is the single catalogue destination; field exploration is never a separate navigation route. Authentication previews replace the repeated header brand with a clear “Back to Vertex” action while retaining the stable navigation frame.
 
 ### Theme toggle
 
@@ -139,13 +140,13 @@ The component must not become cartoonish. Details are small, motion is controlle
 - No glow, heavy shadow, glass, or decorative sweep.
 - Loading preserves width. Disabled state removes motion and explains the reason when unclear.
 
-### Cards and destination tiles
+### Cards and grouped surfaces
 
-Use calm surfaces, one border, moderate radius, and enough internal whitespace. Hover may tint the surface, strengthen the border, and move an arrow toward the destination. Avoid indexed labels and decorative corner nodes.
+Use calm surfaces, one border, moderate radius, and enough internal whitespace. A surface must explain a real relationship: selection, comparison, destination, or shared state. Narrative copy that reads naturally without containment remains on the page canvas. Avoid indexed labels and decorative corner nodes.
 
-### Tags and filters
+### Field selection, tags, and filters
 
-Use small rounded rectangles with readable labels. Pills are acceptable only when the compact shape matches the content. Active state uses accent text plus a soft accent surface. Do not make static coverage labels resemble clickable controls.
+Field exploration lives inside Discover as a labelled multi-select group. Each option is a native button with a visible icon, text label, check state, and `aria-pressed`; selecting fields changes only the presentation state until catalogue filtering belongs to an implemented milestone. Use small rounded rectangles for later tags only when the compact shape matches the content. Active state uses accent text plus a soft accent surface. Do not make static coverage labels resemble clickable controls.
 
 ### Forms
 
@@ -175,7 +176,7 @@ Loading states preserve the final layout and remain visually quiet. Error states
 - Theme atmosphere: up to 500ms with a restrained spring curve.
 - Controls: 160–250ms.
 - Page hierarchy reveal: up to 700ms with a light stagger.
-- Ambient grid: 8–18 second cycles with seamless repetition.
+- Ambient grid: a 20-second seamless topology cycle, throttled to approximately 30 frames per second and capped at 1.5 device pixel ratio.
 - Ambient motion must never demand attention or respond to the pointer.
 - No hero particles, parallax, Three.js, water simulation, or literal waves.
 - The Milestone 1 custom 404 retains its separately required Three.js treatment.
@@ -189,7 +190,7 @@ Loading states preserve the final layout and remain visually quiet. Error states
 - Theme toggle and hamburger remain grouped at the right edge.
 - The wordmark may hide only below 370px when space is constrained.
 - Three-column content becomes a spacious vertical sequence on tablet.
-- Field tiles become two columns, then one.
+- Field options move from four columns to two, then one.
 - Large headings reflow; they are not reduced to ordinary body scale merely to preserve a desktop composition.
 
 ## Accessibility
@@ -210,10 +211,10 @@ Do not use blueprint diagrams, construction lines, decorative rails, diamonds, C
 
 - Correct: a clear hero statement sits above a softly breathing grid with occasional illuminated intersections.
 - Incorrect: routes, checkpoints, arrows, coordinates, and diamonds are drawn across the grid.
-- Correct: three homepage ideas have distinct icons, generous gaps, and concise copy.
-- Incorrect: three stages are numbered like a process when no action is actually occurring.
-- Correct: a field destination gently tints and moves its arrow on hover.
-- Incorrect: the tile gains an industrial inset rail or decorative node.
+- Correct: the homepage tells why Vertex exists, explains the real competition journey, then distinguishes student and organiser value.
+- Incorrect: the homepage repeats a row of interchangeable feature cards or invented proof.
+- Correct: field buttons within Discover support independent multi-selection and announce the count.
+- Incorrect: a separate Fields page sends users back to Discover or a decorative tile pretends to filter unavailable data.
 - Correct: an empty catalogue says what opportunities will appear there.
 - Incorrect: it reports an internal catalogue status or advertises organiser tooling.
 - Correct: the theme switch transforms a complete day scene into a complete night scene.
