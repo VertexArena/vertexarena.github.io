@@ -120,6 +120,8 @@ feat: establish Vertex foundation and routing
 
 # Milestone 2 â€” Supabase Bootstrap, Authentication, and Profiles
 
+**Status: Complete - 31 July 2026**
+
 ## User-visible result
 
 A user can:
