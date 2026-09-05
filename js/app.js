@@ -1,3 +1,4 @@
+import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const app = document.querySelector('#app');
@@ -9,9 +10,10 @@ const supabase = config?.SUPABASE_PROJECT_URL && config?.SUPABASE_ANON_KEY
   : null;
 
 const state = { session: null, profile: null, authReady: false };
-const publicNav = [['/', 'Home'], ['/discover', 'Discover'], ['/people', 'People']];
+const publicNav = [['/', 'Home'], ['/discover', 'Discover'], ['/people', 'People'], ['/organisations', 'Organisations']];
 let cleanup = () => {};
 let initialRender = true;
+let renderRevision = 0;
 
 const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -62,7 +64,7 @@ function footer() {
 }
 
 function shell(content, path, noFooter = false) {
-  return `${header(path)}<main id="main-content" class="shell" tabindex="-1">${content}</main>${noFooter ? '' : footer()}`;
+  return `${header(path)}<div class="navigation-progress" data-route-progress role="status" hidden>Opening page…</div><main id="main-content" class="shell" tabindex="-1">${content}</main>${noFooter ? '' : footer()}`;
 }
 
 function home() {
@@ -77,7 +79,7 @@ function discover() {
 
 function authView(mode) {
   const login = mode === 'login';
-  return `<div class="auth"><section class="auth-visual"><img class="auth-logo" src="/assets/logo.png" alt="Vertex logo"><div><span class="eyebrow" style="color:#fff">Vertex account</span><h1>${login ? 'Welcome back.' : 'Make your work visible.'}</h1><p>${login ? 'Return to the opportunities you are following and see what comes next.' : 'Create one clear identity for every challenge entered, organised, and completed.'}</p></div></section><section class="auth-panel"><div class="auth-inner"><span class="eyebrow">${login ? 'Log in' : 'Sign up'}</span><h2>${login ? 'Access your workspace' : 'Join Vertex'}</h2><p>${login ? 'Use your email and password. Your session remains available when you return.' : 'Choose how you will use Vertex. You can refine your public profile after signup.'}</p><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-auth-form="${mode}">${login ? loginFields() : signupFields()}<button class="button primary button-full" type="submit" data-submit>${login ? 'Log in' : 'Create account'} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></form><p class="auth-switch">${login ? 'Don’t have an account? <a data-link href="/signup">Create one</a>' : 'Already have an account? <a data-link href="/login">Log in</a>'}</p></div></section></div>`;
+  return `<div class="auth"><section class="auth-visual"><div><span class="eyebrow" style="color:#fff">Vertex account</span><h1>${login ? 'Welcome back.' : 'Make your work visible.'}</h1><p>${login ? 'Return to the opportunities you are following and see what comes next.' : 'Create one clear identity for every challenge entered, organised, and completed.'}</p></div></section><section class="auth-panel"><div class="auth-inner"><a class="brand auth-brand" data-link href="/" aria-label="Vertex home"><img class="auth-logo" src="/assets/logo.png" alt="Vertex logo"><span class="word">VERTEX</span></a><span class="eyebrow">${login ? 'Log in' : 'Sign up'}</span><h2>${login ? 'Access your workspace' : 'Join Vertex'}</h2><p>${login ? 'Use your email and password. Your session remains available when you return.' : 'Choose how you will use Vertex. You can refine your public profile after signup.'}</p><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-auth-form="${mode}">${login ? loginFields() : signupFields()}<button class="button primary button-full" type="submit" data-submit>${login ? 'Log in' : 'Create account'} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></form><p class="auth-switch">${login ? 'Don’t have an account? <a data-link href="/signup">Create one</a>' : 'Already have an account? <a data-link href="/login">Log in</a>'}</p></div></section></div>`;
 }
 
 function loginFields() {
@@ -85,13 +87,13 @@ function loginFields() {
 }
 
 function signupFields() {
-  return `<fieldset class="account-type"><legend>I will use Vertex as</legend><div><label><input type="radio" name="account_type" value="participant" checked><span><i class="fa-solid fa-compass" aria-hidden="true"></i><strong>Participant</strong><small>Discover and enter competitions</small></span></label><label><input type="radio" name="account_type" value="organiser"><span><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><strong>Organiser</strong><small>Create and manage opportunities</small></span></label></div></fieldset><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" aria-describedby="username-help"></span><small id="username-help">3–24 letters, numbers, or underscores</small></label></div><label class="field participant-only"><span>Date of birth</span><input name="birthday" type="date" autocomplete="bday" required></label><label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" required maxlength="254"></label><div class="form-grid"><label class="field"><span>Password</span><span class="password-field"><input name="password" type="password" autocomplete="new-password" required minlength="8"><button type="button" data-password-toggle aria-label="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button></span></label><label class="field"><span>Confirm password</span><input name="confirm_password" type="password" autocomplete="new-password" required minlength="8"></label></div><label class="check-field"><input type="checkbox" name="public_notice" required><span>I understand my name, @username, bio, picture, affiliation, location, and social links form a public profile. Date of birth stays private.</span></label>`;
+  return `<fieldset class="account-type"><legend>I will use Vertex as</legend><div><label><input type="radio" name="account_type" value="participant" checked><span><i class="fa-solid fa-compass" aria-hidden="true"></i><strong>Participant</strong><small>Discover and enter competitions</small></span></label><label><input type="radio" name="account_type" value="organiser"><span><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><strong>Organiser</strong><small>Create and manage opportunities</small></span></label><label><input type="radio" name="account_type" value="organisation"><span><i class="fa-solid fa-building-columns" aria-hidden="true"></i><strong>Organisation</strong><small>Represent a school or organisation</small></span></label></div></fieldset><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" aria-describedby="username-help"></span><small id="username-help">3–24 letters, numbers, or underscores</small></label></div><label class="field participant-only"><span>Date of birth</span><input name="birthday" type="date" autocomplete="bday" required></label><label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" required maxlength="254"></label><div class="form-grid"><label class="field"><span>Password</span><span class="password-field"><input name="password" type="password" autocomplete="new-password" required minlength="8"><button type="button" data-password-toggle aria-label="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button></span></label><label class="field"><span>Confirm password</span><input name="confirm_password" type="password" autocomplete="new-password" required minlength="8"></label></div><label class="check-field"><input type="checkbox" name="public_notice" required><span>I understand my name, @username, bio, picture, affiliation, location, and social links form a public profile. Date of birth stays private.</span></label>`;
 }
 
 function profileForm(profile) {
   const socials = Array.isArray(profile.social_links) ? profile.social_links : [];
   const rows = [...socials, ...Array(Math.max(2 - socials.length, 0)).fill({ label: '', url: '' })];
-  return `<div class="profile-edit page"><div class="page-head compact-head"><span class="eyebrow">Your Vertex identity</span><h1>Edit profile.</h1><p>Keep public details useful and current. Birthday remains private and only supports eligibility checks.</p></div><div class="profile-edit-grid"><aside class="profile-preview" aria-label="Profile preview"><div class="profile-preview-top">${avatar(profile, 'avatar-large')}<div><strong data-preview-name>${escapeHtml(profile.full_name || 'Your name')}</strong><span data-preview-username>@${escapeHtml(profile.username || 'username')}</span></div></div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(profile.account_type)}</span><p>Your public identity updates when changes save.</p><a class="text-link" data-public-profile-link data-link href="${profile.username ? `/profile/@${encodeURIComponent(profile.username)}` : '/profile/edit'}">View public profile</a></aside><section class="form-surface"><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-profile-form><fieldset><legend>Identity</legend><div class="avatar-upload"><div data-avatar-preview>${avatar(profile, 'avatar-medium')}</div><label class="button secondary upload-button"><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose picture</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100" value="${escapeHtml(profile.full_name)}"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" value="${escapeHtml(profile.username)}"></span></label></div>${profile.account_type === 'participant' ? `<label class="field"><span>Date of birth <small>Private</small></span><input name="birthday" type="date" autocomplete="bday" required value="${escapeHtml(profile.birthday)}"><small>Never shown on your public profile.</small></label>` : ''}</fieldset><fieldset><legend>About</legend><label class="field"><span>Bio</span><textarea name="bio" maxlength="1000" rows="5" placeholder="What do you study, build, or organise?">${escapeHtml(profile.bio)}</textarea><small><span data-bio-count>${String(profile.bio || '').length}</span>/1000</small></label><div class="form-grid"><label class="field"><span>School or affiliation <small>Optional</small></span><input name="affiliation" maxlength="160" value="${escapeHtml(profile.affiliation)}"></label><label class="field"><span>Location <small>Optional</small></span><input name="location" maxlength="120" value="${escapeHtml(profile.location)}"></label></div></fieldset><fieldset><legend>Social links</legend><p class="field-intro">Add up to eight public links. Only secure HTTP links are accepted.</p><div class="social-list" data-social-list>${rows.map(socialRow).join('')}</div><button class="button secondary add-social" type="button" data-add-social><i class="fa-solid fa-plus" aria-hidden="true"></i> Add link</button></fieldset><div class="form-actions"><button class="button primary" type="submit" data-submit>Save profile</button><button class="button quiet" type="button" data-logout>Log out</button></div></form></section></div></div>`;
+  return `<div class="profile-edit page"><div class="page-head compact-head"><span class="eyebrow">Your Vertex identity</span><h1>Edit profile.</h1><p>Keep public details useful and current. Birthday remains private and only supports eligibility checks.</p></div><div class="profile-edit-grid"><aside class="profile-preview" aria-label="Profile preview"><div class="profile-preview-top">${avatar(profile, 'avatar-large')}<div><strong data-preview-name>${escapeHtml(profile.full_name || 'Your name')}</strong><span data-preview-username>@${escapeHtml(profile.username || 'username')}</span></div></div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(profile.account_type)}</span><p>Your public identity updates when changes save.</p>${profile.account_type === 'organisation' ? '<a class="button secondary" data-link href="/organisation/edit">Manage organisation</a>' : profile.account_type === 'organiser' ? '<a class="button secondary" data-link href="/organisations">Your organisations & invitations</a>' : ''}<a class="text-link" data-public-profile-link data-link href="${profile.username ? `/profile/@${encodeURIComponent(profile.username)}` : '/profile/edit'}">View public profile</a></aside><section class="form-surface"><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-profile-form><fieldset><legend>Identity</legend><div class="avatar-upload"><div data-avatar-preview>${avatar(profile, 'avatar-medium')}</div><label class="button secondary upload-button"><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose picture</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100" value="${escapeHtml(profile.full_name)}"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" value="${escapeHtml(profile.username)}"></span></label></div>${profile.account_type === 'participant' ? `<label class="field"><span>Date of birth <small>Private</small></span><input name="birthday" type="date" autocomplete="bday" required value="${escapeHtml(profile.birthday)}"><small>Never shown on your public profile.</small></label>` : ''}</fieldset><fieldset><legend>About</legend><label class="field"><span>Bio</span><textarea name="bio" maxlength="1000" rows="5" placeholder="What do you study, build, or organise?">${escapeHtml(profile.bio)}</textarea><small><span data-bio-count>${String(profile.bio || '').length}</span>/1000</small></label><div class="form-grid"><label class="field"><span>School or affiliation <small>Optional</small></span><input name="affiliation" maxlength="160" value="${escapeHtml(profile.affiliation)}"></label><label class="field"><span>Location <small>Optional</small></span><input name="location" maxlength="120" value="${escapeHtml(profile.location)}"></label></div></fieldset><fieldset><legend>Social links</legend><p class="field-intro">Add up to eight public links. Only secure HTTP links are accepted.</p><div class="social-list" data-social-list>${rows.map(socialRow).join('')}</div><button class="button secondary add-social" type="button" data-add-social><i class="fa-solid fa-plus" aria-hidden="true"></i> Add link</button></fieldset><div class="form-actions"><button class="button primary" type="submit" data-submit>Save profile</button><button class="button quiet" type="button" data-logout>Log out</button></div></form></section></div></div>`;
 }
 
 function socialRow(item = { label: '', url: '' }) {
@@ -104,7 +106,7 @@ function publicProfileView(profile) {
 }
 
 function peopleView() {
-  return `<div class="people page"><div class="page-head compact-head"><span class="eyebrow">Vertex community</span><h1>Find people.</h1><p>Search a precise @username or a full name. Public profiles show work and interests, never private birthdays.</p></div><form class="people-search" role="search" data-people-search><label for="people-query">Search people</label><div><span aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span><input id="people-query" name="query" type="search" minlength="2" maxlength="100" autocomplete="off" placeholder="@username or full name"><button class="button primary" type="submit">Search</button></div></form><div class="search-status" data-search-status role="status" aria-live="polite">Enter at least two characters.</div><section class="people-results" data-people-results aria-label="Search results"></section></div>`;
+  return `<div class="people page"><div class="page-head compact-head"><span class="eyebrow">Vertex community</span><h1>Find people.</h1><p>Find people by @username or full name. Suggestions update as you type. Public profiles show work and interests, never private birthdays.</p></div><form class="people-search" role="search" data-people-search><label for="people-query">Search people</label><div><span aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span><input id="people-query" name="query" type="search" minlength="2" maxlength="100" autocomplete="off" placeholder="@username or full name"><button class="button primary" type="submit">Search</button></div></form><div class="search-status" data-search-status role="status" aria-live="polite">Enter at least two characters.</div><section class="people-results" data-people-results aria-label="Search results"></section></div>`;
 }
 
 function peopleResults(rows) {
@@ -183,13 +185,13 @@ async function submitAuth(form) {
       if (!data.session) throw new Error('Signup did not create an active session. Confirm email verification is disabled in Supabase Auth.');
       state.session = data.session;
       await loadOwnProfile();
-      navigate('/profile/edit');
+      navigate(accountType === 'organisation' ? '/organisation/edit' : '/profile/edit');
     } else {
       const { data, error } = await supabase.auth.signInWithPassword({ email: String(values.get('email')).trim(), password: String(values.get('password')) });
       if (error) throw error;
       state.session = data.session;
       await loadOwnProfile();
-      const destination = sessionStorage.getItem('vertex-return-path') || new URLSearchParams(location.search).get('returnTo') || '/profile/edit';
+      const destination = sessionStorage.getItem('vertex-return-path') || new URLSearchParams(location.search).get('returnTo') || (state.profile?.account_type === 'organisation' ? '/organisation/edit' : '/profile/edit');
       sessionStorage.removeItem('vertex-return-path');
       navigate(destination.startsWith('/') && !destination.startsWith('//') ? destination : '/profile/edit');
     }
@@ -250,6 +252,7 @@ async function logout() {
 }
 
 function bind() {
+  organisations.bind();
   document.querySelector('button[data-theme]')?.addEventListener('click', event => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = theme;
@@ -286,7 +289,7 @@ function bind() {
     const birthday = document.querySelector('.participant-only input');
     const participant = input.form.elements.account_type.value === 'participant';
     document.querySelector('.participant-only')?.toggleAttribute('hidden', !participant);
-    if (birthday) birthday.required = participant;
+    if (birthday) { birthday.required = participant; birthday.disabled = !participant; }
   }));
   document.querySelector('[data-auth-form]')?.addEventListener('submit', event => { event.preventDefault(); submitAuth(event.currentTarget); });
   document.querySelector('[data-profile-form]')?.addEventListener('submit', event => { event.preventDefault(); saveProfile(event.currentTarget); });
@@ -311,7 +314,17 @@ function bind() {
     const url = URL.createObjectURL(file);
     preview.innerHTML = `<img class="avatar avatar-medium" src="${url}" alt="Selected profile picture preview">`;
   });
-  document.querySelector('[data-people-search]')?.addEventListener('submit', searchPeople);
+  const searchForm = document.querySelector('[data-people-search]');
+  if (searchForm) {
+    let timer;
+    const run = () => searchPeople(searchForm);
+    searchForm.addEventListener('submit', event => { event.preventDefault(); clearTimeout(timer); run(); });
+    searchForm.elements.query.addEventListener('input', () => {
+      clearTimeout(timer);
+      searchRevision++;
+      timer = setTimeout(run, 220);
+    });
+  }
 }
 
 function bindSocialRemove() {
@@ -325,9 +338,10 @@ function bindSocialRemove() {
   });
 }
 
-async function searchPeople(event) {
-  event.preventDefault();
-  const form = event.currentTarget;
+let searchRevision = 0;
+async function searchPeople(form) {
+  if (!form.isConnected) return;
+  const revision = ++searchRevision;
   const query = String(new FormData(form).get('query')).trim();
   const status = document.querySelector('[data-search-status]');
   const results = document.querySelector('[data-people-results]');
@@ -335,6 +349,7 @@ async function searchPeople(event) {
   setStatus(status, 'Searching profiles…');
   results.innerHTML = `<div class="result-skeleton" aria-hidden="true"></div><div class="result-skeleton" aria-hidden="true"></div>`;
   const { data, error } = await supabase.rpc('search_profiles', { search_term: query, result_limit: 12 });
+  if (revision !== searchRevision || !form.isConnected) return;
   if (error) { setStatus(status, authMessage(error), 'error'); results.innerHTML = ''; return; }
   setStatus(status, `${data.length} profile${data.length === 1 ? '' : 's'} found.`);
   results.innerHTML = peopleResults(data);
@@ -376,7 +391,11 @@ async function scene() {
   } catch (error) { console.warn('Three.js unavailable; static fallback active.', error); return () => {}; }
 }
 
+const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render });
+
 async function resolveRoute(path) {
+  const organisationRoute = await organisations.resolve(path);
+  if (organisationRoute !== undefined) return organisationRoute;
   if (path === '/') return { content: home(), title: 'Vertex - Student competitions, clearly organised' };
   if (path === '/discover') return { content: discover(), title: 'Discover competitions - Vertex' };
   if (path === '/people') return { content: peopleView(), title: 'Find people - Vertex' };
@@ -392,17 +411,21 @@ async function resolveRoute(path) {
     const { data, error } = await supabase.from('public_profiles').select('*').eq('username', match[1]).maybeSingle();
     if (error) throw error;
     if (!data) return null;
-    return { content: publicProfileView(data), title: `${data.full_name} (@${data.username}) - Vertex` };
+    return { content: publicProfileView(data).replace('</article></div>', '</article>' + await organisations.associations(data) + '</div>'), title: `${data.full_name} (@${data.username}) - Vertex` };
   }
   return null;
 }
 
 async function render() {
+  const revision = ++renderRevision;
   cleanup(); cleanup = () => {}; document.body.classList.remove('nav-open');
   const path = location.pathname;
+  app.setAttribute('aria-busy', 'true');
+  document.querySelector('[data-route-progress]')?.removeAttribute('hidden');
   try {
     if (!state.authReady) app.innerHTML = shell(loadingView('Checking your session'), path, true);
     const route = await resolveRoute(path);
+    if (revision !== renderRevision) return;
     if (route?.protected) {
       sessionStorage.setItem('vertex-return-path', `${location.pathname}${location.search}`);
       history.replaceState({}, '', `/login?returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`);
@@ -410,15 +433,25 @@ async function render() {
     }
     document.title = route ? route.title : 'Page not found - Vertex';
     app.innerHTML = shell(route ? route.content : notFound(), location.pathname, route?.noFooter || !route);
+    app.removeAttribute('inert');
+    app.setAttribute('aria-busy', 'false');
     bind();
     if (!initialRender) document.querySelector('#main-content')?.focus({ preventScroll: true });
     initialRender = false; scrollTo(0, 0);
-    if (path === '/') cleanup = opportunityLandscape(); else if (!route) cleanup = await scene();
+    if (path === '/') cleanup = opportunityLandscape();
+    else if (!route) {
+      const disposeScene = await scene();
+      if (revision !== renderRevision) { disposeScene(); return; }
+      cleanup = disposeScene;
+    }
     if (window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.from('.hero-copy > *, .page-head, .profile-identity > *', { y: 22, opacity: 0, duration: .7, stagger: .07, ease: 'power3.out' });
   } catch (error) {
+    if (revision !== renderRevision) return;
     console.error(error);
     document.title = 'Vertex could not open this page';
     app.innerHTML = shell(errorView('Vertex could not open this page.', authMessage(error)), path);
+    app.removeAttribute('inert');
+    app.setAttribute('aria-busy', 'false');
     bind();
   }
 }
@@ -454,7 +487,14 @@ async function bootstrap() {
     state.session = session;
     if (event === 'SIGNED_OUT') state.profile = null;
   });
-  render();
+  await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));
+  await render();
 }
 
-bootstrap();
+bootstrap().finally(async () => {
+  const splash = document.querySelector('#vertex-splash');
+  await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));
+  splash?.classList.add('splash-finished');
+  document.querySelector('#app')?.removeAttribute('inert');
+  setTimeout(() => splash?.remove(), 260);
+});

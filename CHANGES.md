@@ -1,0 +1,6 @@
+The loading screen is not aesthetic and should work more as a splash screen. It should be redesigned to be a splash screen that always shows up, highlighting the logo and brand.
+Ensure the main font used across the site is Geist.
+When searching for people in the "People" tab, suggestions should show up as I type (fuzzy search/recommendations basically). When results are shown, The name, username, tag, and arrow button to view their profile all have underlines as they are links. I do not want this as this does not look clean.
+Across the website, links should not have underlines as a rule of thumb, they should be a different colour and should be evident that they are a link (you can style links as buttons so it is obvious), but no underlines please. Even in the navbar when logged in there is an underline underneath your name. Remove underlines basically.
+On the login page, the logo is placed on a blue background, and is hence basically invisible. Please position it on the right instead so it is visible.
+As an organiser, when signing up, the birthday field should not be asked.

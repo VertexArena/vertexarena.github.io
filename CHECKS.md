@@ -1,30 +1,53 @@
-# Milestone 2 Manual Checks
+# Vertex — Milestone 3 manual review
 
-Automated Playwright tests already cover signup, immediate sessions, profile persistence, public search, privacy, duplicate usernames, RLS, Storage ownership, direct routes, desktop/mobile layouts, and Milestone 1 regressions. These checks focus on human visual judgement and hosted settings.
+Automated checks cover database permissions, registration, persistence, invitation
+transitions, uploads, and routing. Use this pass to judge the experience with your
+own names, logo, and devices. Records named “Vertex E2E” are development test data.
 
-## Hosted Supabase setting
+## Branding and People
 
-- [ ] Open Supabase Dashboard, then **Authentication > Providers > Email**. Confirm email/password is enabled and **Confirm email** is disabled.
+- [ ] Open Vertex in a fresh tab, then refresh. Judge whether the logo, VERTEX
+  wordmark, and short splash feel polished without making entry feel slow.
+- [ ] Open Log in. Confirm the logo is clearly visible on the form side, and the
+  font, spacing, and link styling match the rest of Vertex.
+- [ ] Open People and type a familiar name or username, including a small typo.
+  Judge whether suggestions are useful and easy to distinguish. Open a result;
+  the whole row should feel clearly clickable without underlines.
 
-## Signup experience
+## Organisation profile
 
-- [ ] Open `/signup` at desktop width. Confirm participant and organiser choices read clearly, selected state is obvious without relying only on colour, and form feels calm rather than crowded.
-- [ ] Choose **Organiser**. Confirm birthday field disappears cleanly without a jump or broken gap. Choose **Participant** again and confirm birthday returns.
-- [ ] Repeat at about 390 px wide. Confirm every control fits, password controls remain easy to tap, and no horizontal scrolling appears.
+- [ ] From Sign up, choose Organisation. Confirm the choice explains its purpose
+  clearly and asks no birthday. Use an organisation account to reach the setup form.
+- [ ] Enter your organisation’s real display name, a suitable slug, description,
+  website, and social links. Upload your logo. Check the preview for cropping,
+  padding, transparency, and readability before saving.
+- [ ] Choose View organisation. Judge the page hierarchy using your actual content:
+  name first, description and links easy to read, associated organisers easy to find.
+- [ ] Open the public organisation address in a signed-out tab. Confirm the page
+  feels appropriate to share. The Competitions area should explain that nothing
+  is published yet, without offering unavailable competition controls.
 
-## Profile editor
+## Invitations and associations
 
-- [ ] Sign in and open `/profile/edit`. Confirm full name and `@username` form one clear identity, while account type, public-profile link, and privacy copy remain secondary.
-- [ ] Upload a real portrait or logo. Confirm circular crop looks intentional in header, preview card, editor, search result, and public profile.
-- [ ] Add several social links. Confirm rows remain readable, remove buttons clearly belong to their row, and **Add link** never feels ambiguous.
-- [ ] Switch light and dark modes. Confirm inputs, borders, success/error messages, avatar fallback, and **Save profile / Log out** controls remain readable with visible focus states.
+- [ ] Invite an organiser you control using their exact @username. Check that the
+  pending state and invitation feedback are easy to notice from the form.
+- [ ] In that organiser account, open Organisations. Review the invitation’s sender,
+  expiry, and Accept/Decline actions. After accepting, follow the organisation link
+  and the organiser’s profile link; judge whether their relationship is clear.
+- [ ] Review Cancel invitation, Remove organiser, and Leave organisation. Read the
+  confirmation before proceeding; cancel if you want to keep your association.
+  Confirm the wording makes each action’s consequence understandable.
 
-## Public identity and privacy
+## Layout, accessibility, and comfort
 
-- [ ] Open your public profile in a signed-out/private browser window. Confirm full name appears above `@username`, long names wrap naturally, bio remains readable, and external-link icons make destination behaviour clear.
-- [ ] Confirm birthday appears only inside your private editor with a **Private** label and never on public profile or people search result.
-- [ ] Open `/people`, search a partial name and an exact `@username`, then judge whether results are easy to scan and account types are immediately understandable.
+- [ ] Repeat the organisation page and invitation inbox on your phone. Check long
+  names, link labels, buttons, and navigation without sideways scrolling.
+- [ ] Switch between light and dark themes. Inspect your own logo especially;
+  text and controls should stay readable in both.
+- [ ] On desktop, use Tab and Shift+Tab through the organisation form. Check that
+  focus is easy to see and follows a comfortable order. Try browser zoom at 200%.
+- [ ] With reduced motion enabled in your device settings, revisit the splash and
+  organisation pages. Confirm the experience remains clear and comfortable.
 
-## Error language
-
-- [ ] Try an incorrect login and a username already in use. Confirm messages explain what to correct, remain visible near form, and do not expose database or Supabase internals.
+If something feels wrong, note the page address, device width, theme, and exact
+action. No manual SQL or security probing is needed for this review.

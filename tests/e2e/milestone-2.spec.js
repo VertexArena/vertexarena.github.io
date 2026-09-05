@@ -68,7 +68,8 @@ test.describe.serial('Milestone 2', () => {
     await page.goto('/people');
     await page.getByLabel('Search people').fill(`@${participant.username}`);
     await page.getByRole('button', { name: 'Search' }).click();
-    await expect(page.getByText('1 profile found.')).toBeVisible();
+    await expect(page.locator('[data-search-status]')).toHaveText(/\d+ profiles? found\./);
+    await expect(page.locator('.person-row').first()).toContainText(participant.name);
     await expect(page.getByRole('link', { name: new RegExp(participant.name) })).toBeVisible();
 
     await page.goto('/profile/edit');
