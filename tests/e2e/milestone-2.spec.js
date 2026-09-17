@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './helpers/test.js';
 import path from 'node:path';
 
 test.describe.serial('Milestone 2', () => {

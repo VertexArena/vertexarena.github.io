@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './helpers/test.js';
 
 test('public organisation directory, navigation, direct refresh and protected management', async ({ page }, info) => {
   await page.goto('/organisations');

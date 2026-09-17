@@ -12,8 +12,10 @@ export async function createAccount(page, accountType = 'organiser', prefix = 'c
   };
   await page.goto('/signup');
   await page.locator(`.account-type label:has(input[value="${accountType}"])`).click();
-  await page.getByLabel('Full name').fill(account.name);
-  await page.locator('input[name="username"]').fill(account.username);
+  if (accountType !== 'organisation') {
+    await page.getByLabel('Full name').fill(account.name);
+    await page.locator('input[name="username"]').fill(account.username);
+  }
   if (accountType === 'participant') await page.getByLabel('Date of birth', { exact: true }).fill('2009-03-14');
   await page.getByLabel('Email address').fill(account.email);
   await page.getByLabel('Password', { exact: true }).fill(account.password);

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './helpers/test.js';
 import { createAccount } from './helpers/accounts.js';
 
 test('brand splash on initial load and refresh; Geist and visible auth logo', async ({ page }, info) => {

@@ -28,9 +28,9 @@ const safeUrl = value => {
 
 const link = (href, label, path) => `<a data-link href="${href}" ${path === href || (href !== '/' && path.startsWith(`${href}/`)) ? 'aria-current="page"' : ''}>${label}</a>`;
 
-function avatarUrl(path) {
+function avatarUrl(path, bucket = 'profile-pictures') {
   if (!path || !supabase) return null;
-  return supabase.storage.from('profile-pictures').getPublicUrl(path).data.publicUrl;
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 
 function initials(name) {
@@ -38,7 +38,8 @@ function initials(name) {
 }
 
 function avatar(profile, className = '') {
-  const url = avatarUrl(profile?.avatar_path);
+  const organisation = profile?.organisation;
+  const url = organisation ? avatarUrl(organisation.logo_path, 'organisation-logos') : profile?.account_type === 'organisation' ? null : avatarUrl(profile?.avatar_path);
   return url
     ? `<img class="avatar ${className}" src="${escapeHtml(url)}" alt="${escapeHtml(profile.full_name)} profile picture">`
     : `<span class="avatar avatar-fallback ${className}" aria-hidden="true">${escapeHtml(initials(profile?.full_name))}</span>`;
@@ -50,11 +51,14 @@ function header(path) {
   const identity = authPage
     ? `<a class="back-home" data-link href="/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Vertex</span></a>`
     : `<a class="brand" data-link href="/" aria-label="Vertex home"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></a>`;
+  const organisationAccount = state.profile?.account_type === 'organisation';
+  const accountPath = organisationAccount ? '/organisation/edit' : '/profile/edit';
+  const accountLabel = organisationAccount ? 'Edit organisation' : 'Edit profile';
   const accountAction = state.session
-    ? `<a class="account-link" data-link href="/profile/edit" aria-label="Edit your profile">${avatar(state.profile, 'avatar-small')}<span>${escapeHtml(state.profile?.full_name || 'Complete profile')}</span></a>`
+    ? `<a class="account-link" data-link href="${accountPath}" aria-label="${organisationAccount ? 'Edit organisation' : 'Edit your profile'}">${avatar(state.profile, 'avatar-small')}<span>${escapeHtml(state.profile?.full_name || 'Complete profile')}</span></a>`
     : `<a class="button quiet login" data-link href="/login" ${path === '/login' ? 'aria-current="page"' : ''}>Log in</a>`;
   const drawerAccount = state.session
-    ? `<a class="button primary" data-link href="/profile/edit">Edit profile</a><button class="button secondary" type="button" data-logout>Log out</button>`
+    ? `<a class="button primary" data-link href="${accountPath}">${accountLabel}</a><button class="button secondary" type="button" data-logout>Log out</button>`
     : `<a class="button primary" data-link href="/login">Log in</a>`;
   return `<header class="header"><div class="header-in">${identity}<nav class="nav" aria-label="Primary">${publicNav.map(item => link(...item, path)).join('')}</nav><div class="actions">${accountAction}<button class="theme-toggle" data-theme type="button" role="switch" aria-checked="${dark}" aria-label="Switch to ${dark ? 'light' : 'dark'} mode"><span class="theme-scene" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars"><i></i><i></i><i></i></span><span class="theme-orbit"><span class="theme-orb"><span class="theme-moon"><i></i><i></i><i></i></span></span></span></span></button><button class="icon menu" data-menu aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button></div></div></header><nav class="drawer" data-open="false" aria-label="Mobile">${publicNav.map(item => link(...item, path)).join('')}${drawerAccount}</nav>`;
 }
@@ -87,7 +91,7 @@ function loginFields() {
 }
 
 function signupFields() {
-  return `<fieldset class="account-type"><legend>I will use Vertex as</legend><div><label><input type="radio" name="account_type" value="participant" checked><span><i class="fa-solid fa-compass" aria-hidden="true"></i><strong>Participant</strong><small>Discover and enter competitions</small></span></label><label><input type="radio" name="account_type" value="organiser"><span><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><strong>Organiser</strong><small>Create and manage opportunities</small></span></label><label><input type="radio" name="account_type" value="organisation"><span><i class="fa-solid fa-building-columns" aria-hidden="true"></i><strong>Organisation</strong><small>Represent a school or organisation</small></span></label></div></fieldset><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" aria-describedby="username-help"></span><small id="username-help">3–24 letters, numbers, or underscores</small></label></div><label class="field participant-only"><span>Date of birth</span><input name="birthday" type="date" autocomplete="bday" required></label><label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" required maxlength="254"></label><div class="form-grid"><label class="field"><span>Password</span><span class="password-field"><input name="password" type="password" autocomplete="new-password" required minlength="8"><button type="button" data-password-toggle aria-label="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button></span></label><label class="field"><span>Confirm password</span><input name="confirm_password" type="password" autocomplete="new-password" required minlength="8"></label></div><label class="check-field"><input type="checkbox" name="public_notice" required><span>I understand my name, @username, bio, picture, affiliation, location, and social links form a public profile. Date of birth stays private.</span></label>`;
+  return `<fieldset class="account-type"><legend>I will use Vertex as</legend><div><label><input type="radio" name="account_type" value="participant" checked><span><i class="fa-solid fa-compass" aria-hidden="true"></i><strong>Participant</strong><small>Discover and enter competitions</small></span></label><label><input type="radio" name="account_type" value="organiser"><span><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><strong>Organiser</strong><small>Create and manage opportunities</small></span></label><label><input type="radio" name="account_type" value="organisation"><span><i class="fa-solid fa-building-columns" aria-hidden="true"></i><strong>Organisation</strong><small>Represent a school or organisation</small></span></label></div></fieldset><div class="form-grid" data-personal-signup><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" aria-describedby="username-help"></span><small id="username-help">3–24 letters, numbers, or underscores</small></label></div><label class="field participant-only"><span>Date of birth</span><input name="birthday" type="date" autocomplete="bday" required></label><label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" required maxlength="254"></label><div class="form-grid"><label class="field"><span>Password</span><span class="password-field"><input name="password" type="password" autocomplete="new-password" required minlength="8"><button type="button" data-password-toggle aria-label="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button></span></label><label class="field"><span>Confirm password</span><input name="confirm_password" type="password" autocomplete="new-password" required minlength="8"></label></div><label class="check-field"><input type="checkbox" name="public_notice" required><span data-public-notice>I understand my name, @username, bio, picture, affiliation, location, and social links form a public profile. Date of birth stays private.</span></label>`;
 }
 
 function profileForm(profile) {
@@ -111,7 +115,7 @@ function peopleView() {
 
 function peopleResults(rows) {
   if (!rows.length) return `<div class="empty compact-empty"><span class="empty-marker" aria-hidden="true"><i class="fa-solid fa-user-group"></i></span><div><h2>No public profiles match.</h2><p>Check spelling or try a shorter username.</p></div></div>`;
-  return rows.map(profile => `<a class="person-row" data-link href="/profile/@${encodeURIComponent(profile.username)}">${avatar(profile, 'avatar-medium')}<span><strong>${escapeHtml(profile.full_name)}</strong><small>@${escapeHtml(profile.username)}</small>${profile.affiliation ? `<em>${escapeHtml(profile.affiliation)}</em>` : ''}</span><span class="account-badge">${escapeHtml(profile.account_type)}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`).join('');
+  return rows.map(profile => profile.account_type === 'organisation' ? organisations.personResult(profile) : `<a class="person-row" data-link href="/profile/@${encodeURIComponent(profile.username)}">${avatar(profile, 'avatar-medium')}<span><strong>${escapeHtml(profile.full_name)}</strong><small>@${escapeHtml(profile.username)}</small>${profile.affiliation ? `<em>${escapeHtml(profile.affiliation)}</em>` : ''}</span><span class="account-badge">${escapeHtml(profile.account_type)}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`).join('');
 }
 
 function notFound() {
@@ -130,6 +134,13 @@ async function loadOwnProfile() {
   if (!state.session || !supabase) { state.profile = null; return null; }
   const { data, error } = await supabase.from('profiles').select('*').eq('id', state.session.user.id).single();
   if (error) throw error;
+  state.profile = data;
+  if (data.account_type === 'organisation') {
+    const organisation = await supabase.from('organisations').select('*').eq('management_profile_id', data.id).maybeSingle();
+    if (organisation.error) throw organisation.error;
+    data.organisation = organisation.data;
+    data.full_name = organisation.data?.name || data.full_name || 'Set up organisation';
+  }
   state.profile = data;
   return data;
 }
@@ -172,14 +183,16 @@ async function submitAuth(form) {
       if (password !== values.get('confirm_password')) throw new Error('Passwords do not match.');
       const accountType = String(values.get('account_type'));
       const birthday = String(values.get('birthday') || '');
-      const username = String(values.get('username')).trim();
+      const username = accountType === 'organisation' ? null : String(values.get('username')).trim();
       if (accountType === 'participant' && !birthday) throw new Error('Date of birth is required for participants.');
-      const availability = await supabase.from('public_profiles').select('id').ilike('username', username).limit(1);
-      if (availability.error) throw availability.error;
-      if (availability.data.length) throw new Error('That email or username is already in use.');
+      if (username) {
+        const availability = await supabase.from('public_profiles').select('id').eq('username', username).limit(1);
+        if (availability.error) throw availability.error;
+        if (availability.data.length) throw new Error('That email or username is already in use.');
+      }
       const { data, error } = await supabase.auth.signUp({
         email: String(values.get('email')).trim(), password,
-        options: { data: { account_type: accountType, full_name: String(values.get('full_name')).trim(), username, birthday: accountType === 'participant' ? birthday : null } }
+        options: { data: { account_type: accountType, full_name: accountType === 'organisation' ? null : String(values.get('full_name')).trim(), username, birthday: accountType === 'participant' ? birthday : null } }
       });
       if (error) throw error;
       if (!data.session) throw new Error('Signup did not create an active session. Confirm email verification is disabled in Supabase Auth.');
@@ -290,6 +303,13 @@ function bind() {
     const participant = input.form.elements.account_type.value === 'participant';
     document.querySelector('.participant-only')?.toggleAttribute('hidden', !participant);
     if (birthday) { birthday.required = participant; birthday.disabled = !participant; }
+    const organisation = input.form.elements.account_type.value === 'organisation';
+    const personal = input.form.querySelector('[data-personal-signup]');
+    personal?.toggleAttribute('hidden', organisation);
+    personal?.querySelectorAll('input').forEach(field => { field.disabled = organisation; field.required = !organisation; });
+    document.querySelector('[data-public-notice]').textContent = organisation
+      ? 'I understand my organisation’s name, logo, description, and links will form a public organisation profile. I will add these after signup.'
+      : 'I understand my name, @username, bio, picture, affiliation, location, and social links form a public profile. Date of birth stays private.';
   }));
   document.querySelector('[data-auth-form]')?.addEventListener('submit', event => { event.preventDefault(); submitAuth(event.currentTarget); });
   document.querySelector('[data-profile-form]')?.addEventListener('submit', event => { event.preventDefault(); saveProfile(event.currentTarget); });
@@ -351,8 +371,15 @@ async function searchPeople(form) {
   const { data, error } = await supabase.rpc('search_profiles', { search_term: query, result_limit: 12 });
   if (revision !== searchRevision || !form.isConnected) return;
   if (error) { setStatus(status, authMessage(error), 'error'); results.innerHTML = ''; return; }
-  setStatus(status, `${data.length} profile${data.length === 1 ? '' : 's'} found.`);
-  results.innerHTML = peopleResults(data);
+  try {
+    const rows = await organisations.search(query, data);
+    if (revision !== searchRevision || !form.isConnected) return;
+    setStatus(status, `${rows.length} profile${rows.length === 1 ? '' : 's'} found.`);
+    results.innerHTML = peopleResults(rows);
+  } catch (error) {
+    if (revision !== searchRevision || !form.isConnected) return;
+    setStatus(status, authMessage(error), 'error'); results.innerHTML = '';
+  }
 }
 
 function opportunityLandscape() {
@@ -404,6 +431,7 @@ async function resolveRoute(path) {
   if (path === '/profile/edit') {
     if (!state.session) return { protected: true };
     if (!state.profile) await loadOwnProfile();
+    if (state.profile.account_type === 'organisation') return { redirect: '/organisation/edit' };
     return { content: profileForm(state.profile), title: 'Edit profile - Vertex' };
   }
   const match = path.match(/^\/profile\/@([A-Za-z0-9_]{3,24})$/);
@@ -411,6 +439,11 @@ async function resolveRoute(path) {
     const { data, error } = await supabase.from('public_profiles').select('*').eq('username', match[1]).maybeSingle();
     if (error) throw error;
     if (!data) return null;
+    if (data.account_type === 'organisation') {
+      const { data: org, error: orgError } = await supabase.from('organisations').select('slug').eq('management_profile_id', data.id).maybeSingle();
+      if (orgError) throw orgError;
+      return org ? { redirect: `/organisation/${org.slug}` } : null;
+    }
     return { content: publicProfileView(data).replace('</article></div>', '</article>' + await organisations.associations(data) + '</div>'), title: `${data.full_name} (@${data.username}) - Vertex` };
   }
   return null;
@@ -426,6 +459,7 @@ async function render() {
     if (!state.authReady) app.innerHTML = shell(loadingView('Checking your session'), path, true);
     const route = await resolveRoute(path);
     if (revision !== renderRevision) return;
+    if (route?.redirect) { history.replaceState({}, '', route.redirect); return render(); }
     if (route?.protected) {
       sessionStorage.setItem('vertex-return-path', `${location.pathname}${location.search}`);
       history.replaceState({}, '', `/login?returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`);

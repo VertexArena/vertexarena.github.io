@@ -2,6 +2,7 @@ node_modules/
 playwright-report/
 test-results/
 test-results-regression/
+.test-data/
 .env
 .agents/
 mobile-home-review.png

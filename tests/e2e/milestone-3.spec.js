@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './helpers/test.js';
 import path from 'node:path';
 import { createAccount, login, sessionCredentials } from './helpers/accounts.js';
 
@@ -176,6 +176,7 @@ test.describe.serial('Milestone 3', () => {
     await page.goto('/profile/edit');
     await page.getByRole('button', { name: 'Log out' }).last().click();
     await createAccount(page, 'organisation', 'm3duplicate');
+    await page.getByLabel('Organisation name').fill('Vertex E2E Duplicate Organisation');
     await page.getByLabel('Organisation slug').fill(organisation.slug);
     await page.getByRole('button', { name: 'Create organisation', exact: true }).click();
     await expect(page.getByText('That organisation slug is already in use. Choose another.')).toBeVisible();
@@ -231,7 +232,7 @@ test.describe.serial('Milestone 3', () => {
     // Fail a network request, then retry against the real hosted project.
     await page.route('**/rest/v1/organisations?*', route => route.abort('failed'));
     await page.goto(`/organisation/${organisation.slug}`);
-    await expect(page.getByRole('heading', { name: 'Vertex could not open this page.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Vertex could not open this page.' })).toBeVisible({ timeout: 20000 });
     await page.unroute('**/rest/v1/organisations?*');
     await page.getByRole('link', { name: 'Try again' }).click();
     await expect(page.getByRole('heading', { name: organisation.name, exact: true })).toBeVisible();

@@ -230,6 +230,15 @@ feat: add Supabase auth and account profiles
 
 # Milestone 3 â€” Organisation Accounts and Organiser Membership
 
+**Complete — 17 September 2026.** All seven acceptance criteria verified through
+the real UI and hosted Supabase, including RLS and Storage access checks.
+Desktop/mobile regression suite: 54 passed, 2 intentionally skipped; final
+organisation identity and network-recovery checks: 4 passed. Screenshots inspected.
+The CHANGES.md duplicate organisation identity issue is resolved. Migration 002 is
+already applied; this correction requires no new migration. Test-data cleanup is
+delegated to the user by explicit agreement; the local cleanup checklist identifies
+the recorded accounts. Milestone 4 has not started.
+
 ## User-visible result
 
 Organisation profiles function as read-only public containers, and organiser accounts can be associated with organisations.

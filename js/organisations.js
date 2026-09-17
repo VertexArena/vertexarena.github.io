@@ -17,6 +17,31 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
   const orgLink = org => `<a class="organisation-row" data-link href="/organisation/${encodeURIComponent(org.slug)}">${logo(org)}<span><strong>${h(org.name)}</strong><small>/${h(org.slug)}</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`;
   const empty = (title, copy) => `<div class="organisation-empty"><h3>${h(title)}</h3><p>${h(copy)}</p></div>`;
 
+  function updateOwnIdentity(org) {
+    if (org && org.management_profile_id === state.session?.user.id) {
+      state.profile = { ...state.profile, id: org.management_profile_id, account_type: 'organisation', full_name: org.name, organisation: org };
+    }
+  }
+
+  async function search(query, profiles) {
+    const term = query.replace(/^@/, '').replace(/[\\%_]/g, '\\$&');
+    const [names, slugs] = await Promise.all([
+      result(client.from('organisations').select('*').ilike('name', `%${term}%`).limit(12)),
+      result(client.from('organisations').select('*').ilike('slug', `%${term}%`).limit(12))
+    ]);
+    const legacyIds = profiles.filter(profile => profile.account_type === 'organisation').map(profile => profile.id);
+    const legacy = legacyIds.length ? await result(client.from('organisations').select('*').in('management_profile_id', legacyIds)) : [];
+    const unique = new Map([...names, ...slugs, ...legacy].map(org => [org.id, org]));
+    return [...profiles.filter(profile => profile.account_type !== 'organisation'), ...[...unique.values()].map(org => ({
+      id: org.management_profile_id, account_type: 'organisation', full_name: org.name, username: org.slug, organisation: org
+    }))].sort((a, b) => Number(b.username.toLowerCase() === query.replace(/^@/, '').toLowerCase()) - Number(a.username.toLowerCase() === query.replace(/^@/, '').toLowerCase())).slice(0, 24);
+  }
+
+  function personResult(profile) {
+    const org = profile.organisation;
+    return `<a class="person-row" data-link href="/organisation/${h(org.slug)}">${logo(org)}<span><strong>${h(org.name)}</strong><small>/${h(org.slug)}</small></span><span class="account-badge">Organisation</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`;
+  }
+
   async function memberships(query) {
     // PostgREST caps each response. Page explicitly so associations never silently disappear.
     let rows = [], offset = 0;
@@ -40,11 +65,12 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
 
   async function managementView() {
     const org = await result(client.from('organisations').select('*').eq('management_profile_id', state.session.user.id).maybeSingle());
+    updateOwnIdentity(org);
     const rows = org ? await memberships(() => client.from('organisation_memberships').select('*').eq('organisation_id', org.id)) : [];
     const profiles = rows.length ? await result(client.from('public_profiles').select('*').in('id', rows.map(row => row.organiser_id))) : [];
     const profileMap = new Map(profiles.map(profile => [profile.id, profile]));
     const socials = org?.social_links?.length ? org.social_links : [{ label: '', url: '' }];
-    return `<div class="organisation-manage page"><div class="page-head compact-head"><span class="eyebrow">Organisation account</span><h1>${org ? 'Your organisation.' : 'Give your organisation a home.'}</h1><p>Introduce your school or organisation, then invite the organisers who represent it.</p></div><div class="organisation-layout"><aside class="profile-preview"><div data-org-logo-preview>${logo(org || { name: state.profile.full_name }, 'logo-large')}</div><strong>${h(org?.name || state.profile.full_name)}</strong><p>Your public profile brings organisers and their competitions together. Linked organisers manage competitions through their own accounts.</p>${org ? `<a class="button secondary" data-link href="/organisation/${h(org.slug)}">View organisation</a>` : ''}<a class="text-link" data-link href="/profile/edit">Edit account identity</a></aside><div class="organisation-sections"><section class="form-surface" aria-labelledby="organisation-details-heading"><h2 id="organisation-details-heading">Public profile</h2>${statusBox()}<form class="form-stack" data-organisation-form data-id="${h(org?.id || '')}" data-old-logo="${h(org?.logo_path || '')}"><label class="field"><span>Organisation name</span><input name="name" required minlength="2" maxlength="140" value="${h(org?.name || state.profile.full_name)}"></label><label class="field"><span>Organisation slug</span><input name="slug" required minlength="3" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" value="${h(org?.slug || '')}" aria-describedby="slug-help"><small id="slug-help">3–80 lowercase letters, numbers, or hyphens. Public address: /organisation/<span data-slug-preview>${h(org?.slug || 'your-slug')}</span></small>${org ? '<small>Changing this address makes the previous link unavailable.</small>' : ''}</label><div class="avatar-upload"><label class="button secondary upload-button"><input name="logo" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose logo</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div>${org?.logo_path ? '<label class="check-field"><input name="remove_logo" type="checkbox"><span>Remove current logo</span></label>' : ''}<label class="field"><span>Description</span><textarea name="description" rows="5" maxlength="3000">${h(org?.description || '')}</textarea></label><label class="field"><span>Website <small>Optional</small></span><input name="website_url" type="url" maxlength="2048" placeholder="https://" value="${h(org?.website_url || '')}"></label><fieldset><legend>Social links</legend><p class="field-intro">Up to eight public links.</p><div data-social-list class="social-list">${socials.map(socialRow).join('')}</div><button type="button" class="button secondary" data-add-social>Add link</button></fieldset><button type="submit" class="button primary" data-submit>${org ? 'Save organisation' : 'Create organisation'}</button></form></section>${org ? `<section class="form-surface" aria-labelledby="organiser-team-heading"><h2 id="organiser-team-heading">Associated organisers</h2><p class="field-intro">Invitations expire after 14 days. Membership appears publicly only after acceptance.</p><form class="form-stack" data-org-invite data-id="${h(org.id)}"><label class="field"><span>Organiser username</span><input name="username" required pattern="@?[A-Za-z0-9_]{3,24}" maxlength="25" placeholder="@username" autocomplete="off"></label><button class="button primary" type="submit" data-submit>Send invitation</button></form><div class="form-status" data-invite-status role="status" aria-live="polite"></div><div class="membership-list">${rows.length ? rows.map(row => managementMember(row, profileMap.get(row.organiser_id))).join('') : empty('No organisers yet.', 'Invite an organiser by their @username to get started.')}</div></section>` : ''}</div></div></div>`;
+    return `<div class="organisation-manage page"><div class="page-head compact-head"><span class="eyebrow">Organisation account</span><h1>${org ? 'Your organisation.' : 'Give your organisation a home.'}</h1><p>Set your organisation’s name, public address, and logo here. This is the profile people see throughout Vertex.</p></div><div class="organisation-layout"><aside class="profile-preview"><div data-org-logo-preview>${logo(org || { name: state.profile.full_name }, 'logo-large')}</div><strong>${h(org?.name || (state.profile.full_name === 'Set up organisation' ? '' : state.profile.full_name))}</strong><p>Your public profile brings organisers and their competitions together. Linked organisers manage competitions through their own accounts.</p>${org ? `<a class="button secondary" data-link href="/organisation/${h(org.slug)}">View organisation</a>` : ''}<button class="button quiet" type="button" data-logout>Log out</button></aside><div class="organisation-sections"><section class="form-surface" aria-labelledby="organisation-details-heading"><h2 id="organisation-details-heading">Public profile</h2>${statusBox()}<form class="form-stack" data-organisation-form data-id="${h(org?.id || '')}" data-old-logo="${h(org?.logo_path || '')}"><label class="field"><span>Organisation name</span><input name="name" required minlength="2" maxlength="140" value="${h(org?.name || state.profile.full_name)}"></label><label class="field"><span>Organisation slug</span><input name="slug" required minlength="3" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" value="${h(org?.slug || '')}" aria-describedby="slug-help"><small id="slug-help">3–80 lowercase letters, numbers, or hyphens. Public address: /organisation/<span data-slug-preview>${h(org?.slug || 'your-slug')}</span></small>${org ? '<small>Changing this address makes the previous link unavailable.</small>' : ''}</label><div class="avatar-upload"><label class="button secondary upload-button"><input name="logo" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose logo</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div>${org?.logo_path ? '<label class="check-field"><input name="remove_logo" type="checkbox"><span>Remove current logo</span></label>' : ''}<label class="field"><span>Description</span><textarea name="description" rows="5" maxlength="3000">${h(org?.description || '')}</textarea></label><label class="field"><span>Website <small>Optional</small></span><input name="website_url" type="url" maxlength="2048" placeholder="https://" value="${h(org?.website_url || '')}"></label><fieldset><legend>Social links</legend><p class="field-intro">Up to eight public links.</p><div data-social-list class="social-list">${socials.map(socialRow).join('')}</div><button type="button" class="button secondary" data-add-social>Add link</button></fieldset><button type="submit" class="button primary" data-submit>${org ? 'Save organisation' : 'Create organisation'}</button></form></section>${org ? `<section class="form-surface" aria-labelledby="organiser-team-heading"><h2 id="organiser-team-heading">Associated organisers</h2><p class="field-intro">Invitations expire after 14 days. Membership appears publicly only after acceptance.</p><form class="form-stack" data-org-invite data-id="${h(org.id)}"><label class="field"><span>Organiser username</span><input name="username" required pattern="@?[A-Za-z0-9_]{3,24}" maxlength="25" placeholder="@username" autocomplete="off"></label><button class="button primary" type="submit" data-submit>Send invitation</button></form><div class="form-status" data-invite-status role="status" aria-live="polite"></div><div class="membership-list">${rows.length ? rows.map(row => managementMember(row, profileMap.get(row.organiser_id))).join('') : empty('No organisers yet.', 'Invite an organiser by their @username to get started.')}</div></section>` : ''}</div></div></div>`;
   }
 
   function managementMember(row, profile) {
@@ -71,6 +97,7 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
   async function publicView(slug) {
     const org = await result(client.from('organisations').select('*').eq('slug', slug).maybeSingle());
     if (!org) return null;
+    updateOwnIdentity(org);
     const rows = await memberships(() => client.from('organisation_memberships').select('organiser_id, created_at').eq('organisation_id', org.id).eq('status', 'accepted'));
     const profiles = rows.length ? await result(client.from('public_profiles').select('*').in('id', rows.map(row => row.organiser_id)).order('full_name')) : [];
     const links = [...(org.website_url ? [{ label: 'Website', url: org.website_url }] : []), ...(org.social_links || [])].filter(item => safeUrl(item.url));
@@ -117,9 +144,10 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
         description: String(values.get('description')).trim() || null, website_url: website || null,
         social_links: links, logo_path: uploaded || (values.get('remove_logo') ? null : form.dataset.oldLogo || null) };
       const id = form.dataset.id;
-      await result(id ? client.from('organisations').update(details).eq('id', id).select().single()
+      const saved = await result(id ? client.from('organisations').update(details).eq('id', id).select().single()
         : client.from('organisations').insert({ ...details, management_profile_id: state.session.user.id }).select().single());
       persisted = true;
+      updateOwnIdentity(saved);
       if (form.dataset.oldLogo && details.logo_path !== form.dataset.oldLogo) await client.storage.from('organisation-logos').remove([form.dataset.oldLogo]);
       await render();
       setStatus(document.querySelector('[data-org-status]'), 'Organisation saved.', 'success');
@@ -172,5 +200,5 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
     }));
     document.querySelector('[data-org-refresh]')?.addEventListener('click', event => action(event.currentTarget, async () => {}, 'Invitations refreshed.'));
   }
-  return { resolve, bind, associations };
+  return { resolve, bind, associations, search, personResult };
 }

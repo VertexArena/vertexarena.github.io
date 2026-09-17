@@ -1,5 +1,8 @@
 # AGENTS.md
 
+## About Database Testing
+When Codex creates test accounts and test records in Supabase, it should ensure it deletes them after testing.
+
 ## About Browser Testing
 
 Codex may use Playwright as a development and testing dependency.

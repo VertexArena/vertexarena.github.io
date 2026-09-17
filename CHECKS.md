@@ -17,10 +17,15 @@ own names, logo, and devices. Records named “Vertex E2E” are development tes
 ## Organisation profile
 
 - [ ] From Sign up, choose Organisation. Confirm the choice explains its purpose
-  clearly and asks no birthday. Use an organisation account to reach the setup form.
+  clearly. Enter email and password; the next screen should be the only place
+  asking for organisation name, slug, and logo. There is no personal username or birthday.
 - [ ] Enter your organisation’s real display name, a suitable slug, description,
   website, and social links. Upload your logo. Check the preview for cropping,
   padding, transparency, and readability before saving.
+- [ ] Compare your logo and organisation name in the header, People search results,
+  and public organisation page. Judge whether they feel like one consistent identity.
+  Use the account menu to return to the same organisation editor; there should be
+  no separate personal-profile or profile-picture setup.
 - [ ] Choose View organisation. Judge the page hierarchy using your actual content:
   name first, description and links easy to read, associated organisers easy to find.
 - [ ] Open the public organisation address in a signed-out tab. Confirm the page

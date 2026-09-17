@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './helpers/test.js';
 import { createAccount } from './helpers/accounts.js';
 
 test('typo suggestions use public profiles and never expose birthdays', async ({ page, request }) => {

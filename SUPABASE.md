@@ -37,10 +37,10 @@ excludes birthdays. Do not rerun `SCHEMA.sql` on the existing project.
 
 Reusable acceptance: `tests/e2e/search-migration.spec.js` against the hosted project.
 
-### Pending Milestone 3 migration
+### Applied Milestone 3 migration
 
-Apply `supabase/migrations/002_organisations_and_membership.sql` once to the
-existing project. `SCHEMA.sql` includes the same changes for a clean installation;
+`supabase/migrations/002_organisations_and_membership.sql` has been applied to the
+existing project and verified using the relevant account roles. `SCHEMA.sql` includes the same changes for a clean installation;
 do not run that bootstrap on this existing project.
 
 This migration enables organisation accounts at signup, ownership-checked profile
@@ -50,7 +50,23 @@ can accept or decline within 14 days. Pending invitations are visible only to th
 management account and the invitee. Accepted associations are public. Membership
 does not grant organisation management or competition permissions.
 
-Run `tests/e2e/milestone-3.spec.js` after applying it. Completion, checklist,
-commit, and push remain pending until hosted acceptance and regressions pass.
+The organisation identity correction uses this existing schema and requires no
+additional migration. Organisation signup creates the authentication account;
+the organisation editor collects its public name, slug, and logo once. The header,
+People results, and public organisation page use that same organisation record.
+Older personal-profile URLs for organisation accounts redirect to the organisation.
+
+Run `tests/e2e/milestone-3.spec.js` and `tests/e2e/organisation-identity.spec.js`
+for membership acceptance and unified-identity regression coverage.
+
+### Test data cleanup
+
+Test signup responses record only account IDs, test emails, and creation times in
+the ignored `.test-data/accounts.ndjson` file. No passwords or access tokens are
+written to that manifest. This run uses the user's explicit manual-cleanup choice.
+Delete uploaded objects in `profile-pictures` and `organisation-logos` through
+Storage before removing related memberships, organisations, and Auth users.
+Never delete Storage metadata directly in SQL; that does not remove stored files.
+Future runs must arrange authorised admin/connector cleanup before creating data.
 
 RLS and Storage policies remain the security boundary; hiding the anon key is not a security control.
