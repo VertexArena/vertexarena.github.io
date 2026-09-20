@@ -3,7 +3,7 @@ import { createAccount, sessionCredentials } from './helpers/accounts.js';
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 
-test('one organisation editor, slug and logo across account navigation, People and public profile', async ({ page }, info) => {
+test('one organisation editor, slug and logo across account navigation, Organisations and public profile', async ({ page }, info) => {
   const account = await createAccount(page, 'organisation', 'identity');
   const credentials = await sessionCredentials(page);
   const slug = `identity-${account.username.replaceAll('_', '-')}`;
@@ -14,13 +14,15 @@ test('one organisation editor, slug and logo across account navigation, People a
   await page.getByLabel('Organisation name').fill(name);
   await page.getByLabel('Organisation slug').fill(slug);
   await page.getByLabel('Description').fill('A clearly identifiable development test organisation.');
-  await page.locator('input[name="logo"]').setInputFiles(path.resolve('assets/logo.png'));
+  const uploadImages = process.env.VERTEX_TEST_IDENTITY_UPLOADS === '1';
+  if (uploadImages) await page.locator('input[name="logo"]').setInputFiles(path.resolve('assets/logo.png'));
   await page.getByRole('button', { name: 'Create organisation', exact: true }).click();
   await expect(page.getByText('Organisation saved.')).toBeVisible();
-  const logo = await page.locator('[data-org-logo-preview] img').getAttribute('src');
+  const logo = uploadImages ? await page.locator('[data-org-logo-preview] img').getAttribute('src') : null;
   await expect(page.locator('.account-link')).toHaveAttribute('href', '/organisation/edit');
   await expect(page.locator('.account-link')).toContainText(name);
-  await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
+  if (logo) await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
+  else await expect(page.locator('.account-link .avatar-fallback')).toHaveCount(1);
   await page.goto('/profile/edit');
   await expect(page).toHaveURL(/\/organisation\/edit$/);
   await expect(page.getByLabel('Organisation slug')).toHaveValue(slug);
@@ -35,36 +37,43 @@ test('one organisation editor, slug and logo across account navigation, People a
   await page.unroute('**/rest/v1/organisations?*');
   await page.getByRole('link', { name: 'Try again' }).click();
   await expect(page.getByRole('heading', { name: `${name} Updated`, exact: true })).toBeVisible();
-  await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
+  if (logo) await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
+  else await expect(page.locator('.account-link .avatar-fallback')).toHaveCount(1);
   await expect(page.locator('.account-link')).toContainText(`${name} Updated`);
   await page.screenshot({ path: `test-results/organisation-recovered-${info.project.name}.png`, fullPage: true });
   await page.reload();
-  await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
-  await page.goto('/people');
-  await page.getByLabel('Search people').fill(slug);
-  const result = page.locator('.person-row').filter({ hasText: `${name} Updated` });
+  if (logo) await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
+  else await expect(page.locator('.account-link .avatar-fallback')).toHaveCount(1);
+  await page.goto('/organisations');
+  await page.getByLabel('Search organisations').fill(slug);
+  const result = page.locator('[data-org-results] .organisation-row').filter({ hasText: `${name} Updated` });
   await expect(result).toHaveCount(1);
   await expect(result).toHaveAttribute('href', `/organisation/${slug}`);
-  await expect(result.locator('img')).toHaveAttribute('src', logo);
+  if (logo) await expect(result.locator('img')).toHaveAttribute('src', logo);
+  else await expect(result.locator('.logo-fallback')).toBeVisible();
   await result.click();
   await expect(page.getByRole('heading', { name: `${name} Updated`, exact: true })).toBeVisible();
-  await expect(page.locator('.logo-hero')).toHaveAttribute('src', logo);
+  if (logo) await expect(page.locator('.logo-hero')).toHaveAttribute('src', logo);
+  else await expect(page.locator('.logo-hero.logo-fallback')).toBeVisible();
   await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
   await page.screenshot({ path: `test-results/organisation-identity-${info.project.name}.png`, fullPage: true });
   // Reproduce an older organisation account with a separate personal identity.
   const headers = { apikey: credentials.SUPABASE_ANON_KEY, Authorization: `Bearer ${credentials.token}` };
   const legacyPath = `${credentials.userId}/legacy-profile.png`;
+  if (uploadImages) {
   const legacyUpload = await page.request.post(`${credentials.SUPABASE_PROJECT_URL}/storage/v1/object/profile-pictures/${legacyPath}`, {
     headers: { ...headers, 'Content-Type': 'image/png' }, data: await readFile(path.resolve('assets/logo.png'))
   });
   expect(legacyUpload.ok()).toBe(true);
+  }
   const legacyProfile = await page.request.patch(`${credentials.SUPABASE_PROJECT_URL}/rest/v1/profiles?id=eq.${credentials.userId}`, {
-    headers, data: { full_name: 'Vertex E2E Old Account Identity', username: account.username, avatar_path: legacyPath }
+    headers, data: { full_name: 'Vertex E2E Old Account Identity', username: account.username, avatar_path: uploadImages ? legacyPath : null }
   });
   expect(legacyProfile.ok()).toBe(true);
   await page.goto(`/profile/@${account.username}`);
   await expect(page).toHaveURL(new RegExp(`/organisation/${slug}$`));
-  await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
+  if (logo) await expect(page.locator('.account-link img')).toHaveAttribute('src', logo);
+  else await expect(page.locator('.account-link .avatar-fallback')).toHaveCount(1);
   await expect(page.locator('.account-link')).toContainText(`${name} Updated`);
   await page.goto('/organisation/edit');
   await page.getByRole('button', { name: 'Log out', exact: true }).last().click();

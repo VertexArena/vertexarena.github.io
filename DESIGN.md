@@ -233,3 +233,12 @@ Do not use blueprint diagrams, construction lines, decorative rails, diamonds, C
 - [ ] Does it work at 320px, 200% zoom, and reduced motion?
 - [ ] Does it feel calm, ambitious, optimistic, and exploratory rather than enterprise-oriented?
 - [ ] Would it still feel like Vertex without the logo and product name?
+
+## Milestone 4 — competition authoring
+
+The organiser flow uses five real steps with an explicit saved state. The timeline
+is its signature: a compact top-X path in the editor, and a numbered round history
+in the public preview. Dates stay beside their meaning, with local time zone shown.
+Existing Geist typography, blue accent, quiet surfaces and 12–18px corners continue.
+On mobile, steps wrap and timeline fields become one column. Banner captions use
+an opaque dark treatment so user-selected colours and images cannot erase labels.

@@ -3,6 +3,18 @@
 ## About Database Testing
 When Codex creates test accounts and test records in Supabase, it should ensure it deletes them after testing.
 
+Do not upload profile pictures for test accounts or logos for test organisations.
+Use the application's default image states for routine testing to avoid unnecessary
+Storage cleanup. Upload testing requires a separate explicit user request.
+
+## About Database Migrations
+
+From now on, use the connected Supabase app/connector to run migrations against
+the existing Vertex project. Do not ask the user to run migrations manually when
+the connector is available. Continue creating immutable migration files, updating
+SCHEMA.sql, and verifying the applied changes. If connector access is unavailable,
+report the access blocker rather than claiming a migration was applied.
+
 ## About Browser Testing
 
 Codex may use Playwright as a development and testing dependency.

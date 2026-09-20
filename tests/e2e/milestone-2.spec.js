@@ -39,7 +39,7 @@ test.describe.serial('Milestone 2', () => {
     await urls.nth(0).fill('https://example.com/portfolio');
     await labels.nth(1).fill('GitHub');
     await urls.nth(1).fill('https://github.com/example');
-    await page.locator('input[name="avatar"]').setInputFiles(path.resolve('assets/logo.png'));
+    if (process.env.VERTEX_TEST_IDENTITY_UPLOADS === '1') await page.locator('input[name="avatar"]').setInputFiles(path.resolve('assets/logo.png'));
     await page.getByRole('button', { name: 'Save profile' }).click();
     await expect(page.getByText('Profile saved.')).toBeVisible();
 

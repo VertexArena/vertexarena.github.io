@@ -237,7 +237,7 @@ organisation identity and network-recovery checks: 4 passed. Screenshots inspect
 The CHANGES.md duplicate organisation identity issue is resolved. Migration 002 is
 already applied; this correction requires no new migration. Test-data cleanup is
 delegated to the user by explicit agreement; the local cleanup checklist identifies
-the recorded accounts. Milestone 4 has not started.
+the recorded accounts. That cleanup was completed on 18 September 2026.
 
 ## User-visible result
 
@@ -286,6 +286,17 @@ feat: add organisation profiles and organiser membership
 ---
 
 # Milestone 4 â€” Competition Creation and Editing
+
+**Complete — 20 September 2026.** All 14 acceptance criteria verified through
+actual desktop/mobile UI and hosted Supabase. Combined acceptance/regression run:
+42 passed, 2 intentional mobile skips; remaining identity/search/branding regressions:
+14 passed. Final state/search follow-up: 4 passed. Custom rounds, direct top X, organisation association, error recovery,
+RLS, Storage access and optimistic edit conflicts also verified. Screenshots inspected.
+Migrations 002a, 003, 003a and 003b applied through the Supabase connector;
+SCHEMA.sql restored and updated. All 77 recorded test accounts, 24 competitions,
+22 organisations and remaining test banners removed; normal accounts preserved.
+Milestone 5 has not started. See tests/MILESTONE-4.md for evidence and CHECKS.md
+for manual visual review.
 
 ## User-visible result
 

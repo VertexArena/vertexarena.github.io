@@ -1,8 +1,8 @@
 import { test as base, expect } from '@playwright/test';
 import { appendFileSync, mkdirSync } from 'node:fs';
 
-// This run uses user-requested manual cleanup. Record exact IDs, never passwords
-// or tokens, so the user can delete only these accounts and their owned uploads.
+// Record exact test account IDs for verified Supabase connector cleanup. Never
+// retain passwords or tokens. Identity image uploads require explicit permission.
 export const test = base.extend({
   page: async ({ page }, use) => {
     const pending = [];

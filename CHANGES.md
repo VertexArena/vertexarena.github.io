@@ -1,1 +1,0 @@
-There is a discrepancy between organiser accounts and the "Create Organisation" form that shows up on creation. Both ask for slug and are basically the same but are different. Pfp is set through the regular one (like how other account types do it) and the image uploaded during the initial form is shown as the organisation logo but the pfp is diff idk.

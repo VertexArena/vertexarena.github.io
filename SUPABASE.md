@@ -53,7 +53,7 @@ does not grant organisation management or competition permissions.
 The organisation identity correction uses this existing schema and requires no
 additional migration. Organisation signup creates the authentication account;
 the organisation editor collects its public name, slug, and logo once. The header,
-People results, and public organisation page use that same organisation record.
+organisation-directory results, and public organisation page use that same organisation record.
 Older personal-profile URLs for organisation accounts redirect to the organisation.
 
 Run `tests/e2e/milestone-3.spec.js` and `tests/e2e/organisation-identity.spec.js`
@@ -63,10 +63,29 @@ for membership acceptance and unified-identity regression coverage.
 
 Test signup responses record only account IDs, test emails, and creation times in
 the ignored `.test-data/accounts.ndjson` file. No passwords or access tokens are
-written to that manifest. This run uses the user's explicit manual-cleanup choice.
+written to that manifest. Use the connected Supabase connector for verified cleanup after each run.
 Delete uploaded objects in `profile-pictures` and `organisation-logos` through
 Storage before removing related memberships, organisations, and Auth users.
 Never delete Storage metadata directly in SQL; that does not remove stored files.
-Future runs must arrange authorised admin/connector cleanup before creating data.
+Routine tests use default profile and organisation images. Identity upload tests run only after explicit permission, with VERTEX_TEST_IDENTITY_UPLOADS=1. Competition banner tests are part of Milestone 4 acceptance.
+
+Run node tests/cleanup-test-banners.mjs to remove remaining Milestone 4 test banners through their owners’ Storage sessions, including interrupted runs. Then delete only manifest-verified test competitions, memberships, organisations and Auth users through the Supabase connector. Preserve normal application accounts.
 
 RLS and Storage policies remain the security boundary; hiding the anon key is not a security control.
+
+## Applied Milestone 4 migrations
+
+Applied through the connected Supabase app to Vertex (hbadiyiopvypeffaigmc):
+
+- 002a_directory_suggestions.sql: separate People/organisation search and organiser-only suggestions.
+- 003_competitions_rounds_and_timelines.sql: competition and round tables, atomic authoring RPC, RLS, private banner bucket.
+- 003a_competition_conflict_and_date_guards.sql: immediate HTTP 409 edit conflicts, finite timestamps, trigger execute restriction.
+- 003b_competition_banner_reference_policies.sql: explicit Storage object references for publication and safe deletion.
+
+No manual migration is needed on the existing project. SCHEMA.sql is the complete clean-install bootstrap, restored from immutable history; never rerun it on this project.
+
+Published participation rules, organisation, stable addresses and timeline are fixed. Descriptive fields and banners remain editable. Competition and round writes use an owner-checked atomic RPC; direct table writes are denied. Draft banner URLs require owner access; published references permit signed public reads. File replacement uploads a new path and removes the old object only after saving succeeds.
+
+### Existing security-advisor findings
+
+The public_profiles view intentionally exposes only completed public profile fields, never birthdays; its definer access supports public profiles while the underlying table remains owner-only. See [view guidance](https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view). Organisation mutation RPCs and save_competition deliberately use privileged atomic transactions with explicit persisted-role/ownership checks and restricted execute grants. See [RPC guidance](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable). Hosted leaked-password protection remains disabled; this is an existing Auth configuration, separate from migration state. See [password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).

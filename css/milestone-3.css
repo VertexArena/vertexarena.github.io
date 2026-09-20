@@ -49,3 +49,12 @@
   .membership-row .organisation-row, .member-identity { min-width: 0; flex-basis: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .organisation-row { transition: none; } .organisation-row:hover { transform: none; } }
+
+.suggestion { width: 100%; text-align: left; cursor: pointer; font: inherit; background: var(--surface); }
+[data-invite-suggestions] { display: grid; gap: 8px; }
+[data-org-search-status] { margin: 12px 0; color: var(--muted); }
+
+
+.organisation-row > .organisation-logo { flex: 0 0 56px; }
+[data-org-search] > div { grid-template-columns: minmax(0,1fr) auto; padding-left: 14px; }
+@media(max-width:600px) { [data-org-search] > div { grid-template-columns: minmax(0,1fr); } }

@@ -1,0 +1,32 @@
+import { test, expect } from './helpers/test.js';
+import { createAccount } from './helpers/accounts.js';
+
+test('separate live directories and selectable organiser invitations', async ({ page }, info) => {
+  const organiser = await createAccount(page, 'organiser', 'directory');
+  await page.getByRole('button',{name:'Log out',exact:true}).click();
+  const owner = await createAccount(page, 'organisation', 'directoryowner');
+  await page.getByLabel('Organisation name',{exact:true}).fill(owner.name);
+  await page.getByRole('textbox',{name:/^Organisation slug/}).fill(`directory-${owner.username.replace('_','-')}`);
+  await page.getByRole('button',{name:'Create organisation',exact:true}).click();
+  await expect(page.locator('[data-org-status]')).toContainText('Organisation saved');
+  await page.getByLabel('Organiser username').fill(organiser.username.slice(0,-2));
+  await page.getByRole('button',{name:new RegExp(organiser.name)}).click();
+  await expect(page.getByLabel('Organiser username')).toHaveValue('@'+organiser.username);
+  await page.getByRole('button',{name:'Send invitation'}).click();
+  await expect(page.locator('[data-invite-status]')).toContainText('Invitation sent');
+  await page.goto('/people');
+  await page.getByLabel('Search people').fill(owner.name);
+  await expect(page.locator('[data-search-status]')).toContainText('found');
+  await expect(page.locator('[data-people-results]')).not.toContainText(owner.name);
+  await page.goto('/organisations');
+  const originalDirectory = await page.locator('[data-org-results]').innerText();
+  await page.getByLabel('Search organisations').fill(owner.name);
+  await expect(page.locator('[data-org-search-status]')).toHaveText(/^[1-9]\d* organisations found\.$/);
+  await expect(page.locator('[data-org-results]')).toContainText(owner.name);
+  await expect(page.locator('[data-org-results]')).not.toContainText(organiser.name);
+  await page.screenshot({path:`test-results/directory-${info.project.name}.png`,fullPage:true});
+  await page.getByLabel('Search organisations').fill('zzzzzznotfoundzzzz');
+  await expect(page.locator('[data-org-search-status]')).toContainText('0 organisations');
+  await page.getByLabel('Search organisations').fill('');
+  await expect(page.locator('[data-org-results]')).toContainText(owner.name);
+});

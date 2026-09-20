@@ -1,3 +1,4 @@
+import { createCompetitions } from './competitions.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -97,7 +98,7 @@ function signupFields() {
 function profileForm(profile) {
   const socials = Array.isArray(profile.social_links) ? profile.social_links : [];
   const rows = [...socials, ...Array(Math.max(2 - socials.length, 0)).fill({ label: '', url: '' })];
-  return `<div class="profile-edit page"><div class="page-head compact-head"><span class="eyebrow">Your Vertex identity</span><h1>Edit profile.</h1><p>Keep public details useful and current. Birthday remains private and only supports eligibility checks.</p></div><div class="profile-edit-grid"><aside class="profile-preview" aria-label="Profile preview"><div class="profile-preview-top">${avatar(profile, 'avatar-large')}<div><strong data-preview-name>${escapeHtml(profile.full_name || 'Your name')}</strong><span data-preview-username>@${escapeHtml(profile.username || 'username')}</span></div></div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(profile.account_type)}</span><p>Your public identity updates when changes save.</p>${profile.account_type === 'organisation' ? '<a class="button secondary" data-link href="/organisation/edit">Manage organisation</a>' : profile.account_type === 'organiser' ? '<a class="button secondary" data-link href="/organisations">Your organisations & invitations</a>' : ''}<a class="text-link" data-public-profile-link data-link href="${profile.username ? `/profile/@${encodeURIComponent(profile.username)}` : '/profile/edit'}">View public profile</a></aside><section class="form-surface"><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-profile-form><fieldset><legend>Identity</legend><div class="avatar-upload"><div data-avatar-preview>${avatar(profile, 'avatar-medium')}</div><label class="button secondary upload-button"><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose picture</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100" value="${escapeHtml(profile.full_name)}"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" value="${escapeHtml(profile.username)}"></span></label></div>${profile.account_type === 'participant' ? `<label class="field"><span>Date of birth <small>Private</small></span><input name="birthday" type="date" autocomplete="bday" required value="${escapeHtml(profile.birthday)}"><small>Never shown on your public profile.</small></label>` : ''}</fieldset><fieldset><legend>About</legend><label class="field"><span>Bio</span><textarea name="bio" maxlength="1000" rows="5" placeholder="What do you study, build, or organise?">${escapeHtml(profile.bio)}</textarea><small><span data-bio-count>${String(profile.bio || '').length}</span>/1000</small></label><div class="form-grid"><label class="field"><span>School or affiliation <small>Optional</small></span><input name="affiliation" maxlength="160" value="${escapeHtml(profile.affiliation)}"></label><label class="field"><span>Location <small>Optional</small></span><input name="location" maxlength="120" value="${escapeHtml(profile.location)}"></label></div></fieldset><fieldset><legend>Social links</legend><p class="field-intro">Add up to eight public links. Only secure HTTP links are accepted.</p><div class="social-list" data-social-list>${rows.map(socialRow).join('')}</div><button class="button secondary add-social" type="button" data-add-social><i class="fa-solid fa-plus" aria-hidden="true"></i> Add link</button></fieldset><div class="form-actions"><button class="button primary" type="submit" data-submit>Save profile</button><button class="button quiet" type="button" data-logout>Log out</button></div></form></section></div></div>`;
+  return `<div class="profile-edit page"><div class="page-head compact-head"><span class="eyebrow">Your Vertex identity</span><h1>Edit profile.</h1><p>Keep public details useful and current. Birthday remains private and only supports eligibility checks.</p></div><div class="profile-edit-grid"><aside class="profile-preview" aria-label="Profile preview"><div class="profile-preview-top">${avatar(profile, 'avatar-large')}<div><strong data-preview-name>${escapeHtml(profile.full_name || 'Your name')}</strong><span data-preview-username>@${escapeHtml(profile.username || 'username')}</span></div></div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(profile.account_type)}</span><p>Your public identity updates when changes save.</p>${profile.account_type === 'organisation' ? '<a class="button secondary" data-link href="/organisation/edit">Manage organisation</a>' : profile.account_type === 'organiser' ? '<a class="button primary" data-link href="/organiser">Manage competitions</a><a class="button secondary" data-link href="/organisations">Your organisations & invitations</a>' : ''}<a class="text-link" data-public-profile-link data-link href="${profile.username ? `/profile/@${encodeURIComponent(profile.username)}` : '/profile/edit'}">View public profile</a></aside><section class="form-surface"><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-profile-form><fieldset><legend>Identity</legend><div class="avatar-upload"><div data-avatar-preview>${avatar(profile, 'avatar-medium')}</div><label class="button secondary upload-button"><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose picture</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100" value="${escapeHtml(profile.full_name)}"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" value="${escapeHtml(profile.username)}"></span></label></div>${profile.account_type === 'participant' ? `<label class="field"><span>Date of birth <small>Private</small></span><input name="birthday" type="date" autocomplete="bday" required value="${escapeHtml(profile.birthday)}"><small>Never shown on your public profile.</small></label>` : ''}</fieldset><fieldset><legend>About</legend><label class="field"><span>Bio</span><textarea name="bio" maxlength="1000" rows="5" placeholder="What do you study, build, or organise?">${escapeHtml(profile.bio)}</textarea><small><span data-bio-count>${String(profile.bio || '').length}</span>/1000</small></label><div class="form-grid"><label class="field"><span>School or affiliation <small>Optional</small></span><input name="affiliation" maxlength="160" value="${escapeHtml(profile.affiliation)}"></label><label class="field"><span>Location <small>Optional</small></span><input name="location" maxlength="120" value="${escapeHtml(profile.location)}"></label></div></fieldset><fieldset><legend>Social links</legend><p class="field-intro">Add up to eight public links. Only secure HTTP links are accepted.</p><div class="social-list" data-social-list>${rows.map(socialRow).join('')}</div><button class="button secondary add-social" type="button" data-add-social><i class="fa-solid fa-plus" aria-hidden="true"></i> Add link</button></fieldset><div class="form-actions"><button class="button primary" type="submit" data-submit>Save profile</button><button class="button quiet" type="button" data-logout>Log out</button></div></form></section></div></div>`;
 }
 
 function socialRow(item = { label: '', url: '' }) {
@@ -115,7 +116,7 @@ function peopleView() {
 
 function peopleResults(rows) {
   if (!rows.length) return `<div class="empty compact-empty"><span class="empty-marker" aria-hidden="true"><i class="fa-solid fa-user-group"></i></span><div><h2>No public profiles match.</h2><p>Check spelling or try a shorter username.</p></div></div>`;
-  return rows.map(profile => profile.account_type === 'organisation' ? organisations.personResult(profile) : `<a class="person-row" data-link href="/profile/@${encodeURIComponent(profile.username)}">${avatar(profile, 'avatar-medium')}<span><strong>${escapeHtml(profile.full_name)}</strong><small>@${escapeHtml(profile.username)}</small>${profile.affiliation ? `<em>${escapeHtml(profile.affiliation)}</em>` : ''}</span><span class="account-badge">${escapeHtml(profile.account_type)}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`).join('');
+  return rows.filter(profile => profile.account_type !== 'organisation').map(profile => `<a class="person-row" data-link href="/profile/@${encodeURIComponent(profile.username)}">${avatar(profile, 'avatar-medium')}<span><strong>${escapeHtml(profile.full_name)}</strong><small>@${escapeHtml(profile.username)}</small>${profile.affiliation ? `<em>${escapeHtml(profile.affiliation)}</em>` : ''}</span><span class="account-badge">${escapeHtml(profile.account_type)}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`).join('');
 }
 
 function notFound() {
@@ -266,6 +267,7 @@ async function logout() {
 
 function bind() {
   organisations.bind();
+  competitions.bind();
   document.querySelector('button[data-theme]')?.addEventListener('click', event => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = theme;
@@ -368,11 +370,11 @@ async function searchPeople(form) {
   if (query.replace(/^@/, '').length < 2) { setStatus(status, 'Enter at least two characters.', 'error'); results.innerHTML = ''; return; }
   setStatus(status, 'Searching profiles…');
   results.innerHTML = `<div class="result-skeleton" aria-hidden="true"></div><div class="result-skeleton" aria-hidden="true"></div>`;
-  const { data, error } = await supabase.rpc('search_profiles', { search_term: query, result_limit: 12 });
+  const { data, error } = await supabase.rpc('search_people', { search_term: query });
   if (revision !== searchRevision || !form.isConnected) return;
   if (error) { setStatus(status, authMessage(error), 'error'); results.innerHTML = ''; return; }
   try {
-    const rows = await organisations.search(query, data);
+    const rows = data;
     if (revision !== searchRevision || !form.isConnected) return;
     setStatus(status, `${rows.length} profile${rows.length === 1 ? '' : 's'} found.`);
     results.innerHTML = peopleResults(rows);
@@ -418,13 +420,16 @@ async function scene() {
   } catch (error) { console.warn('Three.js unavailable; static fallback active.', error); return () => {}; }
 }
 
-const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render });
+const competitions = createCompetitions({ client: supabase, state, escapeHtml, navigate, setStatus });
+const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
+  const competitionRoute = await competitions.resolve(path);
+  if (competitionRoute !== undefined) return competitionRoute;
   const organisationRoute = await organisations.resolve(path);
   if (organisationRoute !== undefined) return organisationRoute;
   if (path === '/') return { content: home(), title: 'Vertex - Student competitions, clearly organised' };
-  if (path === '/discover') return { content: discover(), title: 'Discover competitions - Vertex' };
+  if (path === '/discover') return { content: discover().replace(/<section class="empty">[\s\S]*?<\/section>/, await competitions.publicList()), title: 'Discover competitions - Vertex' };
   if (path === '/people') return { content: peopleView(), title: 'Find people - Vertex' };
   if (path === '/login') return { content: authView('login'), title: 'Log in - Vertex', noFooter: true };
   if (path === '/signup') return { content: authView('signup'), title: 'Sign up - Vertex', noFooter: true };
@@ -491,6 +496,7 @@ async function render() {
 }
 
 function navigate(path) {
+  if (!competitions.canLeave()) return;
   history.pushState({}, '', path);
   render();
 }
