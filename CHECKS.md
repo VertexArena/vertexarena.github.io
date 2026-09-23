@@ -1,18 +1,17 @@
-# Vertex — Milestone 4 manual review
+# Vertex — Milestone 5 manual review
 
-Automated tests cover saving, publication, permissions, validation and route recovery.
-Use this checklist to judge clarity and visual comfort with your own content.
+Automated browser tests covered search, filters, pagination, direct routes, preview,
+bookmarks, age messages, role permissions, and desktop/mobile behaviour. Use these
+steps to judge clarity and visual quality with real competition content.
 
-- [ ] Log in as an organiser. Open **Edit profile → Manage competitions → Create competition**. Check that the five steps feel easy to follow and the saved/unsaved message is easy to notice.
-- [ ] Enter a realistic competition name, description and prizes. Check long text, field choices, and the explanation that the address becomes fixed after saving.
-- [ ] Compare Individual, Team and Both modes. Judge whether age limits, team sizes and optional categories are understandable without extra explanation.
-- [ ] Open Timeline. Compare a direct final with the three-round preset and custom rounds. Check the top-X path, local time zone, date labels, and round ordering controls.
-- [ ] In Appearance, try your intended banner colour or gradient. If using a real competition image, inspect its crop in both preview and public page; text should remain readable.
-- [ ] Open Review. Check whether description, prizes, categories and the competition path have a useful reading order. Read the publication confirmation before deciding to publish.
-- [ ] For a published competition, inspect the locked rules message and editable descriptive fields. Check that the distinction is clear and the public-page link is easy to find.
-- [ ] On your phone, inspect the editor, public competition page and organisation competition cards. Check touch targets, long names, dates and spacing without sideways scrolling.
-- [ ] Switch light/dark themes, enable reduced motion, and try 200% zoom. Use Tab/Shift+Tab through steps and inputs; focus should remain visible.
-- [ ] On Organisations, search a familiar organisation. In an organisation account, type part of an organiser’s name or username in the invitation field. Judge suggestion clarity and keyboard selection. People search should feel clearly separate.
+- [ ] Log out and open **Discover**. Check that title, search, field choices, entry format, and competition count are easy to scan.
+- [ ] Search for a real competition by part of its name. Try two fields together, then each entry format. Switch between soonest deadline, latest deadline, and recently published. Check that changes feel quick and the result count makes sense.
+- [ ] Open **Quick preview** on a card. Check that description, prizes, dates, entry format, age range, and field tags are readable. Close it with Escape and the close button.
+- [ ] Open **Full details**. Check banner treatment, organisation link when present, prize details, registration state, and round timeline. Refresh the page and check it still opens.
+- [ ] Log in as a participant. Save a competition, refresh, then select **Saved only**. Remove the bookmark and check that the empty state gives a useful way back to all competitions.
+- [ ] Inspect a competition outside your age range. Check that the card and full page explain the mismatch without revealing your birthday.
+- [ ] Compare cards with uploaded, solid colour, and gradient banners, plus long names and descriptions. Check text crop, contrast, and card spacing.
+- [ ] On a phone, repeat search, filters, preview, full details, and bookmark actions. Check that no controls overlap or require sideways scrolling.
+- [ ] Switch light and dark themes. At 200% zoom and with reduced motion enabled, check focus visibility, keyboard use, readable text, and preview scrolling.
 
-If anything feels wrong, note the page URL, device, theme, and exact action.
-Do not upload profile pictures or organisation logos for disposable test accounts.
+If something feels wrong, note page address, device, theme, and exact action.

@@ -295,8 +295,7 @@ RLS, Storage access and optimistic edit conflicts also verified. Screenshots ins
 Migrations 002a, 003, 003a and 003b applied through the Supabase connector;
 SCHEMA.sql restored and updated. All 77 recorded test accounts, 24 competitions,
 22 organisations and remaining test banners removed; normal accounts preserved.
-Milestone 5 has not started. See tests/MILESTONE-4.md for evidence and CHECKS.md
-for manual visual review.
+See tests/MILESTONE-4.md for Milestone 4 evidence.
 
 ## User-visible result
 
@@ -379,6 +378,15 @@ feat: add complete competition creation workflow
 ---
 
 # Milestone 5 â€” Competition Discovery, Search, Filters, and Bookmarks
+
+**Status: Complete — 23 September 2026.** Desktop and mobile Playwright acceptance
+passed against hosted Supabase: public catalogue, name search, field and entry
+filters, deadline sorting, 12-item pagination, preview, direct detail routes,
+age guidance, bookmark persistence and role isolation. Milestone 1 regression:
+19 passed, one intended mobile skip. Screenshots inspected. Migration 004 applied
+through connected Supabase app and SCHEMA.sql updated. All Milestone 5 test
+accounts and competition records removed after verification. See
+tests/MILESTONE-5.md and CHECKS.md.
 
 ## User-visible result
 

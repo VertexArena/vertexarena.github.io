@@ -1,4 +1,5 @@
 import { createCompetitions } from './competitions.js';
+import { createDiscovery } from './discovery.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -74,12 +75,6 @@ function shell(content, path, noFooter = false) {
 
 function home() {
   return `<section class="hero"><canvas class="opportunity-grid" aria-hidden="true"></canvas><div class="hero-in"><div class="hero-copy"><span class="eyebrow">A world of student competitions</span><h1>Find your next <span>challenge.</span></h1><p>Explore ideas across every field, follow what sparks your curiosity, and find the opportunity worth pursuing.</p><div class="hero-buttons"><a class="button primary" data-link href="/discover">Explore competitions <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="button secondary" data-link href="/signup">Create account</a></div></div><p class="hero-aside">New directions are always waiting just beyond the familiar.</p></div></section><section class="section story-section"><div class="story-heading"><span class="eyebrow">Why Vertex exists</span><h2>Opportunity should be easier to see.</h2></div><div class="story-copy"><p class="story-lead">The right competition can change what a student believes they are capable of.</p><p>Yet opportunities are often scattered across school notices, social posts, forms, and disconnected websites. Vertex gives that landscape one calm place—so curiosity can become a decision instead of a search through noise.</p></div></section><section class="journey-section"><div class="section"><div class="journey-heading"><span class="eyebrow">The competition journey</span><h2>Clarity at every meaningful moment.</h2><p>A competition is more than a deadline. It is a sequence of choices, effort, feedback, and growth.</p></div><ol class="journey"><li><span class="journey-number">01</span><div><h3>Discover what draws you in.</h3><p>See enough context to recognise the challenge that fits your interests and ambition.</p></div></li><li><span class="journey-number">02</span><div><h3>Know what comes next.</h3><p>Keep the important moments of participation understandable as the competition unfolds.</p></div></li><li><span class="journey-number">03</span><div><h3>Carry the outcome forward.</h3><p>Let every result become part of a lasting record of effort, progress, and achievement.</p></div></li></ol></div></section><section class="section audience-section"><div class="intro"><span class="eyebrow">Built for both sides</span><h2>Students explore. Organisers create the opportunity.</h2></div><div class="audience-grid"><article class="audience-card student-card"><span class="audience-icon"><i class="fa-solid fa-compass" aria-hidden="true"></i></span><div><h3>For students</h3><p>Vertex makes the wider competition landscape easier to understand, helping students move from “What is out there?” to “This is worth trying.”</p></div></article><article class="audience-card organiser-card"><span class="audience-icon"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i></span><div><h3>For organisers</h3><p>Vertex gives each competition a credible, coherent home where expectations stay clear and the work of participants can be treated with care.</p></div></article></div></section><section class="difference-section"><div class="section difference-in"><div><span class="eyebrow">What makes Vertex different</span><h2>The challenge stays at the centre.</h2></div><div class="difference-copy"><p>Vertex is not a feed competing for attention and not a collection of disconnected forms. It is designed around the arc of a real competition.</p><p>Discovery leads naturally toward participation, participation toward an outcome, and every outcome toward the next possibility.</p></div></div></section><section class="section closing-section"><div class="closing-card"><span class="eyebrow">Your next direction</span><h2>See what might be worth pursuing.</h2><p>Begin with the open catalogue, or create an account when you are ready to make Vertex your own.</p><div class="hero-buttons"><a class="button primary" data-link href="/discover">Explore competitions <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="button secondary" data-link href="/signup">Create account</a></div></div></section>`;
-}
-
-const fields = [['fa-square-root-variable', 'Mathematics'], ['fa-atom', 'Physics'], ['fa-flask', 'Chemistry'], ['fa-dna', 'Biology'], ['fa-code', 'Programming'], ['fa-robot', 'Robotics'], ['fa-microscope', 'Research'], ['fa-pen-nib', 'Writing'], ['fa-pen-ruler', 'Design'], ['fa-briefcase', 'Business'], ['fa-comments', 'Debate'], ['fa-lightbulb', 'Innovation']];
-
-function discover() {
-  return `<div class="page discover-page"><div class="page-head"><span class="eyebrow">Discover</span><h1>Open field.</h1><p>Look across disciplines, follow more than one curiosity, and leave room for the challenge you did not expect.</p></div><section class="field-selector" aria-labelledby="field-selector-title"><div class="selector-heading"><div><span class="eyebrow">Explore by field</span><h2 id="field-selector-title">Choose the ideas that pull you in.</h2></div><p>Select as many fields as you want to explore. Your choices stay visible together, leaving room for more than one direction.</p></div><div class="field-options">${fields.map(([icon, name]) => `<button class="field-option" type="button" data-field-option aria-pressed="false"><i class="fa-solid ${icon}" aria-hidden="true"></i><span>${name}</span><i class="fa-solid fa-check field-check" aria-hidden="true"></i></button>`).join('')}</div><p class="selection-status" data-selection-status aria-live="polite">No fields selected yet.</p></section><section class="empty"><span class="empty-marker" aria-hidden="true"><i class="fa-solid fa-binoculars"></i></span><div><span class="status-label">Ready to explore</span><h2>The first opportunities will appear here.</h2><p>As competitions are published, this space will become a clear view across every field.</p></div></section></div>`;
 }
 
 function authView(mode) {
@@ -268,6 +263,7 @@ async function logout() {
 function bind() {
   organisations.bind();
   competitions.bind();
+  discoveryDirectory.bind();
   document.querySelector('button[data-theme]')?.addEventListener('click', event => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = theme;
@@ -286,13 +282,6 @@ function bind() {
     menu.innerHTML = `<i class="fa-solid ${open ? 'fa-xmark' : 'fa-bars'}" aria-hidden="true"></i>`;
     document.body.classList.toggle('nav-open', open);
   });
-  const options = [...document.querySelectorAll('[data-field-option]')];
-  const selectionStatus = document.querySelector('[data-selection-status]');
-  options.forEach(option => option.addEventListener('click', () => {
-    option.setAttribute('aria-pressed', String(option.getAttribute('aria-pressed') !== 'true'));
-    const count = options.filter(item => item.getAttribute('aria-pressed') === 'true').length;
-    selectionStatus.textContent = count ? `${count} field${count === 1 ? '' : 's'} selected.` : 'No fields selected yet.';
-  }));
   document.querySelectorAll('[data-password-toggle]').forEach(button => button.addEventListener('click', () => {
     const input = button.parentElement.querySelector('input');
     const show = input.type === 'password';
@@ -421,6 +410,7 @@ async function scene() {
 }
 
 const competitions = createCompetitions({ client: supabase, state, escapeHtml, navigate, setStatus });
+const discoveryDirectory = createDiscovery({ client: supabase, state, escapeHtml, navigate });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
@@ -429,7 +419,7 @@ async function resolveRoute(path) {
   const organisationRoute = await organisations.resolve(path);
   if (organisationRoute !== undefined) return organisationRoute;
   if (path === '/') return { content: home(), title: 'Vertex - Student competitions, clearly organised' };
-  if (path === '/discover') return { content: discover().replace(/<section class="empty">[\s\S]*?<\/section>/, await competitions.publicList()), title: 'Discover competitions - Vertex' };
+  if (path === '/discover') return { content: discoveryDirectory.controls(), title: 'Discover competitions - Vertex' };
   if (path === '/people') return { content: peopleView(), title: 'Find people - Vertex' };
   if (path === '/login') return { content: authView('login'), title: 'Log in - Vertex', noFooter: true };
   if (path === '/signup') return { content: authView('signup'), title: 'Sign up - Vertex', noFooter: true };

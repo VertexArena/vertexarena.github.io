@@ -37,7 +37,7 @@ test.describe('Milestone 1', () => {
     }
   });
 
-  for (const [path, heading] of [['/discover', 'Open field.'], ['/login', 'Access your workspace'], ['/signup', 'Join Vertex']]) {
+  for (const [path, heading] of [['/discover', 'Find your next challenge.'], ['/login', 'Access your workspace'], ['/signup', 'Join Vertex']]) {
     test(`direct route ${path}`, async ({ page }, info) => {
       await page.goto(path);
       await expect(page.getByRole('heading', { name: heading })).toBeVisible();
@@ -70,20 +70,22 @@ test.describe('Milestone 1', () => {
     expect(Math.abs(homeHeader.width - loginHeader.width)).toBeLessThan(1);
   });
 
-  test('Discover supports keyboard-accessible multi-field selection without filtering', async ({ page }) => {
+  test('Discover supports keyboard-accessible multi-field filtering', async ({ page }) => {
     await page.goto('/discover');
-    const mathematics = page.getByRole('button', { name: /Mathematics/ });
-    const physics = page.getByRole('button', { name: /Physics/ });
+    const mathematics = page.getByRole('checkbox', { name: 'mathematics' });
+    const physics = page.getByRole('checkbox', { name: 'physics' });
     await mathematics.focus();
     await expect(mathematics).toBeFocused();
-    await mathematics.press('Enter');
-    await expect(mathematics).toHaveAttribute('aria-pressed', 'true');
+    await mathematics.press('Space');
+    await expect(mathematics).toBeChecked();
     await physics.press('Space');
-    await expect(physics).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('[data-selection-status]')).toHaveText('2 fields selected.');
-    await expect(page).toHaveURL(/\/discover$/);
-    await mathematics.press('Enter');
-    await expect(page.locator('[data-selection-status]')).toHaveText('1 field selected.');
+    await expect(physics).toBeChecked();
+    await expect(page).toHaveURL(/field=mathematics.*field=physics/);
+    await page.reload();
+    await expect(mathematics).toBeChecked();
+    await expect(physics).toBeChecked();
+    await mathematics.press('Space');
+    await expect(mathematics).not.toBeChecked();
   });
 
   test('custom 404 direct recovery', async ({ page }, info) => {
@@ -106,7 +108,7 @@ test.describe('Milestone 1', () => {
     await expect(page.locator('.fallback')).toBeVisible();
     await page.getByRole('link', { name: /Return home/ }).click();
     await page.getByRole('link', { name: /Explore competitions/ }).first().click();
-    await expect(page.getByRole('heading', { name: 'Open field.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Find your next challenge.' })).toBeVisible();
   });
 
   test('skip link and authentication language remain usable', async ({ page }) => {
