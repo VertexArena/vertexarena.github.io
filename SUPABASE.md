@@ -121,3 +121,15 @@ Realtime. The new security-definer RPCs have fixed search paths, restricted
 execute grants, and explicit role and ownership checks; the security advisor
 flags this intentional RPC pattern. The advisor's remaining public-profile view,
 profile search, and hosted password-protection findings predate Milestone 7.
+
+## Applied Milestone 8 migration
+
+`006b_dashboard_summary.sql` (remote version `20260923124703`) was applied through
+the connected Supabase app to the existing Vertex project. It is included in
+`SCHEMA.sql` for clean installations; do not rerun the bootstrap on this project.
+
+The authenticated `organiser_dashboard_summary` RPC returns counts and recent
+activity for competitions owned by the calling organiser. It checks the stored
+organiser role and scopes every query by `auth.uid()`. The fixed search path and
+restricted execute grant protect this security-definer RPC; the security advisor
+flags the intentional pattern. Anonymous and participant callers cannot execute it.

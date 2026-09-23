@@ -1,5 +1,16 @@
 import { test as base, expect } from '@playwright/test';
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+
+// Playwright can use a local copy of the same pinned public browser client when
+// this host blocks CDN traffic. Normal runs still load the CDN module directly.
+const cachedClient = '.test-data/supabase-js-2.117.1.umd.js';
+base.beforeEach(async ({ context }) => {
+  if (!existsSync(cachedClient)) return;
+  const module = `${readFileSync(cachedClient, 'utf8')}\nexport const createClient = supabase.createClient;`;
+  await context.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/+esm', route => route.fulfill({ status: 200, contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: module }));
+  await context.route('https://fonts.googleapis.com/**', route => route.abort());
+  await context.route('https://cdnjs.cloudflare.com/**', route => route.abort());
+});
 
 // Record exact test account IDs for verified Supabase connector cleanup. Never
 // retain passwords or tokens. Identity image uploads require explicit permission.

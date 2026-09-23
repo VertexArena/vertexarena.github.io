@@ -565,6 +565,15 @@ feat: add team formation and registration
 
 # Milestone 8 â€” Participant and Organiser Dashboards
 
+**Status: Complete — 23 September 2026.** Participant and organiser dashboard
+acceptance passed in desktop and mobile Playwright against hosted Supabase.
+Timeline classification, invitations, deadlines, entry counts, owner-only summary,
+workspace navigation, empty states, direct routes, and refresh were verified.
+Prior milestone 1, 4, 5, 6, and 7 browser regressions passed. Screenshots were
+inspected. Migration 006b was applied through the connected Supabase app and
+included in `SCHEMA.sql`. Test accounts, competitions, and banners were removed.
+See `tests/MILESTONE-8.md` and `CHECKS.md`.
+
 ## User-visible result
 
 Participants and organisers each have a useful operational dashboard.

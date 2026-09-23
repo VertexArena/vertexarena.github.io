@@ -1,15 +1,15 @@
-# Vertex — Milestone 7 manual review
+# Vertex — Milestone 8 manual review
 
-Use a published competition that accepts teams, has open registration, and requires at least three members. You need a captain, three other participant accounts, and an organiser account. The automated tests cover database rules; these steps help confirm the experience and appearance.
+Use your own participant and organiser accounts. For the richest review, use an organiser with an upcoming competition, one already in progress, and one whose final results date has passed. Register the participant before registration closes. If you create throwaway accounts or competitions, remove them afterward.
 
-- [ ] While logged out, open the competition and select **Build or join team**. Log in as the captain. Check that you return to that competition's team page.
-- [ ] Create a team. Check its name, captain badge, member count, minimum size, and open seats. Refresh the page; the team should remain.
-- [ ] Search for two participants by `@username` and invite them. Check suggestions show each full name and username. Each invitee should see an invitation in their dashboard and team page, with a notification.
-- [ ] Accept one invitation and decline the other. On the captain's page, check the accepted member appears in the roster and the declined invitation is clearly marked. Refresh if a live update has been deferred while you type.
-- [ ] Try **Register team** below the minimum size. Check the message names the required and current member counts. Add enough members, select a category if shown, and register. Check the confirmation and locked roster after refresh.
-- [ ] Open the captain's dashboard. Check the team competition and registration notice. Open the organiser's participant view: the team should be a parent row with each member beneath it; individual entries should be separate.
-- [ ] In a second unregistered team, try cancelling an invitation, leaving as a member, removing a member as captain, and disbanding the empty team. Check each action gives clear feedback and updates the roster.
-- [ ] On a phone and desktop, review the team page, invitation cards, confirmation, dashboard, and organiser roster in light and dark themes. Check names wrap, buttons are easy to tap, focus is visible, and no page scrolls sideways.
-- [ ] Open team and organiser participant addresses directly and refresh them. With reduced motion enabled, check every action still works and status messages remain readable.
+- [ ] Sign in as a participant and open **Dashboard**. Scan the first screen: competition status counts, next dates, and the discovery action should be easy to understand without scrolling.
+- [ ] Review **In progress**, **Upcoming**, and **Completed**. Check that each entry is under the right heading and its entry link opens the expected competition or team page. A team still being built should be separate from confirmed entries.
+- [ ] Have another participant invite you to a team. On your dashboard, check that the invitation names the team and competition, gives a response deadline, and opens the team page where you can respond.
+- [ ] Check **Approaching deadlines** against the competition timeline. Dates and times should read naturally in your local time zone; past dates should no longer appear as upcoming.
+- [ ] Review the announcement, meeting, submission, results, certificate, and achievement areas. Empty messages should state what is currently available without suggesting an action you cannot take. A confirmed first entry should show the first competition achievement preview.
+- [ ] Sign in as an organiser and open **Dashboard**. Check each competition card clearly shows status and confirmed registrations, people, and teams. Open its **workspace** with the arrow, then use **View participants** and the back link to return.
+- [ ] On the organiser workspace, compare round dates and entry totals with the competition editor and participant roster. Check the edit and public-page links lead to the right competition.
+- [ ] On a phone and desktop, review both dashboards and a workspace in light and dark modes. Check long competition names wrap, columns stack cleanly, text stays readable, no page scrolls sideways, and all links remain easy to tap.
+- [ ] Use keyboard navigation and reduced-motion mode. Focus should be visible, section headings should make sense to a screen reader, and counts should remain readable without animation.
 
-If something looks wrong, note the page address, device, theme, and action taken.
+If something looks wrong, note the page address, account type, device width, theme, and action taken.

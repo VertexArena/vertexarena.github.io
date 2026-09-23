@@ -4,7 +4,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 const sandbox={window:{}};vm.runInNewContext(fs.readFileSync('config.js','utf8'),sandbox);
 const {SUPABASE_PROJECT_URL:url,SUPABASE_ANON_KEY:anon}=sandbox.window.VERTEX_CONFIG;
-const accounts=[...new Map(fs.readFileSync('.test-data/accounts.ndjson','utf8').trim().split('\n').map(s=>JSON.parse(s)).map(a=>[a.id,a])).values()];
+const since=process.argv[2] ? new Date(process.argv[2]).getTime() : null;
+const accounts=[...new Map(fs.readFileSync('.test-data/accounts.ndjson','utf8').trim().split('\n').map(s=>JSON.parse(s)).map(a=>[a.id,a])).values()]
+  .filter(account => !since || (account.created_at && new Date(account.created_at).getTime() >= since));
 let removed=0;
 for(const account of accounts) {
   const match=account.email.match(/^vertex-e2e-m4-([a-f0-9]{14})@example\.com$/);
