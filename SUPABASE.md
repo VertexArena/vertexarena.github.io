@@ -104,3 +104,20 @@ It creates the registration and confirmation notification atomically. The RPC
 is a deliberate security-definer function with a fixed search path and restricted
 execute grant, so the existing security-advisor definer-function warning also
 applies to it.
+
+## Applied Milestone 7 migrations
+
+`006_competition_teams.sql` (remote version `20260923072032`) and the immutable
+foreign-key index follow-up `006a_team_foreign_key_indexes.sql` (remote version
+`20260923073302`) were applied through the connected Supabase app to the
+existing Vertex project. Both are included in `SCHEMA.sql` for clean installs.
+
+Team, membership, and invitation rows have RLS. Direct client writes are denied.
+Authenticated RPCs enforce participant identity, captain control, age and
+registration windows, team capacity, category, one active entry per participant,
+and locked registered rosters. The organiser roster RPC checks competition
+ownership and pages teams and individuals. Notifications and team state are in
+Realtime. The new security-definer RPCs have fixed search paths, restricted
+execute grants, and explicit role and ownership checks; the security advisor
+flags this intentional RPC pattern. The advisor's remaining public-profile view,
+profile search, and hosted password-protection findings predate Milestone 7.

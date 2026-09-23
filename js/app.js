@@ -1,6 +1,7 @@
 import { createCompetitions } from './competitions.js';
 import { createDiscovery } from './discovery.js';
 import { createRegistration } from './registration.js';
+import { createTeams } from './teams.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -269,6 +270,7 @@ function bind() {
   competitions.bind();
   discoveryDirectory.bind();
   registration.bind();
+  teams.bind();
   document.querySelector('button[data-theme]')?.addEventListener('click', event => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = theme;
@@ -417,9 +419,12 @@ async function scene() {
 const competitions = createCompetitions({ client: supabase, state, escapeHtml, navigate, setStatus });
 const discoveryDirectory = createDiscovery({ client: supabase, state, escapeHtml, navigate });
 const registration = createRegistration({ client: supabase, state, escapeHtml, navigate, setStatus });
+const teams = createTeams({ client: supabase, state, escapeHtml, setStatus, refresh: render });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
+  const teamRoute = await teams.resolve(path);
+  if (teamRoute !== undefined) return teamRoute;
   const registrationRoute = await registration.resolve(path);
   if (registrationRoute !== undefined) return registrationRoute;
   const competitionRoute = await competitions.resolve(path);
@@ -473,6 +478,7 @@ async function render() {
     app.removeAttribute('inert');
     app.setAttribute('aria-busy', 'false');
     bind();
+    if (route && /^\/competition\/[a-z0-9-]+\/team$/.test(path)) cleanup = teams.subscribe(path);
     if (!initialRender) document.querySelector('#main-content')?.focus({ preventScroll: true });
     initialRender = false; scrollTo(0, 0);
     if (path === '/') cleanup = opportunityLandscape();

@@ -502,6 +502,13 @@ feat: add individual competition registration
 
 # Milestone 7 â€” Competition Teams and Team Registration
 
+**Status: Complete — 23 September 2026.** Desktop, standard mobile, and narrow
+mobile Playwright acceptance passed against the hosted project. Milestone 1,
+5, and 6 regressions: 25 passed, one planned mobile skip. Team, confirmation,
+and organiser roster screenshots were inspected. Migrations 006 and 006a were
+applied through the connected Supabase app and included in `SCHEMA.sql`. Test
+accounts and records were removed. See `tests/MILESTONE-7.md` and `CHECKS.md`.
+
 ## User-visible result
 
 Participants can create competition-specific teams, invite members by username, and register valid teams.
