@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 
-export async function createAccount(page, accountType = 'organiser', prefix = 'changes') {
+export async function createAccount(page, accountType = 'organiser', prefix = 'changes', birthday = '2009-03-14') {
   const identifier = randomUUID().replaceAll('-', '').slice(0, 14);
   const account = {
     username: `e2e_${identifier}`,
@@ -16,7 +16,7 @@ export async function createAccount(page, accountType = 'organiser', prefix = 'c
     await page.getByLabel('Full name').fill(account.name);
     await page.locator('input[name="username"]').fill(account.username);
   }
-  if (accountType === 'participant') await page.getByLabel('Date of birth', { exact: true }).fill('2009-03-14');
+  if (accountType === 'participant') await page.getByLabel('Date of birth', { exact: true }).fill(birthday);
   await page.getByLabel('Email address').fill(account.email);
   await page.getByLabel('Password', { exact: true }).fill(account.password);
   await page.getByLabel('Confirm password').fill(account.password);

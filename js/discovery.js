@@ -1,4 +1,5 @@
 import { fields } from './competition-model.js';
+import { ageMismatch } from './eligibility.js';
 
 export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
   const pageSize = 12;
@@ -14,21 +15,9 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
   const queryText = () => (params().get('q') || '').trim().slice(0, 100);
   const pageNumber = () => Math.max(0, Math.min(100000, Number.parseInt(params().get('page'), 10) || 0));
   const onlySaved = () => params().get('saved') === '1';
-  const age = birthday => {
-    if (!birthday) return null;
-    const birth = new Date(`${birthday}T12:00:00`);
-    const today = new Date();
-    let years = today.getFullYear() - birth.getFullYear();
-    if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) years--;
-    return years;
-  };
   function eligibility(c) {
     if (state.profile?.account_type !== 'participant') return null;
-    const years = age(state.profile.birthday);
-    if (years === null) return 'Add your birthday in your profile to check age eligibility.';
-    if (c.minimum_age !== null && years < c.minimum_age) return `You are ${years}. This competition requires age ${c.minimum_age} or older.`;
-    if (c.maximum_age !== null && years > c.maximum_age) return `You are ${years}. This competition is for age ${c.maximum_age} or younger.`;
-    return null;
+    return ageMismatch(c, state.profile.birthday);
   }
   function registration(c) {
     const now = Date.now();

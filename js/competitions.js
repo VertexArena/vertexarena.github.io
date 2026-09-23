@@ -61,7 +61,11 @@ export function createCompetitions({ client, state, escapeHtml: h, navigate, set
     const c=await result(client.from('competitions').select('*,organisations(id,name,slug)').eq('slug',match[1]).eq('status','published').maybeSingle());
     if(!c) return null;
     const rounds=await result(client.from('competition_rounds').select('*').eq('competition_id',c.id).order('sequence'));
-    return {title:`${c.name} - Vertex`,content:`<div class="page competition-public" data-competition-id="${h(c.id)}" data-minimum-age="${h(c.minimum_age ?? '')}" data-maximum-age="${h(c.maximum_age ?? '')}"><a class="back-link" data-link href="/discover"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Discover competitions</a>${c.owner_id===state.session?.user.id?`<a class="button secondary competition-edit-link" data-link href="/organiser/competition/${h(c.slug)}">Edit competition</a>`:''}${await detailsView(c,rounds,await bannerUrl(c),c.organisations)}</div>`,competition:c};
+    const details=await detailsView(c,rounds,await bannerUrl(c),c.organisations);
+    const entry=(c.team_mode!=='team' && (!state.session || state.profile?.account_type==='participant'))
+      ? `<div class="competition-entry-callout"><div><span class="eyebrow">Take part</span><p>Register an individual entry${c.categories.length?' and choose your category':''}.</p></div><a class="button primary" data-link href="/competition/${h(c.slug)}/register">Register individually <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>` : '';
+    const publicDetails=entry?details.replace('<div class="competition-body">',`${entry}<div class="competition-body">`):details;
+    return {title:`${c.name} - Vertex`,content:`<div class="page competition-public" data-competition-id="${h(c.id)}" data-minimum-age="${h(c.minimum_age ?? '')}" data-maximum-age="${h(c.maximum_age ?? '')}"><a class="back-link" data-link href="/discover"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Discover competitions</a>${c.owner_id===state.session?.user.id?`<a class="button secondary competition-edit-link" data-link href="/organiser/competition/${h(c.slug)}">Edit competition</a>`:''}${publicDetails}</div>`,competition:c};
   }
   function readPanel() {
     if(!editor) return;

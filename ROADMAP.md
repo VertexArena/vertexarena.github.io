@@ -446,6 +446,14 @@ feat: add competition discovery and bookmarks
 
 # Milestone 6 â€” Participant Registration and Age Enforcement
 
+**Status: Complete — 23 September 2026.** Desktop and mobile Playwright
+acceptance passed against the hosted project, including login return,
+category choice, confirmed entry, dashboard, age and window blocks, duplicate
+prevention, and cross-account isolation. Milestone 1 and 5 regression: 23 passed,
+one planned mobile skip. Screenshots inspected. Migration 005 applied through
+the connected Supabase app and included in SCHEMA.sql. Test accounts and records
+removed after verification. See tests/MILESTONE-6.md and CHECKS.md.
+
 ## User-visible result
 
 Eligible participants can register for individual competitions, while invalid registrations are correctly blocked.

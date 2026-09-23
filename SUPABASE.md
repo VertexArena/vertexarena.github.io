@@ -89,3 +89,18 @@ Published participation rules, organisation, stable addresses and timeline are f
 ### Existing security-advisor findings
 
 The public_profiles view intentionally exposes only completed public profile fields, never birthdays; its definer access supports public profiles while the underlying table remains owner-only. See [view guidance](https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view). Organisation mutation RPCs and save_competition deliberately use privileged atomic transactions with explicit persisted-role/ownership checks and restricted execute grants. See [RPC guidance](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable). Hosted leaked-password protection remains disabled; this is an existing Auth configuration, separate from migration state. See [password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
+## Applied Milestone 5 and 6 migrations
+
+`004_discovery_and_bookmarks.sql` and `005_individual_registration.sql` were applied
+through the connected Supabase app to the existing Vertex project. `SCHEMA.sql`
+includes both for clean installation. Do not rerun that bootstrap on this project.
+
+Milestone 6 creates private registration and notification tables. Direct table
+writes are denied. The authenticated `register_individual` RPC checks the stored
+participant role, completed profile and birthday, published competition, team
+mode, opening and closing timestamps, age limits, category, and duplicate entry.
+It creates the registration and confirmation notification atomically. The RPC
+is a deliberate security-definer function with a fixed search path and restricted
+execute grant, so the existing security-advisor definer-function warning also
+applies to it.

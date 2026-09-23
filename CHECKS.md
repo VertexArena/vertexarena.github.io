@@ -1,17 +1,18 @@
-# Vertex — Milestone 5 manual review
+# Vertex — Milestone 6 manual review
 
-Automated browser tests covered search, filters, pagination, direct routes, preview,
-bookmarks, age messages, role permissions, and desktop/mobile behaviour. Use these
-steps to judge clarity and visual quality with real competition content.
+Use a published **individual** competition whose registration is open. Set an age
+range and at least two categories if you want to check every branch. These are
+visual and usability checks to do after the automated browser and database tests.
 
-- [ ] Log out and open **Discover**. Check that title, search, field choices, entry format, and competition count are easy to scan.
-- [ ] Search for a real competition by part of its name. Try two fields together, then each entry format. Switch between soonest deadline, latest deadline, and recently published. Check that changes feel quick and the result count makes sense.
-- [ ] Open **Quick preview** on a card. Check that description, prizes, dates, entry format, age range, and field tags are readable. Close it with Escape and the close button.
-- [ ] Open **Full details**. Check banner treatment, organisation link when present, prize details, registration state, and round timeline. Refresh the page and check it still opens.
-- [ ] Log in as a participant. Save a competition, refresh, then select **Saved only**. Remove the bookmark and check that the empty state gives a useful way back to all competitions.
-- [ ] Inspect a competition outside your age range. Check that the card and full page explain the mismatch without revealing your birthday.
-- [ ] Compare cards with uploaded, solid colour, and gradient banners, plus long names and descriptions. Check text crop, contrast, and card spacing.
-- [ ] On a phone, repeat search, filters, preview, full details, and bookmark actions. Check that no controls overlap or require sideways scrolling.
-- [ ] Switch light and dark themes. At 200% zoom and with reduced motion enabled, check focus visibility, keyboard use, readable text, and preview scrolling.
+- [ ] While logged out, open the competition details. Select **Register individually**. Check that login opens, then log in as an eligible participant. You should return to this competition's registration page.
+- [ ] On the registration page, read the entry summary. Check that the format, closing time, start time, and age range match the competition. Check your full name, @username, and current age.
+- [ ] Leave **Competition category** empty and select **Confirm registration**. The page should require a category. Choose one and register.
+- [ ] Check the confirmation names the right competition and category. Refresh. It should still show the confirmed entry, with no registration form.
+- [ ] Select **Open your dashboard**. Check the competition, category, start time, and registration confirmation notice. Refresh the dashboard; the entry should remain.
+- [ ] Reopen the competition and try to register again. You should see your confirmed entry rather than a second registration option.
+- [ ] With a participant below the minimum age, open the registration page. Check that it states their current age and required minimum, without revealing their birthday. Repeat with a participant above the maximum age.
+- [ ] Open competitions whose registration has not opened and whose deadline has passed. Check that each page explains the correct reason and offers no active registration form. Check a team-only competition too.
+- [ ] On a phone and desktop, review the entry form, blocked state, confirmation, and dashboard in light and dark themes. Check readable type, clear focus, usable buttons, and no sideways scrolling.
+- [ ] Refresh the registration and dashboard addresses directly. With reduced motion enabled, check that all actions still work and the confirmation remains clear.
 
-If something feels wrong, note page address, device, theme, and exact action.
+If anything looks wrong, note the page address, device, theme, and exact action.

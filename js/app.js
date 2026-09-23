@@ -1,5 +1,6 @@
 import { createCompetitions } from './competitions.js';
 import { createDiscovery } from './discovery.js';
+import { createRegistration } from './registration.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -62,7 +63,8 @@ function header(path) {
   const drawerAccount = state.session
     ? `<a class="button primary" data-link href="${accountPath}">${accountLabel}</a><button class="button secondary" type="button" data-logout>Log out</button>`
     : `<a class="button primary" data-link href="/login">Log in</a>`;
-  return `<header class="header"><div class="header-in">${identity}<nav class="nav" aria-label="Primary">${publicNav.map(item => link(...item, path)).join('')}</nav><div class="actions">${accountAction}<button class="theme-toggle" data-theme type="button" role="switch" aria-checked="${dark}" aria-label="Switch to ${dark ? 'light' : 'dark'} mode"><span class="theme-scene" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars"><i></i><i></i><i></i></span><span class="theme-orbit"><span class="theme-orb"><span class="theme-moon"><i></i><i></i><i></i></span></span></span></span></button><button class="icon menu" data-menu aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button></div></div></header><nav class="drawer" data-open="false" aria-label="Mobile">${publicNav.map(item => link(...item, path)).join('')}${drawerAccount}</nav>`;
+  const navigation = state.profile?.account_type === 'participant' ? [...publicNav, ['/dashboard', 'Dashboard']] : publicNav;
+  return `<header class="header"><div class="header-in">${identity}<nav class="nav" aria-label="Primary">${navigation.map(item => link(...item, path)).join('')}</nav><div class="actions">${accountAction}<button class="theme-toggle" data-theme type="button" role="switch" aria-checked="${dark}" aria-label="Switch to ${dark ? 'light' : 'dark'} mode"><span class="theme-scene" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars"><i></i><i></i><i></i></span><span class="theme-orbit"><span class="theme-orb"><span class="theme-moon"><i></i><i></i><i></i></span></span></span></span></button><button class="icon menu" data-menu aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button></div></div></header><nav class="drawer" data-open="false" aria-label="Mobile">${navigation.map(item => link(...item, path)).join('')}${drawerAccount}</nav>`;
 }
 
 function footer() {
@@ -194,7 +196,9 @@ async function submitAuth(form) {
       if (!data.session) throw new Error('Signup did not create an active session. Confirm email verification is disabled in Supabase Auth.');
       state.session = data.session;
       await loadOwnProfile();
-      navigate(accountType === 'organisation' ? '/organisation/edit' : '/profile/edit');
+      const destination = sessionStorage.getItem('vertex-return-path');
+      sessionStorage.removeItem('vertex-return-path');
+      navigate(destination?.startsWith('/') && !destination.startsWith('//') ? destination : accountType === 'organisation' ? '/organisation/edit' : '/profile/edit');
     } else {
       const { data, error } = await supabase.auth.signInWithPassword({ email: String(values.get('email')).trim(), password: String(values.get('password')) });
       if (error) throw error;
@@ -264,6 +268,7 @@ function bind() {
   organisations.bind();
   competitions.bind();
   discoveryDirectory.bind();
+  registration.bind();
   document.querySelector('button[data-theme]')?.addEventListener('click', event => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = theme;
@@ -411,9 +416,12 @@ async function scene() {
 
 const competitions = createCompetitions({ client: supabase, state, escapeHtml, navigate, setStatus });
 const discoveryDirectory = createDiscovery({ client: supabase, state, escapeHtml, navigate });
+const registration = createRegistration({ client: supabase, state, escapeHtml, navigate, setStatus });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
+  const registrationRoute = await registration.resolve(path);
+  if (registrationRoute !== undefined) return registrationRoute;
   const competitionRoute = await competitions.resolve(path);
   if (competitionRoute !== undefined) return competitionRoute;
   const organisationRoute = await organisations.resolve(path);
