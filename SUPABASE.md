@@ -151,3 +151,18 @@ membership and invitation writes remain denied; RLS scopes reads. The checked
 security-definer RPCs are executable only by authenticated users, never anon.
 The advisor flags this intentional pattern; the inviter foreign-key index
 addresses the new performance finding. Existing advisor findings are unchanged.
+
+## Applied Milestone 10 migration
+
+`008_announcements_and_notifications.sql` (remote version `20260924133839`)
+was applied through the connected Supabase app to the existing Vertex project
+and included in `SCHEMA.sql` for clean installs.
+
+Announcements are private to confirmed participants and the organiser team.
+Direct client writes are denied. Checked authenticated RPCs publish, edit,
+delete, and mark notifications read. Publication fans out one notification per
+registered participant, including registered team members. Announcement edits
+update notification text; deletion removes related notifications. The
+announcements table is in the Realtime publication; notifications were already
+published. The security advisor flags the intended authenticated
+security-definer RPC access; each endpoint validates caller identity and scope.

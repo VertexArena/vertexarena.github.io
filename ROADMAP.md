@@ -685,6 +685,14 @@ feat: add competition organiser collaboration
 
 # Milestone 10 â€” Announcements and Notification Centre
 
+**Status: Complete — 24 September 2026.** Organiser broadcasts, participant
+history, author/timestamps, editing/deletion, realtime delivery, notification
+badge/centre/read actions/deep links, and private RLS passed browser acceptance.
+The 320 px and desktop layouts were checked. Milestone 9 collaboration regression
+passed. Migration 008 was applied through the connected Supabase app and added
+to `SCHEMA.sql`. Test accounts and competitions were removed. See
+`tests/MILESTONE-10.md` and `CHECKS.md`.
+
 ## User-visible result
 
 Organisers can publish announcements, and participants receive them in realtime through the in-app notification system.

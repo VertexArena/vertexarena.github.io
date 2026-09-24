@@ -4,6 +4,8 @@ import { createRegistration } from './registration.js';
 import { createTeams } from './teams.js';
 import { createDashboards } from './dashboards.js';
 import { createOrganiserCollaboration } from './organiser-collaboration.js';
+import { createAnnouncements } from './announcements.js';
+import { createNotifications } from './notifications.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/+esm';
 
@@ -67,7 +69,7 @@ function header(path) {
     ? `<a class="button primary" data-link href="${accountPath}">${accountLabel}</a><button class="button secondary" type="button" data-logout>Log out</button>`
     : `<a class="button primary" data-link href="/login">Log in</a>`;
   const navigation = state.profile?.account_type === 'participant' ? [...publicNav, ['/dashboard', 'Dashboard']] : state.profile?.account_type === 'organiser' ? [...publicNav, ['/organiser', 'Dashboard']] : publicNav;
-  return `<header class="header"><div class="header-in">${identity}<nav class="nav" aria-label="Primary">${navigation.map(item => link(...item, path)).join('')}</nav><div class="actions">${accountAction}<button class="theme-toggle" data-theme type="button" role="switch" aria-checked="${dark}" aria-label="Switch to ${dark ? 'light' : 'dark'} mode"><span class="theme-scene" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars"><i></i><i></i><i></i></span><span class="theme-orbit"><span class="theme-orb"><span class="theme-moon"><i></i><i></i><i></i></span></span></span></span></button><button class="icon menu" data-menu aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button></div></div></header><nav class="drawer" data-open="false" aria-label="Mobile">${navigation.map(item => link(...item, path)).join('')}${drawerAccount}</nav>`;
+  return `<header class="header"><div class="header-in">${identity}<nav class="nav" aria-label="Primary">${navigation.map(item => link(...item, path)).join('')}</nav><div class="actions">${notifications.headerAction()}${accountAction}<button class="theme-toggle" data-theme type="button" role="switch" aria-checked="${dark}" aria-label="Switch to ${dark ? 'light' : 'dark'} mode"><span class="theme-scene" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars"><i></i><i></i><i></i></span><span class="theme-orbit"><span class="theme-orb"><span class="theme-moon"><i></i><i></i><i></i></span></span></span></span></button><button class="icon menu" data-menu aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button></div></div></header><nav class="drawer" data-open="false" aria-label="Mobile">${navigation.map(item => link(...item, path)).join('')}${state.session ? `<a data-link href="/notifications">Notifications</a>` : ''}${drawerAccount}</nav>`;
 }
 
 function footer() {
@@ -268,6 +270,8 @@ async function logout() {
 }
 
 function bind() {
+  notifications.bind();
+  announcements.bind();
   dashboards.bind();
   collaboration.bind();
   organisations.bind();
@@ -425,10 +429,16 @@ const discoveryDirectory = createDiscovery({ client: supabase, state, escapeHtml
 const registration = createRegistration({ client: supabase, state, escapeHtml, navigate, setStatus });
 const teams = createTeams({ client: supabase, state, escapeHtml, setStatus, refresh: render });
 const collaboration = createOrganiserCollaboration({ client: supabase, state, escapeHtml, setStatus, refresh: render });
+const notifications = createNotifications({ client: supabase, state, escapeHtml, refresh: render });
+const announcements = createAnnouncements({ client: supabase, state, escapeHtml, refresh: render });
 const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
+  const notificationRoute = await notifications.resolve(path);
+  if (notificationRoute !== undefined) return notificationRoute;
+  const announcementRoute = await announcements.resolve(path);
+  if (announcementRoute !== undefined) return announcementRoute;
   const collaborationRoute = await collaboration.resolve(path);
   if (collaborationRoute !== undefined) return collaborationRoute;
   const dashboardRoute = await dashboards.resolve(path);
@@ -489,6 +499,7 @@ async function render() {
     app.setAttribute('aria-busy', 'false');
     bind();
     if (route && /^\/competition\/[a-z0-9-]+\/team$/.test(path)) cleanup = teams.subscribe(path);
+    if (route && /^\/competition\/[a-z0-9-]+\/announcements(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = announcements.subscribe(path);
     if (!initialRender) document.querySelector('#main-content')?.focus({ preventScroll: true });
     initialRender = false; scrollTo(0, 0);
     if (path === '/') cleanup = opportunityLandscape();
@@ -536,10 +547,12 @@ async function bootstrap() {
   if (state.session) {
     try { await loadOwnProfile(); } catch (profileError) { console.error(profileError); }
   }
+  notifications.start(state.session?.user.id);
   state.authReady = true;
   supabase.auth.onAuthStateChange((event, session) => {
     state.session = session;
     if (event === 'SIGNED_OUT') state.profile = null;
+    notifications.start(session?.user.id);
   });
   await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));
   await render();
