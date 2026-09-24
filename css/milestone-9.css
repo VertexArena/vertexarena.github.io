@@ -1,0 +1,32 @@
+.collaboration-page { max-width: 1260px; padding-top: 46px; padding-bottom: 100px; }
+.collaboration-page .page-head { margin: 26px 0 32px; }
+.collaboration-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(290px, .8fr); gap: clamp(22px, 4vw, 56px); align-items: start; }
+.collaboration-layout > div { display: grid; gap: 22px; min-width: 0; }
+.collaboration-panel { min-width: 0; padding: clamp(23px, 3vw, 34px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-low); }
+.collaboration-panel h2 { margin: 0 0 15px; font-size: clamp(1.35rem, 2vw, 1.75rem); letter-spacing: -.045em; }
+.collaboration-panel h2 .account-badge { vertical-align: middle; margin-left: 8px; font-family: var(--mono); font-size: .7rem; letter-spacing: 0; }
+.collaboration-panel > p { margin: 0 0 22px; color: var(--muted); line-height: 1.55; }
+.collaboration-list { display: grid; }
+.collaboration-roster .collaboration-row:first-child { padding-left: 17px; border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent-soft) 35%, var(--surface)); }
+.collaboration-row { display: flex; align-items: center; gap: 16px; min-width: 0; padding: 17px 0; border-top: 1px solid var(--border); }
+.collaboration-row > .team-person { flex: 1; min-width: 0; }
+.collaboration-row .team-person strong, .collaboration-row .team-person small { overflow-wrap: anywhere; }
+.collaboration-role { display: grid; justify-items: start; gap: 5px; flex: none; }
+.collaboration-role small { color: var(--muted); font-size: .75rem; }
+.collaboration-row .button { flex: none; }
+.collaboration-panel form { display: grid; gap: 13px; }
+.collaboration-suggestions { display: grid; gap: 4px; }
+.collaboration-suggestions button { padding: 11px 13px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); text-align: left; cursor: pointer; }
+.collaboration-suggestions button:hover, .collaboration-suggestions button:focus-visible { border-color: var(--accent); }
+.collaboration-suggestions .team-person { display: flex; flex-direction: column; }
+.collaboration-invitation { display: grid; gap: 13px; padding: 20px; border: 1px solid var(--border); border-radius: 15px; background: var(--surface); }
+.collaboration-invitation + .collaboration-invitation { margin-top: 10px; }
+.collaboration-invitation > div:first-child > strong { font-size: 1rem; }
+.collaboration-invitation p { margin: 7px 0 0; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+.collaboration-invitation .team-inline-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.collaboration-invitation .button { min-height: 38px; font-size: .78rem; }
+.collaboration-page .form-status:empty, .collaboration-inbox .form-status:empty { display: none; }
+@media (max-width: 900px) { .collaboration-layout { grid-template-columns: 1fr; } .collaboration-layout aside { order: -1; } }
+@media (max-width: 620px) { .collaboration-page { padding-top: 30px; } .collaboration-row { flex-wrap: wrap; } .collaboration-row .team-person { flex-basis: calc(100% - 120px); } .collaboration-row .button { margin-left: auto; } }
+@media (max-width: 420px) { .collaboration-row .team-person { flex-basis: 100%; } .collaboration-role { margin-left: 2px; } .collaboration-row .button { margin-left: 0; } }
+@media (prefers-reduced-motion: reduce) { .collaboration-suggestions button { transition: none; } }

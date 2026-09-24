@@ -631,6 +631,15 @@ feat: add participant and organiser dashboards
 
 # Milestone 9 â€” Competition Organiser Collaboration
 
+**Status: Complete — 24 September 2026.** Owner invitations, notifications,
+accept/decline, manager dashboard and editor access, organiser lists, removal,
+participant exclusion, and owner protection passed browser acceptance. Desktop
+and 320/390 px mobile routes, refresh, and visual layout were checked. Milestone
+4 authoring and Milestone 7 team-roster regressions passed. Migrations 007 and
+007a were applied through the connected Supabase app and included in
+`SCHEMA.sql`. Test accounts and competitions were removed. See
+`tests/MILESTONE-9.md` and `CHECKS.md`.
+
 ## User-visible result
 
 Competition owners can invite other organiser accounts to help manage a competition.

@@ -3,6 +3,7 @@ import { createDiscovery } from './discovery.js';
 import { createRegistration } from './registration.js';
 import { createTeams } from './teams.js';
 import { createDashboards } from './dashboards.js';
+import { createOrganiserCollaboration } from './organiser-collaboration.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/+esm';
 
@@ -268,6 +269,7 @@ async function logout() {
 
 function bind() {
   dashboards.bind();
+  collaboration.bind();
   organisations.bind();
   competitions.bind();
   discoveryDirectory.bind();
@@ -422,10 +424,13 @@ const competitions = createCompetitions({ client: supabase, state, escapeHtml, n
 const discoveryDirectory = createDiscovery({ client: supabase, state, escapeHtml, navigate });
 const registration = createRegistration({ client: supabase, state, escapeHtml, navigate, setStatus });
 const teams = createTeams({ client: supabase, state, escapeHtml, setStatus, refresh: render });
-const dashboards = createDashboards({ client: supabase, state, escapeHtml });
+const collaboration = createOrganiserCollaboration({ client: supabase, state, escapeHtml, setStatus, refresh: render });
+const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
+  const collaborationRoute = await collaboration.resolve(path);
+  if (collaborationRoute !== undefined) return collaborationRoute;
   const dashboardRoute = await dashboards.resolve(path);
   if (dashboardRoute !== undefined) return dashboardRoute;
   const teamRoute = await teams.resolve(path);

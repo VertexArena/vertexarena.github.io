@@ -133,3 +133,21 @@ activity for competitions owned by the calling organiser. It checks the stored
 organiser role and scopes every query by `auth.uid()`. The fixed search path and
 restricted execute grant protect this security-definer RPC; the security advisor
 flags the intentional pattern. Anonymous and participant callers cannot execute it.
+
+## Applied Milestone 9 migrations
+
+`007_competition_organisers.sql` (remote version `20260924131451`) and
+`007a_competition_organiser_inviter_index.sql` (remote version
+`20260924132605`) were applied through the connected Supabase app to the
+existing Vertex project. Both are included in `SCHEMA.sql` for clean installs;
+do not rerun that bootstrap on this project.
+
+The original `competitions.owner_id` remains permanent. Owners invite
+completed organiser accounts; invitees accept or decline within 14 days.
+Accepted managers can edit competition details and view workspace and roster.
+The organiser dashboard summary now includes accepted manager competitions.
+Only owners can invite or remove other managers. Managers may leave. Direct
+membership and invitation writes remain denied; RLS scopes reads. The checked
+security-definer RPCs are executable only by authenticated users, never anon.
+The advisor flags this intentional pattern; the inviter foreign-key index
+addresses the new performance finding. Existing advisor findings are unchanged.

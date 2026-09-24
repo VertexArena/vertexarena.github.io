@@ -65,7 +65,7 @@ export function createTeams({ client, state, escapeHtml: h, setStatus, refresh }
       if (state.profile?.account_type !== 'organiser') return { title: 'Organiser account required - Vertex', content: '<div class="page"><h1>Organiser account required.</h1></div>' };
       const c = await result(client.from('competitions').select('id,name,slug,owner_id').eq('slug', organiser[1]).maybeSingle());
       if (!c) return null;
-      if (c.owner_id !== state.session.user.id) return { title: 'Participants unavailable - Vertex', content: '<div class="page"><h1>Participants unavailable.</h1><p>Only this competition’s owner can view its entries.</p></div>' };
+      if (!(await result(client.rpc('can_manage_competition', { target_competition_id: c.id })))) return { title: 'Participants unavailable - Vertex', content: '<div class="page"><h1>Participants unavailable.</h1><p>Only this competition’s organisers can view its entries.</p></div>' };
       const params = new URLSearchParams(location.search);
       const page = key => Math.max(0, Math.min(100000, Number.parseInt(params.get(key), 10) || 0));
       const data = await result(client.rpc('organiser_competition_entries', { target_competition_id: c.id, team_page: page('teams'), individual_page: page('individuals') }));

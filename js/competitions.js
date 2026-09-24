@@ -40,7 +40,7 @@ export function createCompetitions({ client, state, escapeHtml: h, navigate, set
   function duration(ms) { const minutes=Math.max(1,Math.ceil(ms/60000)); return minutes>=1440?`${Math.floor(minutes/1440)}d ${Math.floor(minutes%1440/60)}h`:minutes>=60?`${Math.floor(minutes/60)}h ${minutes%60}m`:`${minutes}m`; }
   async function editorRoute(slug) {
     const c=slug?await result(client.from('competitions').select('*').eq('slug',slug).maybeSingle()):newCompetition();
-    if(!c || c.owner_id && c.owner_id!==state.session.user.id) return { title:'Competition unavailable - Vertex',content:`<div class="page">${empty('Competition unavailable.','Only the competition owner can open this editor.')}<a class="button secondary" data-link href="/organiser">Your competitions</a></div>` };
+    if(!c || c.owner_id && !(await result(client.rpc('can_manage_competition',{target_competition_id:c.id})))) return { title:'Competition unavailable - Vertex',content:`<div class="page">${empty('Competition unavailable.','Only this competition’s organisers can open its editor.')}<a class="button secondary" data-link href="/organiser">Your competitions</a></div>` };
     const rounds=c.version?(await result(client.from('competition_rounds').select('*').eq('competition_id',c.id).order('sequence'))).map(cleanRound):[newRound()];
     const memberships=await result(client.from('organisation_memberships').select('organisations(id,name,slug)').eq('organiser_id',state.session.user.id).eq('status','accepted'));
     const orgs=memberships.map(m=>m.organisations).filter(Boolean);

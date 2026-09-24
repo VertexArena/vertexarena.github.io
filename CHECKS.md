@@ -1,15 +1,15 @@
-# Vertex — Milestone 8 manual review
+# Vertex — Milestone 9 manual review
 
-Use your own participant and organiser accounts. For the richest review, use an organiser with an upcoming competition, one already in progress, and one whose final results date has passed. Register the participant before registration closes. If you create throwaway accounts or competitions, remove them afterward.
+Use an existing competition owner and two other organiser accounts. Keep a participant account available to check the invite boundary.
 
-- [ ] Sign in as a participant and open **Dashboard**. Scan the first screen: competition status counts, next dates, and the discovery action should be easy to understand without scrolling.
-- [ ] Review **In progress**, **Upcoming**, and **Completed**. Check that each entry is under the right heading and its entry link opens the expected competition or team page. A team still being built should be separate from confirmed entries.
-- [ ] Have another participant invite you to a team. On your dashboard, check that the invitation names the team and competition, gives a response deadline, and opens the team page where you can respond.
-- [ ] Check **Approaching deadlines** against the competition timeline. Dates and times should read naturally in your local time zone; past dates should no longer appear as upcoming.
-- [ ] Review the announcement, meeting, submission, results, certificate, and achievement areas. Empty messages should state what is currently available without suggesting an action you cannot take. A confirmed first entry should show the first competition achievement preview.
-- [ ] Sign in as an organiser and open **Dashboard**. Check each competition card clearly shows status and confirmed registrations, people, and teams. Open its **workspace** with the arrow, then use **View participants** and the back link to return.
-- [ ] On the organiser workspace, compare round dates and entry totals with the competition editor and participant roster. Check the edit and public-page links lead to the right competition.
-- [ ] On a phone and desktop, review both dashboards and a workspace in light and dark modes. Check long competition names wrap, columns stack cleanly, text stays readable, no page scrolls sideways, and all links remain easy to tap.
-- [ ] Use keyboard navigation and reduced-motion mode. Focus should be visible, section headings should make sense to a screen reader, and counts should remain readable without animation.
+- [ ] As the owner, open a competition workspace and choose **Organiser team**. Your name should show as **Owner**, with no remove control.
+- [ ] Search for another organiser by @username. Check that suggestions show their full name with @username beneath it, then send an invitation. The person should appear under **Pending invitations** with an expiry date.
+- [ ] As the invitee, open the organiser dashboard. The invitation should name the competition and owner and offer **Accept invitation** and **Decline**.
+- [ ] Accept one invitation. The competition should appear in that organiser’s dashboard with a **Manager** role. Open its workspace, participant list, organiser team, and editor. Save a descriptive edit and check the public page reflects it.
+- [ ] Send a second invitation and decline it. The competition should stay out of that organiser’s managed list.
+- [ ] As the owner, try inviting a participant @username. The form should explain why the account cannot be invited.
+- [ ] Remove a manager. Their competition should disappear from the dashboard and its private management routes should stop opening. The owner should remain on the team.
+- [ ] On a phone and desktop, check the organiser team and dashboard in light and dark modes. Long names should wrap, controls should fit, focus should be visible, and the page should not scroll sideways.
+- [ ] With reduced motion enabled, check that invitations and organiser controls remain usable.
 
-If something looks wrong, note the page address, account type, device width, theme, and action taken.
+If something fails, record the page address, account role, device width, theme, and action taken.
