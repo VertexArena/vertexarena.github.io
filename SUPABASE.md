@@ -192,3 +192,25 @@ Direct client writes to meeting and assignment tables are denied; the checked
 organiser RPC creates them together. The new table is in Realtime. The security
 advisor reports the intended authenticated security-definer RPCs, alongside
 the pre-existing public-profile view and public search function advisories.
+
+## Applied Milestone 13 migrations
+
+`011_round_submissions.sql` (remote version `20260925125201`) and the immutable
+Storage upload metadata correction `011a_submission_upload_metadata_phase.sql`
+(remote version `20260925131258`) were applied through the connected Supabase
+app and included in `SCHEMA.sql` for clean installs. The follow-up
+`011b_submission_config_editor_index.sql` (remote version `20260925132033`)
+adds the index requested by the performance advisor for the submission config
+editor foreign key. The follow-up advisor check shows no new unindexed foreign
+keys in the Milestone 13 tables.
+
+Round submission rules, entries, files, and links use RLS. Direct client writes
+are denied. Checked authenticated RPCs configure each round, save or replace
+work atomically, and page the organiser's review roster. Private Storage paths
+belong to a registered individual or team captain. The bucket has a 25 MB hard
+limit; the final submission RPC checks the stored file size and MIME type
+against the round settings. Storage initially inserts an object row before its
+size and MIME metadata are final, so the upload policy permits absent metadata
+during that phase and the RPC performs final validation. File reads require
+ownership or a recorded submission accessible to an organiser or team member.
+Submission confirmations use the existing notification system.

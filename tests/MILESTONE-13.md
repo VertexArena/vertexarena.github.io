@@ -1,0 +1,9 @@
+# Milestone 13 verification
+
+Run `node node_modules/@playwright/test/cli.js test tests/e2e/milestone-13.spec.js --project=laptop --workers=1` while serving Vertex locally through Playwright's configured HTTP server.
+
+The browser test creates clearly named organiser and participant accounts, three published competitions, individual and team registrations, and a missing entrant. It configures file, link, and mixed rounds through the organiser interface. It verifies permitted upload, wrong MIME type, the configured size cap, the hard 25 MB cap, replacement, link submission, team captain and member access, notifications, secure organiser review and file download, outsider denial, direct route refresh, mobile layout, and closing-time enforcement. It captures mobile participant and desktop organiser screenshots for inspection.
+
+The test passed on 2026-09-25 using the connected Vertex Supabase project. Both screenshots were inspected. The first run exposed Storage's upload metadata timing; immutable migration `011a_submission_upload_metadata_phase.sql` corrected it. The final full run passed. The performance advisor found a missing config editor foreign-key index, fixed by `011b_submission_config_editor_index.sql`. Existing security-advisor findings concern the intentional authenticated checked RPC pattern and older public profile/search objects.
+
+After the run, both sets of clearly marked fixtures were removed: 12 test Auth users, 6 competitions, and 2 private Storage files. A verification query returned zero matching users, competitions, and submission bucket objects. The ignored `.test-data/m13-fixture.json` manifest and one-off probe scripts were removed. For a future interrupted run, remove referenced file metadata, remove test Storage files using their owners' tokens from the ignored fixture manifest, then delete only `vertex-e2e-m13-%@example.com` users and `m13-%-e2e-%` competitions whose names begin `Vertex M13 `.
