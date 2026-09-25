@@ -1,15 +1,14 @@
-# Vertex — Milestone 10 manual review
+# Vertex — Milestone 11 manual review
 
-Use a published competition with one registered participant, its organiser, and an unrelated account. Open organiser and participant sessions in separate browser windows.
+Use a published competition with one registered participant and its organiser. Open each account in a separate window.
 
-- [ ] As the organiser, open the competition workspace and choose **Manage announcements**. Check the history and **Write an update** panel fit the screen on desktop and phone.
-- [ ] Keep the participant announcement page open. Publish an announcement with a heading and message from the organiser window. It should appear in the participant window without a refresh, with the organiser’s full name, @username, and local date/time.
-- [ ] Look at the participant’s header bell. Its unread count should increase. Open **Notifications** and find the announcement. Choose **Open update**; the exact announcement should open and be highlighted. Refresh that address and check it still opens.
-- [ ] Return to **Notifications**. The opened item should now be read. Publish another announcement, use **Mark as read** on one item, then **Mark all as read**. The unread count should return to zero.
-- [ ] As the organiser, edit an announcement and check both the history and notification title update. Delete one; check it disappears from the history and related notification list.
-- [ ] As an unrelated account, open the competition’s announcements address. It should explain that access is limited. As a participant, confirm there is no publishing form.
-- [ ] Send a team invitation and an organiser invitation using their existing flows. Each invitee should see the relevant item in **Notifications**, with a working **Open update** link.
-- [ ] Check `/notifications` and the announcement page in light and dark modes at desktop, phone, and 320 px width. Text should wrap cleanly, buttons should remain usable, keyboard focus should be visible, and no sideways scrolling should occur.
-- [ ] Enable reduced motion and repeat the publish, open, and read actions. They should still work.
+- [ ] From the competition page, open **Questions & answers**. Confirm the route is easy to find and the page explains who can see questions.
+- [ ] As the participant, write a real question. Confirm the text is readable in the conversation and the form gives clear success feedback.
+- [ ] As the organiser, open **Notifications**, follow the question link, and write a useful reply. Confirm the participant sees the answer and a reply notification in the other window.
+- [ ] Edit the organiser reply. Confirm the updated wording is clear, with an edited date, and the earlier wording is gone.
+- [ ] Mark the question resolved, then reopen it. Confirm both status labels make sense without relying on colour alone.
+- [ ] Open the organiser dashboard and competition workspace. Confirm unanswered questions are easy to find and **Manage questions** opens the right competition.
+- [ ] Review the question page at desktop, phone, and 320 px width in light and dark modes. Check long text wraps, author names and @usernames remain readable, controls fit, and nothing scrolls sideways.
+- [ ] Use keyboard navigation and a screen reader if available. Confirm form labels, focus outlines, status changes, and notification links are understandable. Repeat with reduced motion enabled.
 
 If a check fails, note the page address, account role, device width, theme, and action taken.

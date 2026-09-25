@@ -166,3 +166,16 @@ update notification text; deletion removes related notifications. The
 announcements table is in the Realtime publication; notifications were already
 published. The security advisor flags the intended authenticated
 security-definer RPC access; each endpoint validates caller identity and scope.
+
+## Applied Milestone 11 migration
+
+`009_competition_qa.sql` (remote version `20260925115754`) was applied through
+the connected Supabase app to the existing Vertex project and included in
+`SCHEMA.sql` for clean installs.
+
+Registered participants can post competition questions. Organisers can reply,
+edit their own replies, and resolve or reopen questions. Question and reply
+tables use RLS, deny direct client writes, and participate in Realtime.
+Checked authenticated RPCs create organiser and participant notifications
+with question deep links. The security advisor flags the intended authenticated
+security-definer RPC access; each endpoint checks persisted role and scope.

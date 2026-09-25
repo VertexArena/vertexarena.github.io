@@ -744,6 +744,14 @@ feat: add announcements and realtime notifications
 
 # Milestone 11 â€” Competition Q&A
 
+**Status: Complete — 25 September 2026.** Registered participant questions,
+organiser replies and editing, answered/resolved states, realtime updates,
+notifications and deep links, private RLS, direct routes, and desktop/mobile
+browser acceptance passed. Migration 009 was applied through the connected
+Supabase app and added to `SCHEMA.sql`. Milestone 10 regression passed. Test
+accounts and competitions were removed. See `tests/MILESTONE-11.md` and
+`CHECKS.md`.
+
 ## User-visible result
 
 Participants can ask competition questions and organisers can answer them in realtime.

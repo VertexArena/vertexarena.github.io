@@ -1,0 +1,44 @@
+.competition-community-links { display: flex; flex-wrap: wrap; gap: 9px; margin: 0 0 22px; }
+.competition-community-links .button { gap: 12px; }
+.qa-page { max-width: 1180px; padding-top: clamp(32px, 5vw, 64px); padding-bottom: 100px; }
+.qa-page .back-link { display: inline-flex; margin-bottom: 30px; }
+.qa-page .page-head { margin-bottom: 34px; }
+.qa-page .page-head h1 { font-size: clamp(2.65rem, 6vw, 4.75rem); }
+.qa-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(290px, .8fr); gap: clamp(28px, 5vw, 62px); align-items: start; }
+.qa-list-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 17px; border-bottom: 1px solid var(--border); }
+.qa-list-head h2 { margin: 0; font-size: 1.42rem; letter-spacing: -.04em; }
+.qa-list-head span { color: var(--muted); font-family: var(--mono); font-size: .75rem; }
+.qa-feed { display: grid; gap: 17px; padding-top: 22px; }
+.qa-card { min-width: 0; padding: clamp(20px, 3vw, 28px); border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-low); }
+.qa-focused { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.qa-card-head, .qa-reply-meta { display: flex; align-items: start; justify-content: space-between; gap: 14px; }
+.qa-card-head time, .qa-reply-meta time { color: var(--muted); font-family: var(--mono); font-size: .68rem; text-align: right; }
+.qa-status { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border-radius: 99px; color: var(--accent); background: var(--accent-soft); font-size: .7rem; font-weight: 700; }
+.qa-open { color: #965c08; background: #fff4d8; }
+[data-theme="dark"] .qa-open { color: #f6c76b; background: #3b2b12; }
+.qa-resolved { color: #16734a; background: #e4f7ee; }
+[data-theme="dark"] .qa-resolved { color: #80e2ae; background: #123524; }
+.qa-author { display: flex; align-items: baseline; gap: 8px; margin-top: 23px; font-size: .82rem; }
+.qa-author span, .qa-reply-meta span { color: var(--muted); font-size: .72rem; }
+.qa-card h2 { margin: 8px 0 24px; font-size: clamp(1.25rem, 2.25vw, 1.62rem); line-height: 1.35; letter-spacing: -.035em; white-space: pre-wrap; overflow-wrap: anywhere; }
+.qa-replies { display: grid; gap: 14px; }
+.qa-reply { min-width: 0; padding: 17px 19px; border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; background: var(--accent-soft); }
+.qa-reply-meta > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px; }
+.qa-reply-meta strong { font-size: .82rem; }
+.qa-reply-meta .qa-organiser-label { padding: 2px 5px; border: 1px solid var(--accent); border-radius: 4px; color: var(--accent); font-family: var(--mono); font-size: .58rem; text-transform: uppercase; }
+.qa-reply p { margin: 12px 0 0; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.qa-reply > small { display: block; margin-top: 8px; color: var(--muted); }
+.qa-edit { margin-top: 9px; padding-left: 0; }
+.qa-awaiting { margin: 0; padding: 15px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: .83rem; }
+.qa-manager-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+.qa-manager-actions .button { min-height: 34px; font-size: .76rem; }
+.qa-reply-form { display: grid; gap: 10px; margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--border); }
+.qa-reply-form textarea, .qa-side textarea { resize: vertical; }
+.qa-form-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.qa-more { margin-top: 20px; }
+.qa-side { position: sticky; top: calc(var(--header) + 22px); padding: clamp(22px, 3vw, 30px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-low); }
+.qa-side h2 { margin: 8px 0; font-size: 1.72rem; letter-spacing: -.05em; }
+.qa-side > p { color: var(--muted); font-size: .84rem; line-height: 1.55; }
+.qa-side form { display: grid; gap: 15px; margin-top: 22px; }
+@media (max-width: 860px) { .qa-layout { grid-template-columns: 1fr; } .qa-side { position: static; grid-row: 1; } }
+@media (max-width: 620px) { .qa-card-head, .qa-reply-meta { flex-wrap: wrap; } .qa-card-head time, .qa-reply-meta time { text-align: left; } .qa-card { padding: 19px; } .qa-author { flex-wrap: wrap; } .qa-reply-meta > div { display: grid; gap: 3px; } .qa-reply-meta .qa-organiser-label { width: max-content; } }

@@ -5,6 +5,7 @@ import { createTeams } from './teams.js';
 import { createDashboards } from './dashboards.js';
 import { createOrganiserCollaboration } from './organiser-collaboration.js';
 import { createAnnouncements } from './announcements.js';
+import { createQuestions } from './questions.js';
 import { createNotifications } from './notifications.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/+esm';
@@ -272,6 +273,7 @@ async function logout() {
 function bind() {
   notifications.bind();
   announcements.bind();
+  questions.bind();
   dashboards.bind();
   collaboration.bind();
   organisations.bind();
@@ -431,6 +433,7 @@ const teams = createTeams({ client: supabase, state, escapeHtml, setStatus, refr
 const collaboration = createOrganiserCollaboration({ client: supabase, state, escapeHtml, setStatus, refresh: render });
 const notifications = createNotifications({ client: supabase, state, escapeHtml, refresh: render });
 const announcements = createAnnouncements({ client: supabase, state, escapeHtml, refresh: render });
+const questions = createQuestions({ client: supabase, state, escapeHtml, refresh: render });
 const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
@@ -439,6 +442,8 @@ async function resolveRoute(path) {
   if (notificationRoute !== undefined) return notificationRoute;
   const announcementRoute = await announcements.resolve(path);
   if (announcementRoute !== undefined) return announcementRoute;
+  const questionRoute = await questions.resolve(path);
+  if (questionRoute !== undefined) return questionRoute;
   const collaborationRoute = await collaboration.resolve(path);
   if (collaborationRoute !== undefined) return collaborationRoute;
   const dashboardRoute = await dashboards.resolve(path);
@@ -500,6 +505,7 @@ async function render() {
     bind();
     if (route && /^\/competition\/[a-z0-9-]+\/team$/.test(path)) cleanup = teams.subscribe(path);
     if (route && /^\/competition\/[a-z0-9-]+\/announcements(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = announcements.subscribe(path);
+    if (route && /^\/competition\/[a-z0-9-]+\/questions(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = questions.subscribe(path);
     if (!initialRender) document.querySelector('#main-content')?.focus({ preventScroll: true });
     initialRender = false; scrollTo(0, 0);
     if (path === '/') cleanup = opportunityLandscape();
