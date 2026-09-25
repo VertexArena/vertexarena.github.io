@@ -179,3 +179,16 @@ tables use RLS, deny direct client writes, and participate in Realtime.
 Checked authenticated RPCs create organiser and participant notifications
 with question deep links. The security advisor flags the intended authenticated
 security-definer RPC access; each endpoint checks persisted role and scope.
+
+## Applied Milestone 12 migration
+
+`010_competition_meetings.sql` (remote version `20260925122345`) was applied
+through the connected Supabase app to the existing Vertex project and included
+in `SCHEMA.sql` for clean installs. Meetings have case-insensitively unique
+names within a competition, stable slugs, random Jitsi room names, registered
+participant and team assignments, and assignment notifications. RLS exposes a
+meeting and its room name only to its organisers or assigned registered people.
+Direct client writes to meeting and assignment tables are denied; the checked
+organiser RPC creates them together. The new table is in Realtime. The security
+advisor reports the intended authenticated security-definer RPCs, alongside
+the pre-existing public-profile view and public search function advisories.

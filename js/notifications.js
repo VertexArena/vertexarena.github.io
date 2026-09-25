@@ -7,7 +7,7 @@ export function createNotifications({ client, state, escapeHtml: h, refresh }) {
   const pageSize = 30;
   const result = async query => { const { data, error, count } = await query; if (error) throw error; return { data, count }; };
   const safePath = value => /^\/(?!\/)[a-zA-Z0-9/_@.?=&%-]*$/.test(value || '') ? value : '/notifications';
-  const icon = kind => ({ announcement: 'bullhorn', registration_confirmed: 'circle-check', team_invitation: 'envelope', competition_organiser_invitation: 'user-plus', submission_confirmed: 'file-circle-check', qa_question: 'circle-question', qa_reply: 'comments' })[kind] || 'bell';
+  const icon = kind => ({ announcement: 'bullhorn', registration_confirmed: 'circle-check', team_invitation: 'envelope', competition_organiser_invitation: 'user-plus', submission_confirmed: 'file-circle-check', qa_question: 'circle-question', qa_reply: 'comments', meeting_assignment: 'video' })[kind] || 'bell';
   const card = item => `<article class="notice-row ${item.read_at ? '' : 'notice-unread'}" data-notice-id="${h(item.id)}"><span class="notice-icon"><i class="fa-solid fa-${icon(item.kind)}" aria-hidden="true"></i></span><div class="notice-content"><div class="notice-title"><strong>${h(item.title)}</strong>${item.read_at ? '' : '<span class="notice-dot" aria-label="Unread"></span>'}</div><p>${h(item.body)}</p><time datetime="${h(item.created_at)}">${h(date(item.created_at))}</time><div class="notice-actions"><a data-link data-notice-open="${h(item.id)}" href="${h(safePath(item.link_path))}">Open update</a>${item.read_at ? '' : `<button type="button" data-notice-read="${h(item.id)}">Mark as read</button>`}</div></div></article>`;
 
   function updateBadge() {

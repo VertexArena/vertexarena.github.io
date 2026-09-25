@@ -798,6 +798,14 @@ feat: add realtime competition Q&A
 
 # Milestone 12 â€” Jitsi Meetings and Assigned Access
 
+**Status: Complete — 25 September 2026.** Organisers create uniquely named
+meetings and assign registered individuals or teams. Supabase RLS restricts
+meeting visibility and Jitsi room metadata to invitees and organisers. The
+desktop and mobile Playwright acceptance flow verified notifications,
+case-insensitive duplicate names, direct routes, refresh, Jitsi iframe loading,
+leaving, and unassigned access denial. Migration 010 was applied to the
+existing Supabase project; test records and accounts were removed.
+
 ## User-visible result
 
 Organisers can create Jitsi meetings and assign them to specific participants or teams.
