@@ -9,6 +9,7 @@ import { createQuestions } from './questions.js';
 import { createMeetings } from './meetings.js';
 import { createSubmissions } from './submissions.js';
 import { createScoring } from './scoring.js';
+import { createAdvancement } from './advancement.js';
 import { createNotifications } from './notifications.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/+esm';
@@ -280,6 +281,7 @@ function bind() {
   meetings.bind();
   submissions.bind();
   scoring.bind();
+  advancement.bind();
   dashboards.bind();
   collaboration.bind();
   organisations.bind();
@@ -443,6 +445,7 @@ const questions = createQuestions({ client: supabase, state, escapeHtml, refresh
 const meetings = createMeetings({ client: supabase, state, escapeHtml, refresh: render, navigate });
 const submissions = createSubmissions({ client: supabase, state, escapeHtml, refresh: render });
 const scoring = createScoring({ client: supabase, state, escapeHtml, refresh: render });
+const advancement = createAdvancement({ client: supabase, state, escapeHtml, refresh: render });
 const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
@@ -459,6 +462,8 @@ async function resolveRoute(path) {
   if (submissionRoute !== undefined) return submissionRoute;
   const scoringRoute = await scoring.resolve(path);
   if (scoringRoute !== undefined) return scoringRoute;
+  const advancementRoute = await advancement.resolve(path);
+  if (advancementRoute !== undefined) return advancementRoute;
   const collaborationRoute = await collaboration.resolve(path);
   if (collaborationRoute !== undefined) return collaborationRoute;
   const dashboardRoute = await dashboards.resolve(path);

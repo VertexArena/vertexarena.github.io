@@ -1,14 +1,17 @@
-# Vertex — Milestone 14 manual review
+# Vertex — Milestone 15 manual review
 
-Use a published competition with at least one round, two registered individuals, and one registered team. Sign in as its organiser. Keep a participant or logged-out window open for the public score page.
+Use a published competition with two rounds. Set the first round to advance the top 3. Register at least five entries, including one team with two members. Sign in as an organiser; keep a participant window open.
 
-- [ ] Open the competition workspace and choose **Manage scoring**. Confirm round tabs, progress totals, criteria panel, and entry roster are easy to understand at a glance.
-- [ ] Add two criteria with distinct names, maximum marks, and descriptions. Edit one, move it up or down, refresh, and confirm its text and order remain. Check that controls give clear feedback.
-- [ ] Enter marks for one individual and the team. Confirm each total matches the sum and shows the round maximum. Leave one criterion blank for another entrant; confirm that entry is clearly marked incomplete. A mark of **0** should count as scored.
-- [ ] Edit a saved mark. Try a mark above the criterion maximum and a negative mark. Confirm the page explains the limit and keeps the saved score.
-- [ ] Search the roster by name and `@username`, then switch between score, name, and incomplete sorting. Confirm entries stay recognisable and scores are easy to compare.
-- [ ] Turn on **Show scores publicly**. From the public competition page, choose **View round scores** for that round. Confirm only fully scored entrants appear and team entries are labelled. Turn visibility off and confirm the page explains that scores are private.
-- [ ] Try the scoring address while signed in as a participant. Confirm organiser controls and private marks are unavailable.
-- [ ] Review the organiser page and public score page at desktop and phone widths, in light and dark mode. Check spacing, readable labels, keyboard focus, no sideways scrolling, and understandable empty states.
+- [ ] Open the competition workspace and choose **Resolve advancement**. Confirm each round has a tab and the page shows the cutoff, scored count, decision state, and ranked entries.
+- [ ] Score all first-round entries with no tie across third place. Return to advancement. Confirm exactly three entries show **Advance** and no row has the blue boundary highlight. A tie wholly above or below third place should remain unhighlighted.
+- [ ] Change scores so third and fourth place tie. Confirm only entries in that cutoff tie have the blue highlight and **Decision needed**. Confirm **Finalise round** stays unavailable.
+- [ ] Choose **Include all tied entries**. Confirm all highlighted entries show **Advance**, even though more than three now advance. Choose **Exclude all tied entries** and confirm only entries above the tie advance.
+- [ ] Choose **Leave unresolved**. Confirm finalisation stays unavailable. Select exactly one tied entry in **Manual selection**, save, and confirm only that chosen entry advances from the tie.
+- [ ] Refresh the organiser page. Confirm saved choice and highlighted rows remain. Try selecting too few or too many entries; confirm a clear error explains the exact number required.
+- [ ] Choose **Finalise round** and accept the confirmation. Confirm result state says **Round locked**, scoring controls are locked, and outcome remains after refresh.
+- [ ] Open second-round advancement and scoring. Confirm only first-round advancers appear as active entries. Check that eliminated participants cannot open second-round submissions.
+- [ ] As a team member, open **My round history** from the competition page. Confirm the first-round status and top 3 tag appear. Confirm both team members are eligible for the next round. As an eliminated individual, confirm history says **Eliminated**.
+- [ ] As a participant, open the organiser advancement URL. Confirm organiser controls are unavailable. While signed out, open the same URL and confirm login returns to that address.
+- [ ] Review organiser and participant pages at desktop and phone widths, in light and dark mode. Check readable names and scores, visible focus states, usable controls, and no sideways scrolling.
 
-If a check fails, note the page address, account role, device width, and action taken. Remove any test accounts and competition records you create.
+Remove any accounts or competition records you create for these checks.

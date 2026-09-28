@@ -987,6 +987,15 @@ feat: add competition scoring
 
 # Milestone 15 â€” Advancement and Cutoff Tie Resolution
 
+**Status: Complete — 28 September 2026.** Organisers can review provisional
+rankings, resolve only cutoff-crossing ties with include-all, exclude-all, or
+manual selection, and finalise authoritative outcomes. Later-round scoring and
+submissions use the advanced roster; team members inherit eligibility. The
+hosted migration was applied through the Supabase connector. Playwright
+acceptance passed on desktop with a 320 px visual check; core route regression
+passed on desktop and narrow mobile. Test accounts and records were removed.
+See `tests/MILESTONE-15.md` and `CHECKS.md`.
+
 ## User-visible result
 
 Vertex calculates provisional advancement and requires explicit organiser resolution of cutoff ties.

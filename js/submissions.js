@@ -27,9 +27,9 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
     if (Date.now() >= Date.parse(config.closes_at)) return 'Closed';
     return 'Ready to submit';
   }
-  function roundCard(round, config, submission, c) {
-    const label = status(config, submission);
-    return `<article class="submission-round-card"><div class="submission-round-number">${String(round.sequence).padStart(2, '0')}</div><div class="submission-round-copy"><span class="submission-state ${label === 'Ready to submit' ? 'ready' : label === 'Submitted' ? 'done' : ''}">${h(label)}</span><h2>${h(round.name)}</h2><p>${config?.enabled ? `${config.mode === 'mixed' ? 'Files and links' : config.mode === 'file' ? 'Files' : 'Links'} · Closes ${h(date(config.closes_at))}` : 'Organiser has not opened submissions for this round.'}</p></div><a class="button secondary" data-link href="${viewPath(c.slug, round.slug)}">${submission ? 'View work' : 'Open round'} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>`;
+  function roundCard(round, config, submission, c, eligible) {
+    const label = eligible ? status(config, submission) : 'Not active';
+    return `<article class="submission-round-card"><div class="submission-round-number">${String(round.sequence).padStart(2, '0')}</div><div class="submission-round-copy"><span class="submission-state ${label === 'Ready to submit' ? 'ready' : label === 'Submitted' ? 'done' : ''}">${h(label)}</span><h2>${h(round.name)}</h2><p>${eligible ? config?.enabled ? `${config.mode === 'mixed' ? 'Files and links' : config.mode === 'file' ? 'Files' : 'Links'} · Closes ${h(date(config.closes_at))}` : 'Organiser has not opened submissions for this round.' : 'Only entries advanced from the previous round can submit here.'}</p></div>${eligible ? `<a class="button secondary" data-link href="${viewPath(c.slug, round.slug)}">${submission ? 'View work' : 'Open round'} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>` : ''}</article>`;
   }
   async function entryFor(c) {
     const individual = await result(client.from('individual_registrations').select('id').eq('competition_id', c.id).eq('participant_id', state.session.user.id).maybeSingle());
@@ -105,6 +105,7 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
     if (participantMatch[2]) {
       const round = rounds.find(row => row.slug === participantMatch[2]);
       if (!round) return null;
+      if (!await result(client.rpc('my_round_entry_eligible', { target_round_id: round.id }))) return unavailable('Your entry is not active in this round. Only entrants advanced from the previous round can submit.');
       const config = configs.find(row => row.round_id === round.id);
       const submission = await readMine(round.id);
       active = { type: 'participant-round', c, round, config, entry, submission };
@@ -112,8 +113,9 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
       return participantRound(c, round, config, entry, submission);
     }
     const submissions = await result(client.from('round_submissions').select('id,round_id').in('round_id', rounds.map(row => row.id)));
+    const eligibility = new Map(await Promise.all(rounds.map(async round => [round.id, await result(client.rpc('my_round_entry_eligible', { target_round_id: round.id }))])));
     active = { type: 'participant-list', c, rounds, configs, entry };
-    return { title: `${c.name} submissions - Vertex`, content: `<div class="page submission-page">${heading(c, 'Competition work / submissions', 'Round by round.', `Follow each submission window for ${entry.name}.`, `/competition/${c.slug}`)}<div class="submission-round-list">${rounds.map(round => roundCard(round, configs.find(cfg => cfg.round_id === round.id), submissions.find(item => item.round_id === round.id), c)).join('')}</div></div>` };
+    return { title: `${c.name} submissions - Vertex`, content: `<div class="page submission-page">${heading(c, 'Competition work / submissions', 'Round by round.', `Follow each submission window for ${entry.name}.`, `/competition/${c.slug}`)}<div class="submission-round-list">${rounds.map(round => roundCard(round, configs.find(cfg => cfg.round_id === round.id), submissions.find(item => item.round_id === round.id), c, eligibility.get(round.id))).join('')}</div></div>` };
   }
 
   async function openStoredFile(path, name, mime, view) {
