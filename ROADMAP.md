@@ -931,6 +931,14 @@ feat: add secure round submissions
 
 # Milestone 14 â€” Scoring Criteria and Score Entry
 
+**Status: Complete — 28 September 2026.** Organiser scoring criteria, ordering,
+validated individual and team marks, totals, incomplete warnings, editing,
+sorting, and controlled public score visibility passed browser acceptance.
+Migrations 012, 012a, and 012b were applied through the connected Supabase app
+and added to `SCHEMA.sql`. Desktop and 320 px screenshots were inspected;
+Milestone 1 route/theme regression passed. Test accounts and records were removed.
+See `tests/MILESTONE-14.md` and `CHECKS.md`.
+
 ## User-visible result
 
 Organisers can define scoring criteria and enter complete, validated scores for each round.

@@ -1,17 +1,14 @@
-# Vertex — Milestone 13 manual review
+# Vertex — Milestone 14 manual review
 
-Prepare a published competition with a registered individual, a registered team, and one registered entrant who will leave the round unsubmitted. Use an organiser account, those participant accounts, and an unrelated account in separate browser windows. Set the round submission window to open now and close after these checks.
+Use a published competition with at least one round, two registered individuals, and one registered team. Sign in as its organiser. Keep a participant or logged-out window open for the public score page.
 
-- [ ] In the organiser workspace, open **Manage submissions**. Choose a round and enable submissions. Set **Files**, allow `text/plain`, set a 1 MB file limit, add instructions, and save. Refresh; confirm the settings remain.
-- [ ] As the registered individual, open the competition’s **Submissions** page and that round. Confirm the instructions, opening and closing times, allowed type, size limit, and file chooser are clear.
-- [ ] Choose a small `.txt` file. Confirm its name appears in the preview. Submit it; confirm the success message, saved file, and a **Submission confirmed** notification. Refresh the round and confirm the work remains.
-- [ ] Try a different file type, a `.txt` file larger than 1 MB, and a file larger than 25 MB. Each should show a clear error and leave the saved submission unchanged.
-- [ ] Before the close time, remove the saved file, choose a new allowed file, and save. Confirm the new file replaces the old one and an update notification appears.
-- [ ] In a different round or competition, configure **Links**. Submit a complete `https://` link and confirm it appears in the saved work. Confirm the file chooser is absent.
-- [ ] In another round or competition, configure **Both**. As the registered team captain, submit one allowed file and one link. Confirm both appear. As another team member, confirm both are visible but editing is unavailable; check their notification.
-- [ ] As organiser, return to **Manage submissions**. Confirm the submitted entrant shows **Valid** with the file or link and submission time, while the entrant who sent nothing shows **Missing**. Filter by status and entry type, search by name or @username, open a private file, and export the filtered metadata.
-- [ ] As the unrelated account, paste the participant’s submission page address and a private file address. Confirm neither reveals the submission or file.
-- [ ] After the close time, refresh the participant round. Confirm the deadline message appears and editing is unavailable. Try submitting again; confirm it is rejected.
-- [ ] Repeat the participant round and organiser review at phone and desktop widths, in light and dark mode. Check readable cards, visible focus when using the keyboard, and no horizontal scrolling.
+- [ ] Open the competition workspace and choose **Manage scoring**. Confirm round tabs, progress totals, criteria panel, and entry roster are easy to understand at a glance.
+- [ ] Add two criteria with distinct names, maximum marks, and descriptions. Edit one, move it up or down, refresh, and confirm its text and order remain. Check that controls give clear feedback.
+- [ ] Enter marks for one individual and the team. Confirm each total matches the sum and shows the round maximum. Leave one criterion blank for another entrant; confirm that entry is clearly marked incomplete. A mark of **0** should count as scored.
+- [ ] Edit a saved mark. Try a mark above the criterion maximum and a negative mark. Confirm the page explains the limit and keeps the saved score.
+- [ ] Search the roster by name and `@username`, then switch between score, name, and incomplete sorting. Confirm entries stay recognisable and scores are easy to compare.
+- [ ] Turn on **Show scores publicly**. From the public competition page, choose **View round scores** for that round. Confirm only fully scored entrants appear and team entries are labelled. Turn visibility off and confirm the page explains that scores are private.
+- [ ] Try the scoring address while signed in as a participant. Confirm organiser controls and private marks are unavailable.
+- [ ] Review the organiser page and public score page at desktop and phone widths, in light and dark mode. Check spacing, readable labels, keyboard focus, no sideways scrolling, and understandable empty states.
 
-If a check fails, record the page address, account role, device width, and action taken.
+If a check fails, note the page address, account role, device width, and action taken. Remove any test accounts and competition records you create.
