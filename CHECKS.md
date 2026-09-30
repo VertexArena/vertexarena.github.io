@@ -1,18 +1,66 @@
-# Vertex — Milestone 16 manual review
+# Milestone 17 — Certificate studio
 
-Prepare a published competition with two rounds. Register several participants and one team, enter scores, and finalise each round’s advancement. Include at least two categories with registered entries. Keep organiser and participant browser windows open.
+Use your own certificate artwork and competition data for these checks. Browser
+automation covers the functional flow, permissions, saved layouts, eligibility,
+downloads, refreshes, and mobile widths. These checks focus on your artwork,
+typography, device, and downloaded files.
 
-- [ ] As organiser, open the competition workspace and choose **Manage leaderboards**. Select each round. Confirm its preview shows a top-three podium, the complete ranked list, participant and team names, scores, and advancement or elimination labels.
-- [ ] Search the preview by a participant name, username, and team name. Confirm matching entries appear, then clear the search and confirm the full list returns.
-- [ ] Choose and save a winner for every represented category. Refresh. Confirm each choice remains and the category award cards name the correct winners.
-- [ ] Before the round’s submission deadline, try **Publish now**. Confirm a clear error keeps results private. After the deadline, schedule a future release. Confirm the organiser page says **Scheduled** and shows the chosen release time.
-- [ ] As a participant or signed-out visitor, open `/competition/{competition-slug}/leaderboard/{round-slug}` before release. Confirm a live countdown appears, with no ranks, scores, category winners, or personal outcome. Refresh the direct URL and confirm the countdown remains.
-- [ ] Leave the result page open through the release time. Confirm it changes to the published leaderboard automatically. Refresh and confirm the published result remains available.
-- [ ] Confirm a registered participant receives a leaderboard notification that opens the right round. An advancer should see **You advanced**; an eliminated participant or team member should see **Your run ended here**. Check that round history matches the released result.
-- [ ] Publish one round with **Show scores publicly** off. Confirm public ranks and outcomes appear without numerical scores. Publish another round with the option on and confirm scores appear on both podium and ranked rows.
-- [ ] Open both round URLs after publishing the later round. Confirm the earlier leaderboard remains accessible and unchanged, including after refresh.
-- [ ] On a phone width and desktop width, inspect the podium, category awards, rank rows, search, pagination, countdown, and organiser controls. Check for readable text, usable keyboard focus, light and dark theme contrast, and no sideways scrolling.
-- [ ] If a competition has hundreds of entries, move between leaderboard pages and search for an entry beyond the first page. Confirm the result appears quickly and ranks remain correct.
-- [ ] Open Vertex as an installed app. Toggle between light and dark mode. Confirm the title bar changes with the page background. Close and reopen the app; confirm the saved theme and matching title bar return.
+## Organiser: artwork and layout
 
-Delete any test accounts or competition records you create for this review.
+- [ ] Open your organiser dashboard, open a competition workspace, and choose
+  **Manage certificates**. Confirm template names and award titles make sense
+  for your competition.
+- [ ] Upload your intended PNG, JPEG, or WebP certificate image. Check that the
+  artwork keeps its proportions and is sharp enough for your intended print size.
+- [ ] In **Edit layout**, place **Participant full name** and **Competition name**
+  over the spaces reserved in your artwork. Check the font, colour, alignment,
+  and box sizes against the artwork's printed headings.
+- [ ] Choose **Your full name** under **Preview name**, then choose **New sample**.
+  Check category and placement values fit naturally. Blank organisation names
+  are expected for competitions without an associated organisation.
+- [ ] Choose **Hide field outlines**. Check the clean preview: no awkward wrapping,
+  text touching decorative borders, or poor contrast. Text automatically fits
+  its box; enlarge the box if the resulting text looks too small.
+- [ ] On your phone, check that you can select fields from the **Fields** list,
+  comfortably use the position and size inputs, and reach **Save layout**.
+- [ ] Switch between light and dark mode. Confirm controls remain readable and
+  the certificate artwork retains its original colours.
+
+## Release: award rules
+
+- [ ] Before release, review each template's **Eligibility**, **Result round**, and
+  **Award title**. Confirm custom tags or placement ranges describe the awards you
+  intend to give. Only templates marked **Ready for release** are offered.
+- [ ] After final results are published and the certificate availability date has
+  arrived, choose **Release certificates**. Confirm this is the point at which you
+  want participants to receive their awards.
+- [ ] If a layout needs correction, choose **Pause release**, edit and save it, then
+  release again. Previously downloaded files remain on recipients' devices;
+  new downloads use the current saved layout.
+
+## Participant: final output
+
+- [ ] Sign in with a real eligible participant account and open the competition's
+  **Certificates** page. Confirm the displayed full name is the name you want on
+  the award; update it in **Edit profile** if needed.
+- [ ] Preview an award. Check the actual full name, competition name, team name,
+  category, placement, round, award title, and issue date wherever those fields
+  appear in your layout. Confirm spelling and line breaks are appropriate.
+- [ ] Download the image and open it in your usual image viewer. Inspect at full
+  size for sharpness and correct placement. Confirm no editor outlines appear.
+- [ ] Download the PDF and open it in your usual PDF viewer. Check the page's
+  orientation, margins, and print preview. Image and PDF should show the same
+  artwork and text placement.
+- [ ] On your phone, download an award and confirm you can locate and open it in
+  that device's downloads or files app.
+
+## Expected boundaries
+
+- Certificates remain unavailable until the organiser releases them after final
+  published results and any configured availability date.
+- Awards are determined by registration and saved published results. Team awards
+  produce an individual certificate with each eligible member's full name.
+- Generated images and PDFs download to the device; Vertex stores template
+  artwork and layouts, not a permanent generated file for every participant.
+- PDF generation needs the PDF library to load successfully. If your network
+  blocks its CDN, the page explains the problem and allows another attempt.

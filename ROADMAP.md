@@ -1121,6 +1121,18 @@ feat: add scheduled round leaderboards
 
 # Milestone 17 â€” Certificate Template Editor and Dynamic Generation
 
+**Status: Complete — 30 September 2026.** Organisers can upload private artwork,
+place and style all nine dynamic fields, resize and position fields with pointer
+and keyboard controls, preview samples, save layouts, replace artwork, map
+award eligibility, and release or pause certificates after published final
+results. Participants receive only eligible awards, including team-derived
+awards, and generate matching PNG and PDF downloads using their full names.
+Migrations 015, 015a, 015b, and 015c were applied through the Supabase connector
+and consolidated into SCHEMA.sql. Browser acceptance and leaderboard/theme
+regressions passed; desktop/mobile screenshots and generated files were
+inspected. Test artwork, accounts, and records were removed and verified absent.
+See tests/MILESTONE-17.md and CHECKS.md for verification and manual review.
+
 ## User-visible result
 
 Organisers can create certificate templates visually, and eligible participants can dynamically generate and download their certificates.

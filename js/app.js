@@ -1,3 +1,4 @@
+import { createCertificates } from './certificates.js';
 import { createCompetitions } from './competitions.js';
 import { createDiscovery } from './discovery.js';
 import { createRegistration } from './registration.js';
@@ -284,6 +285,7 @@ function bind() {
   scoring.bind();
   advancement.bind();
   leaderboards.bind();
+  certificates.bind();
   dashboards.bind();
   collaboration.bind();
   organisations.bind();
@@ -451,10 +453,13 @@ const submissions = createSubmissions({ client: supabase, state, escapeHtml, ref
 const scoring = createScoring({ client: supabase, state, escapeHtml, refresh: render });
 const advancement = createAdvancement({ client: supabase, state, escapeHtml, refresh: render });
 const leaderboards = createLeaderboards({ client: supabase, state, escapeHtml, refresh: render });
+const certificates = createCertificates({ client: supabase, state, escapeHtml, refresh: render, navigate });
 const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
+  const certificateRoute = await certificates.resolve(path);
+  if (certificateRoute !== undefined) return certificateRoute;
   const notificationRoute = await notifications.resolve(path);
   if (notificationRoute !== undefined) return notificationRoute;
   const announcementRoute = await announcements.resolve(path);
@@ -529,6 +534,7 @@ async function render() {
     app.innerHTML = shell(route ? route.content : notFound(), location.pathname, route?.noFooter || !route);
     app.removeAttribute('inert');
     app.setAttribute('aria-busy', 'false');
+    lastAllowedPath = location.pathname + location.search;
     bind();
     if (route && /^\/competition\/[a-z0-9-]+\/team$/.test(path)) cleanup = teams.subscribe(path);
     if (route && /^\/competition\/[a-z0-9-]+\/announcements(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = announcements.subscribe(path);
@@ -536,6 +542,7 @@ async function render() {
     if (route && /^\/competition\/[a-z0-9-]+\/meeting\/[a-z0-9-]+$/.test(path)) cleanup = meetings.subscribe();
     if (route && /^\/(?:competition|organiser\/competition)\/[a-z0-9-]+\/submissions(?:\/[a-z0-9-]+)?$/.test(path)) cleanup = submissions.subscribe();
     if (route && /^\/(?:competition\/[a-z0-9-]+\/leaderboard\/[a-z0-9-]+|organiser\/competition\/[a-z0-9-]+\/leaderboards)$/.test(path)) cleanup = leaderboards.subscribe();
+    if (route && /^\/(?:competition|organiser\/competition)\/[a-z0-9-]+\/certificates(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = certificates.subscribe();
     if (!initialRender) document.querySelector('#main-content')?.focus({ preventScroll: true });
     initialRender = false; scrollTo(0, 0);
     if (path === '/') cleanup = opportunityLandscape();
@@ -556,9 +563,11 @@ async function render() {
   }
 }
 
+let lastAllowedPath = location.pathname + location.search;
 function navigate(path) {
-  if (!competitions.canLeave()) return;
+  if (!competitions.canLeave() || !certificates.canLeave()) return;
   history.pushState({}, '', path);
+  lastAllowedPath = path;
   render();
 }
 
@@ -570,7 +579,11 @@ document.addEventListener('click', event => {
   event.preventDefault(); navigate(url.pathname + url.search);
 });
 
-addEventListener('popstate', render);
+addEventListener('popstate', () => {
+  if (!certificates.canLeave()) { history.pushState({}, '', lastAllowedPath); return; }
+  lastAllowedPath = location.pathname + location.search;
+  render();
+});
 
 const recovered = sessionStorage.getItem('vertex-recovery-route');
 if (recovered) { sessionStorage.removeItem('vertex-recovery-route'); history.replaceState({}, '', recovered); }

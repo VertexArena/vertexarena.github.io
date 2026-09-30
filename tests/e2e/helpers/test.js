@@ -4,13 +4,21 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 // Playwright can use a local copy of the same pinned public browser client when
 // this host blocks CDN traffic. Normal runs still load the CDN module directly.
 const cachedClient = '.test-data/supabase-js-2.117.1.umd.js';
-base.beforeEach(async ({ context }) => {
+export async function configureContext(context) {
   if (!existsSync(cachedClient)) return;
   const module = `${readFileSync(cachedClient, 'utf8')}\nexport const createClient = supabase.createClient;`;
   await context.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/+esm', route => route.fulfill({ status: 200, contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: module }));
   await context.route('https://fonts.googleapis.com/**', route => route.abort());
   await context.route('https://cdnjs.cloudflare.com/**', route => route.abort());
-});
+  if (existsSync('node_modules/pdf-lib/dist/pdf-lib.min.js')) await context.route('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm', route => route.fulfill({ status: 200, contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: `${readFileSync('node_modules/pdf-lib/dist/pdf-lib.min.js', 'utf8')}\nexport const PDFDocument = PDFLib.PDFDocument;` }));
+}
+base.beforeEach(async ({ context }) => configureContext(context));
+export async function anotherPage(browser, width = 1366) {
+  const context = await browser.newContext({ viewport: { width, height: width < 600 ? 844 : 768 } });
+  context.setDefaultTimeout(30000);
+  await configureContext(context);
+  return context.newPage();
+}
 
 // Record exact test account IDs for verified Supabase connector cleanup. Never
 // retain passwords or tokens. Identity image uploads require explicit permission.
