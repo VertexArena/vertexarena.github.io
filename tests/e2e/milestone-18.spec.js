@@ -110,6 +110,7 @@ test('private recommendations, team and field history, exploration and new-accou
   const savedPick = fixtures['team-pick-3'];
   await captain.view.goto(`/competition/${savedPick.slug}`);
   await captain.view.getByRole('button', { name: `Save ${savedPick.name} to bookmarks` }).click();
+  await expect(captain.view.getByRole('button', { name: `Remove ${savedPick.name} from bookmarks` })).toHaveAttribute('aria-pressed', 'true');
   await captain.view.goto('/discover');
   await ready(captain.view);
   await expect(section(captain.view, 'for_you').locator('.discovery-card').first()).toContainText(savedPick.name);
@@ -157,6 +158,7 @@ test('private recommendations, team and field history, exploration and new-accou
   expect(oldSave.ok(), await oldSave.text()).toBe(true);
   await newcomer.view.goto(`/competition/${fixtures['robotics-saved'].slug}`);
   await newcomer.view.getByRole('button', { name: `Save ${fixtures['robotics-saved'].name} to bookmarks` }).click();
+  await expect(newcomer.view.getByRole('button', { name: `Remove ${fixtures['robotics-saved'].name} from bookmarks` })).toHaveAttribute('aria-pressed', 'true');
   await newcomer.view.goto('/discover');
   await ready(newcomer.view);
   await expect(section(newcomer.view, 'for_you')).toContainText(fixtures['robotics-more'].name);

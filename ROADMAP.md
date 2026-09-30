@@ -1269,6 +1269,14 @@ feat: add personalised competition recommendations
 
 # Milestone 19 â€” Achievements
 
+**Status: Complete — 30 September 2026.** Thirteen authoritative participant
+achievements now include private progress, profile and dashboard displays,
+optional public sharing, team inheritance, published result awards and restrained
+accessible feedback. Connected Supabase migration 017 applied and verified.
+Playwright acceptance and recommendation regressions passed; core desktop/mobile
+checks passed with one expected skip. Screenshots reviewed and all test records
+removed. Evidence: `tests/MILESTONE-19.md`.
+
 ## User-visible result
 
 Participants earn and view meaningful achievements based on authoritative activity.

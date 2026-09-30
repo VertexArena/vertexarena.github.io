@@ -4,6 +4,7 @@ import { createDiscovery } from './discovery.js';
 import { createRegistration } from './registration.js';
 import { createTeams } from './teams.js';
 import { createDashboards } from './dashboards.js';
+import { createAchievements } from './achievements.js';
 import { createOrganiserCollaboration } from './organiser-collaboration.js';
 import { createAnnouncements } from './announcements.js';
 import { createQuestions } from './questions.js';
@@ -454,7 +455,8 @@ const scoring = createScoring({ client: supabase, state, escapeHtml, refresh: re
 const advancement = createAdvancement({ client: supabase, state, escapeHtml, refresh: render });
 const leaderboards = createLeaderboards({ client: supabase, state, escapeHtml, refresh: render });
 const certificates = createCertificates({ client: supabase, state, escapeHtml, refresh: render, navigate });
-const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration });
+const achievements = createAchievements({ client: supabase, state, escapeHtml });
+const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration, achievements });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
@@ -509,7 +511,7 @@ async function resolveRoute(path) {
       if (orgError) throw orgError;
       return org ? { redirect: `/organisation/${org.slug}` } : null;
     }
-    return { content: publicProfileView(data).replace('</article></div>', '</article>' + await organisations.associations(data) + '</div>'), title: `${data.full_name} (@${data.username}) - Vertex` };
+    return { content: publicProfileView(data).replace('</article></div>', '</article>' + await organisations.associations(data) + achievements.slot(data) + '</div>'), title: `${data.full_name} (@${data.username}) - Vertex` };
   }
   return null;
 }
@@ -551,6 +553,9 @@ async function render() {
       if (revision !== renderRevision) { disposeScene(); return; }
       cleanup = disposeScene;
     }
+    const previousCleanup = cleanup;
+    const achievementCleanup = achievements.bind();
+    cleanup = () => { previousCleanup(); achievementCleanup(); };
     if (window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.from('.hero-copy > *, .page-head, .profile-identity > *', { y: 22, opacity: 0, duration: .7, stagger: .07, ease: 'power3.out' });
   } catch (error) {
     if (revision !== renderRevision) return;

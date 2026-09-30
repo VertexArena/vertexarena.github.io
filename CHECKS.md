@@ -1,34 +1,34 @@
-# Milestone 18 — manual review
+# Milestone 19 — manual review
 
-Browser tests cover ranking signals, eligibility, privacy, bookmarks, retries,
-routes, pagination and keyboard controls. These checks need your judgment with
-real competitions and your own account history.
+Browser tests cover earning rules, team awards, progress, privacy, permissions,
+notifications, refreshes and retries. Use your normal account for these checks
+that need human judgment.
 
-## Relevance and exploration
+## Meaning and usefulness
 
-- [ ] Log in with your normal participant account and open **Discover**. Read
-      the three **For you** cards. Decide whether their fields and entry formats
-      reflect competitions you would seriously consider. Note any surprising pick
-      and its explanation.
-- [ ] Read **New to You**. Decide whether those unfamiliar disciplines offer
-      useful exploration. A different field should still feel like a real
-      opportunity you could enter.
-- [ ] Read **How your picks work**. Confirm the explanation feels clear about
-      what shapes recommendations and how your information is used.
-- [ ] If your account has little history, review the starter selection. Decide
-      whether its variety, deadlines and card information help you choose a first
-      competition. An empty section is expected when no eligible opportunity or
-      different field is currently available.
+- [ ] Log in as a participant and open your public profile while signed in.
+      Scroll to **Achievements**. Read the titles and descriptions. Check that
+      each requirement is easy to understand and that earned dates, unfinished
+      progress and earned awards are easy to tell apart.
+- [ ] Open **Dashboard** and read its compact **Achievements** panel. Decide
+      whether the recent awards and next milestone feel useful alongside your
+      competition tasks. Use **View all achievements** to review the full set.
+- [ ] During your next real registration, submission or published result, keep
+      your profile open in another tab. Watch the award feedback. Check that it
+      feels noticeable and rewarding without distracting from your work.
 
-## Readability and interaction feel
+## Sharing and presentation
 
-- [ ] On your phone, open Discover and swipe each recommendation row. Check
-      that the next-card preview makes swiping obvious and the field, entry
-      format, deadline, prize and explanation remain comfortable to read.
-- [ ] Review the same page in light and dark modes. Check text contrast,
-      spacing and competition artwork using normal names and real banners.
-- [ ] Use **Browse full catalogue**, then browse search and filters. Decide
-      whether the transition makes it easy to move from suggestions to your own
-      search without losing your place.
-- [ ] Save or remove a suggested competition. Check whether the updated
-      selection feels understandable rather than unexpectedly disruptive.
+- [ ] On your signed-in profile, read **Show earned achievements on my public
+      profile** and its explanation. Decide whether the distinction between
+      shared awards and private progress is clear. Choose the setting you want
+      to keep; sharing is off by default.
+- [ ] Open your profile on your phone in light mode, then switch to dark mode.
+      Check that longer descriptions, award dates and progress numbers remain
+      comfortable to read, with enough spacing between cards.
+- [ ] With your usual internet connection, review the achievement icons and
+      typography. Check that the symbols fit their awards and that the section
+      feels consistent with the rest of Vertex.
+- [ ] If you use reduced motion or a screen reader, review the same profile
+      using your normal accessibility settings. Check that earning feedback is
+      calm, understandable and easy to follow.
