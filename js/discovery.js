@@ -1,8 +1,12 @@
 import { fields } from './competition-model.js';
 import { ageMismatch } from './eligibility.js';
+import { createRecommendations } from './recommendations.js';
 
 export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
   const pageSize = 12;
+  const columns = 'id,name,slug,description,field_tags,team_mode,minimum_age,maximum_age,prize_details,registration_opens_at,registration_closes_at,starts_at,banner_kind,banner_colour,banner_colour_end,banner_path,organisations(name,slug)';
+  const filtered = () => Boolean(queryText() || selectedFields().length || mode() !== 'all' || onlySaved() || pageNumber());
+  const recommendations = createRecommendations({ client, state, h, card, imageUrl, columns, filtered });
   const date = value => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Date not set';
   const safeColour = value => /^#[0-9a-f]{6}$/i.test(value || '') ? value : '#2563eb';
   const bannerStyle = c => c.banner_kind === 'gradient'
@@ -35,13 +39,13 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
   function artwork(c, url) {
     return `<div class="discovery-art" style="background:${h(bannerStyle(c))}">${url ? `<img src="${h(url)}" alt="" loading="lazy">` : `<span class="discovery-art-mark" aria-hidden="true">V<span>/${h(c.field_tags[0] || 'open')}</span></span>`}</div>`;
   }
-  function card(c, saved, url) {
+  function card(c, saved, url, reasons = []) {
     const status = registration(c), mismatch = eligibility(c), org = c.organisations;
-    return `<article class="discovery-card">${artwork(c, url)}<div class="discovery-card-content"><div class="discovery-card-top"><span class="discovery-state ${status.label === 'Registration open' ? 'is-open' : ''}">${h(status.label)}</span>${state.profile?.account_type === 'participant' ? bookmark(c, saved) : ''}</div><h3><a data-link href="/competition/${h(c.slug)}">${h(c.name)}</a></h3><p class="discovery-org">${org ? h(org.name) : 'Independent organiser'}</p><p class="discovery-description">${h(c.description)}</p><div class="discovery-tags">${c.field_tags.slice(0, 3).map(f => `<span>${h(f)}</span>`).join('')}</div><dl class="discovery-meta"><div><dt>Entry</dt><dd>${h(c.team_mode === 'both' ? 'Individual or team' : c.team_mode === 'team' ? 'Team' : 'Individual')}</dd></div><div><dt>Deadline</dt><dd>${h(date(c.registration_closes_at))}</dd></div><div><dt>Prize</dt><dd>${h(c.prize_details)}</dd></div></dl>${mismatch ? `<p class="discovery-age" role="note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i>${h(mismatch)}</p>` : ''}<div class="discovery-card-actions"><button type="button" class="discovery-preview-button" data-preview="${h(c.id)}">Quick preview</button><a data-link href="/competition/${h(c.slug)}">Full details <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div></article>`;
+    return `<article class="discovery-card">${artwork(c, url)}<div class="discovery-card-content"><div class="discovery-card-top"><span class="discovery-state ${status.label === 'Registration open' ? 'is-open' : ''}">${h(status.label)}</span>${state.profile?.account_type === 'participant' ? bookmark(c, saved) : ''}</div><h3><a data-link href="/competition/${h(c.slug)}">${h(c.name)}</a></h3><p class="discovery-org">${org ? h(org.name) : 'Independent organiser'}</p><p class="discovery-description">${h(c.description)}</p><div class="discovery-tags">${c.field_tags.slice(0, 3).map(f => `<span>${h(f)}</span>`).join('')}</div><dl class="discovery-meta"><div><dt>Entry</dt><dd>${h(c.team_mode === 'both' ? 'Individual or team' : c.team_mode === 'team' ? 'Team' : 'Individual')}</dd></div><div><dt>Deadline</dt><dd>${h(date(c.registration_closes_at))}</dd></div><div><dt>Prize</dt><dd>${h(c.prize_details)}</dd></div></dl>${reasons.length ? `<ul class="recommendation-reasons">${reasons.map(reason => `<li>${h(reason)}</li>`).join('')}</ul>` : ''}${mismatch ? `<p class="discovery-age" role="note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i>${h(mismatch)}</p>` : ''}<div class="discovery-card-actions"><button type="button" class="discovery-preview-button" data-preview="${h(c.id)}">Quick preview</button><a data-link href="/competition/${h(c.slug)}">Full details <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div></article>`;
   }
   function controls() {
     const chosen = selectedFields();
-    return `<div class="page discover-page discovery-v2"><header class="discovery-heading"><span class="eyebrow">Competition directory</span><h1>Find your next challenge.</h1><p>Search the whole field. Narrow by discipline and entry format, then check the dates that matter.</p></header><section class="discovery-controls" aria-label="Find competitions"><label class="discovery-search"><span class="visually-hidden">Search competitions by name</span><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" name="q" placeholder="Search competition names" value="${h(queryText())}" maxlength="100" autocomplete="off"></label><label class="discovery-mode">Entry format<select name="mode"><option value="all">All formats</option><option value="individual" ${mode() === 'individual' ? 'selected' : ''}>Individual</option><option value="team" ${mode() === 'team' ? 'selected' : ''}>Team</option><option value="both" ${mode() === 'both' ? 'selected' : ''}>Individual or team</option></select></label><label class="discovery-sort">Sort by<select name="sort"><option value="soonest" ${sort() === 'soonest' ? 'selected' : ''}>Soonest deadline</option><option value="latest" ${sort() === 'latest' ? 'selected' : ''}>Latest deadline</option><option value="newest" ${sort() === 'newest' ? 'selected' : ''}>Recently published</option></select></label>${state.profile?.account_type === 'participant' ? `<label class="discovery-saved"><input type="checkbox" name="saved" ${onlySaved() ? 'checked' : ''}> Saved only</label>` : ''}<fieldset class="discovery-fields"><legend>Fields</legend><div>${fields.map(f => `<label><input type="checkbox" name="field" value="${h(f)}" ${chosen.includes(f) ? 'checked' : ''}><span>${h(f)}</span></label>`).join('')}</div></fieldset></section><section class="discovery-catalogue" aria-labelledby="catalogue-title"><div class="discovery-catalogue-head"><div><span class="eyebrow">Explore</span><h2 id="catalogue-title">Competitions</h2></div><p data-discovery-count role="status" aria-live="polite">Loading competitions…</p></div><div data-discovery-results aria-busy="true" class="discovery-grid">${Array.from({length: 6}, () => '<div class="discovery-skeleton" aria-hidden="true"></div>').join('')}</div><nav class="discovery-pages" aria-label="Competition pages" data-discovery-pages></nav></section><dialog class="discovery-dialog" data-discovery-dialog aria-labelledby="preview-title"><div data-discovery-dialog-content></div><button type="button" class="discovery-dialog-close" data-close-preview aria-label="Close preview"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></dialog></div>`;
+    return `<div class="page discover-page discovery-v2"><header class="discovery-heading"><span class="eyebrow">Competition directory</span><h1>Find your next challenge.</h1><p>Search the whole field. Narrow by discipline and entry format, then check the dates that matter.</p></header>${recommendations.shell()}<section class="discovery-controls" aria-label="Find competitions"><label class="discovery-search"><span class="visually-hidden">Search competitions by name</span><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" name="q" placeholder="Search competition names" value="${h(queryText())}" maxlength="100" autocomplete="off"></label><label class="discovery-mode">Entry format<select name="mode"><option value="all">All formats</option><option value="individual" ${mode() === 'individual' ? 'selected' : ''}>Individual</option><option value="team" ${mode() === 'team' ? 'selected' : ''}>Team</option><option value="both" ${mode() === 'both' ? 'selected' : ''}>Individual or team</option></select></label><label class="discovery-sort">Sort by<select name="sort"><option value="soonest" ${sort() === 'soonest' ? 'selected' : ''}>Soonest deadline</option><option value="latest" ${sort() === 'latest' ? 'selected' : ''}>Latest deadline</option><option value="newest" ${sort() === 'newest' ? 'selected' : ''}>Recently published</option></select></label>${state.profile?.account_type === 'participant' ? `<label class="discovery-saved"><input type="checkbox" name="saved" ${onlySaved() ? 'checked' : ''}> Saved only</label>` : ''}<fieldset class="discovery-fields"><legend>Fields</legend><div>${fields.map(f => `<label><input type="checkbox" name="field" value="${h(f)}" ${chosen.includes(f) ? 'checked' : ''}><span>${h(f)}</span></label>`).join('')}</div></fieldset></section><section class="discovery-catalogue" aria-labelledby="catalogue-title"><div class="discovery-catalogue-head"><div><span class="eyebrow">Explore</span><h2 id="catalogue-title">Competitions</h2></div><p data-discovery-count role="status" aria-live="polite">Loading competitions…</p></div><div data-discovery-results aria-busy="true" class="discovery-grid">${Array.from({length: 6}, () => '<div class="discovery-skeleton" aria-hidden="true"></div>').join('')}</div><nav class="discovery-pages" aria-label="Competition pages" data-discovery-pages></nav></section><dialog class="discovery-dialog" data-discovery-dialog aria-labelledby="preview-title"><div data-discovery-dialog-content></div><button type="button" class="discovery-dialog-close" data-close-preview aria-label="Close preview"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></dialog></div>`;
   }
   function updateUrl(update) {
     const next = params();
@@ -50,6 +54,8 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
     history.replaceState({}, '', `/discover${next.size ? `?${next}` : ''}`);
   }
   async function load(root) {
+    const suggestions = root.querySelector('[data-recommendations]');
+    if (suggestions) { suggestions.hidden = filtered(); if (!filtered() && !root._recommendationRows) recommendations.load(root); }
     const requestId = root._discoveryRequest = (root._discoveryRequest || 0) + 1;
     const results = root.querySelector('[data-discovery-results]');
     const count = root.querySelector('[data-discovery-count]');
@@ -70,7 +76,7 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
         results.innerHTML = '<div class="discovery-empty"><h3>No saved competitions yet.</h3><p>Save a competition to return to it here.</p><button class="button secondary" type="button" data-show-all>Show all competitions</button></div>';
         count.textContent = '0 competitions'; pages.innerHTML = ''; return;
       }
-      let query = client.from('competitions').select('id,name,slug,description,field_tags,team_mode,minimum_age,maximum_age,prize_details,registration_opens_at,registration_closes_at,starts_at,banner_kind,banner_colour,banner_colour_end,banner_path,organisations(name,slug)', { count: 'exact' }).eq('status', 'published');
+      let query = client.from('competitions').select(columns, { count: 'exact' }).eq('status', 'published');
       if (queryText()) query = query.ilike('name', `%${queryText().replaceAll('\\', '\\\\').replaceAll('%', '\\%').replaceAll('_', '\\_')}%`);
       if (selectedFields().length) query = query.overlaps('field_tags', selectedFields());
       if (mode() !== 'all') query = query.eq('team_mode', mode());
@@ -98,15 +104,27 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
   }
   async function toggle(button) {
     if (state.profile?.account_type !== 'participant') return;
-    button.disabled = true;
+    const focusedBookmark = button.closest('[data-recommendations]') && document.activeElement === button ? button.dataset.bookmark : null;
+    const copies = [...document.querySelectorAll('[data-bookmark]')].filter(other => other.dataset.bookmark === button.dataset.bookmark);
+    copies.forEach(other => { other.disabled = true; });
     const saved = button.getAttribute('aria-pressed') === 'true';
     const operation = saved ? client.from('competition_bookmarks').delete().eq('competition_id', button.dataset.bookmark).eq('participant_id', state.session.user.id) : client.from('competition_bookmarks').insert({ competition_id: button.dataset.bookmark, participant_id: state.session.user.id });
     const { error } = await operation;
-    button.disabled = false;
+    copies.forEach(other => { other.disabled = false; });
     if (error) { button.title = error.message; button.insertAdjacentHTML('afterend', `<span class="discovery-bookmark-error" role="alert">${h(error.message)}</span>`); return; }
     button.setAttribute('aria-pressed', String(!saved));
+    button.title = saved ? 'Save bookmark' : 'Remove bookmark';
     button.setAttribute('aria-label', button.getAttribute('aria-label').replace(saved ? 'Remove' : 'Save', saved ? 'Save' : 'Remove').replace(saved ? 'from' : 'to', saved ? 'to' : 'from'));
     button.innerHTML = `<i class="fa-${saved ? 'regular' : 'solid'} fa-bookmark" aria-hidden="true"></i>`;
+    document.querySelectorAll('[data-bookmark]').forEach(other => {
+      if (other === button || other.dataset.bookmark !== button.dataset.bookmark) return;
+      other.setAttribute('aria-pressed', String(!saved));
+      other.setAttribute('aria-label', button.getAttribute('aria-label'));
+      other.title = button.title;
+      other.innerHTML = button.innerHTML;
+    });
+    const root = document.querySelector('.discovery-v2');
+    if (root) { root._recommendationRows = null; recommendations.load(root, focusedBookmark); }
     if (onlySaved()) load(document.querySelector('.discovery-v2'));
   }
   function bind() {
@@ -121,11 +139,16 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
       root.querySelector('[name="saved"]')?.addEventListener('change', e => { updateUrl({ saved: e.target.checked ? '1' : '' }); refresh(); });
       root.addEventListener('click', e => {
         const save = e.target.closest('[data-bookmark]'); if (save) { toggle(save); return; }
-        const open = e.target.closest('[data-preview]'); if (open) { const c = root._competitionRows?.get(open.dataset.preview); if (c) { root.querySelector('[data-discovery-dialog-content]').innerHTML = preview(c); root.querySelector('[data-discovery-dialog]').showModal(); } return; }
+        const open = e.target.closest('[data-preview]'); if (open) { const c = root._competitionRows?.get(open.dataset.preview) || root._recommendationRows?.get(open.dataset.preview); if (c) { root.querySelector('[data-discovery-dialog-content]').innerHTML = preview(c); root.querySelector('[data-discovery-dialog]').showModal(); } return; }
         if (e.target.closest('[data-close-preview]')) root.querySelector('[data-discovery-dialog]').close();
         if (e.target.closest('[data-show-all]')) { updateUrl({ saved: '' }); root.querySelector('[name="saved"]').checked = false; load(root); }
         if (e.target.closest('[data-clear-filters]')) { history.replaceState({}, '', '/discover'); navigate('/discover'); }
         if (e.target.closest('[data-retry-discovery]')) load(root);
+        if (e.target.closest('[data-retry-recommendations]')) recommendations.load(root);
+        if (e.target.closest('[data-browse-catalogue]')) {
+          root.querySelector('.discovery-controls').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+          root.querySelector('[name="q"]').focus({ preventScroll: true });
+        }
       });
       load(root);
     }

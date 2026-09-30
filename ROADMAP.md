@@ -1209,6 +1209,17 @@ feat: add dynamic certificate generation
 
 # Milestone 18 â€” Smart Recommendations and New-to-You Discovery
 
+**Status: Complete — 30 September 2026.** Participant discovery now provides
+private, age-eligible For you recommendations and unfamiliar-field New to You
+picks, with recent registrations/bookmarks, field and entry-format preferences,
+deadline awareness, transparent explanations, new-account fallback and the full
+catalogue preserved. Migration 016 was applied through the Supabase connector
+and consolidated in SCHEMA.sql. All eight acceptance criteria, privacy denials,
+loading/retry/empty states, direct routes, keyboard controls and mobile browsing
+passed Playwright. Core route/theme and discovery/registration regressions passed.
+Desktop, mobile light/dark and tablet screenshots were inspected. Test accounts
+and records were removed and verified absent. See tests/MILESTONE-18.md and CHECKS.md.
+
 ## User-visible result
 
 Participants receive useful personalised suggestions while still being exposed to unfamiliar opportunities.
