@@ -293,6 +293,8 @@ function bind() {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
+    document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#0B1120' : '#F8FAFC';
+    document.querySelector('meta[name="color-scheme"]').content = theme;
     localStorage.setItem('vertex-theme', theme);
     event.currentTarget.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
     event.currentTarget.setAttribute('aria-checked', String(theme === 'dark'));
