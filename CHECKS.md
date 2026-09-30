@@ -1,17 +1,18 @@
-# Vertex — Milestone 15 manual review
+# Vertex — Milestone 16 manual review
 
-Use a published competition with two rounds. Set the first round to advance the top 3. Register at least five entries, including one team with two members. Sign in as an organiser; keep a participant window open.
+Prepare a published competition with two rounds. Register several participants and one team, enter scores, and finalise each round’s advancement. Include at least two categories with registered entries. Keep organiser and participant browser windows open.
 
-- [ ] Open the competition workspace and choose **Resolve advancement**. Confirm each round has a tab and the page shows the cutoff, scored count, decision state, and ranked entries.
-- [ ] Score all first-round entries with no tie across third place. Return to advancement. Confirm exactly three entries show **Advance** and no row has the blue boundary highlight. A tie wholly above or below third place should remain unhighlighted.
-- [ ] Change scores so third and fourth place tie. Confirm only entries in that cutoff tie have the blue highlight and **Decision needed**. Confirm **Finalise round** stays unavailable.
-- [ ] Choose **Include all tied entries**. Confirm all highlighted entries show **Advance**, even though more than three now advance. Choose **Exclude all tied entries** and confirm only entries above the tie advance.
-- [ ] Choose **Leave unresolved**. Confirm finalisation stays unavailable. Select exactly one tied entry in **Manual selection**, save, and confirm only that chosen entry advances from the tie.
-- [ ] Refresh the organiser page. Confirm saved choice and highlighted rows remain. Try selecting too few or too many entries; confirm a clear error explains the exact number required.
-- [ ] Choose **Finalise round** and accept the confirmation. Confirm result state says **Round locked**, scoring controls are locked, and outcome remains after refresh.
-- [ ] Open second-round advancement and scoring. Confirm only first-round advancers appear as active entries. Check that eliminated participants cannot open second-round submissions.
-- [ ] As a team member, open **My round history** from the competition page. Confirm the first-round status and top 3 tag appear. Confirm both team members are eligible for the next round. As an eliminated individual, confirm history says **Eliminated**.
-- [ ] As a participant, open the organiser advancement URL. Confirm organiser controls are unavailable. While signed out, open the same URL and confirm login returns to that address.
-- [ ] Review organiser and participant pages at desktop and phone widths, in light and dark mode. Check readable names and scores, visible focus states, usable controls, and no sideways scrolling.
+- [ ] As organiser, open the competition workspace and choose **Manage leaderboards**. Select each round. Confirm its preview shows a top-three podium, the complete ranked list, participant and team names, scores, and advancement or elimination labels.
+- [ ] Search the preview by a participant name, username, and team name. Confirm matching entries appear, then clear the search and confirm the full list returns.
+- [ ] Choose and save a winner for every represented category. Refresh. Confirm each choice remains and the category award cards name the correct winners.
+- [ ] Before the round’s submission deadline, try **Publish now**. Confirm a clear error keeps results private. After the deadline, schedule a future release. Confirm the organiser page says **Scheduled** and shows the chosen release time.
+- [ ] As a participant or signed-out visitor, open `/competition/{competition-slug}/leaderboard/{round-slug}` before release. Confirm a live countdown appears, with no ranks, scores, category winners, or personal outcome. Refresh the direct URL and confirm the countdown remains.
+- [ ] Leave the result page open through the release time. Confirm it changes to the published leaderboard automatically. Refresh and confirm the published result remains available.
+- [ ] Confirm a registered participant receives a leaderboard notification that opens the right round. An advancer should see **You advanced**; an eliminated participant or team member should see **Your run ended here**. Check that round history matches the released result.
+- [ ] Publish one round with **Show scores publicly** off. Confirm public ranks and outcomes appear without numerical scores. Publish another round with the option on and confirm scores appear on both podium and ranked rows.
+- [ ] Open both round URLs after publishing the later round. Confirm the earlier leaderboard remains accessible and unchanged, including after refresh.
+- [ ] On a phone width and desktop width, inspect the podium, category awards, rank rows, search, pagination, countdown, and organiser controls. Check for readable text, usable keyboard focus, light and dark theme contrast, and no sideways scrolling.
+- [ ] If a competition has hundreds of entries, move between leaderboard pages and search for an entry beyond the first page. Confirm the result appears quickly and ranks remain correct.
+- [ ] Open Vertex as an installed app. Toggle between light and dark mode. Confirm the title bar changes with the page background. Close and reopen the app; confirm the saved theme and matching title bar return.
 
-Remove any accounts or competition records you create for these checks.
+Delete any test accounts or competition records you create for this review.

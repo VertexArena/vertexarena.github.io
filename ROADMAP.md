@@ -994,7 +994,7 @@ submissions use the advanced roster; team members inherit eligibility. The
 hosted migration was applied through the Supabase connector. Playwright
 acceptance passed on desktop with a 320 px visual check; core route regression
 passed on desktop and narrow mobile. Test accounts and records were removed.
-See `tests/MILESTONE-15.md` and `CHECKS.md`.
+See `tests/MILESTONE-15.md`.
 
 ## User-visible result
 
@@ -1047,6 +1047,16 @@ feat: add advancement and cutoff tie resolution
 ---
 
 # Milestone 16 â€” Scheduled Leaderboards and Historical Results
+
+**Status: Complete — 30 September 2026.** Organisers can preview saved round
+results, choose category winners, save drafts, and schedule or publish releases.
+Public round pages provide countdowns, podiums, searched and paginated rankings,
+optional scores, participant outcomes, and stable historical routes. Hosted
+migrations and publication cron were applied and verified through Supabase.
+Playwright acceptance, a 500-entry browser test, advancement regression, and
+desktop/mobile core checks passed. Temporary test data was removed. The
+CHANGES.md theme title-bar fix is included; its browser metadata tests passed.
+See `tests/MILESTONE-16.md` and `CHECKS.md` for verification and manual review.
 
 ## User-visible result
 

@@ -10,6 +10,7 @@ import { createMeetings } from './meetings.js';
 import { createSubmissions } from './submissions.js';
 import { createScoring } from './scoring.js';
 import { createAdvancement } from './advancement.js';
+import { createLeaderboards } from './leaderboards.js';
 import { createNotifications } from './notifications.js';
 import { createOrganisations } from './organisations.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/+esm';
@@ -282,6 +283,7 @@ function bind() {
   submissions.bind();
   scoring.bind();
   advancement.bind();
+  leaderboards.bind();
   dashboards.bind();
   collaboration.bind();
   organisations.bind();
@@ -448,6 +450,7 @@ const meetings = createMeetings({ client: supabase, state, escapeHtml, refresh: 
 const submissions = createSubmissions({ client: supabase, state, escapeHtml, refresh: render });
 const scoring = createScoring({ client: supabase, state, escapeHtml, refresh: render });
 const advancement = createAdvancement({ client: supabase, state, escapeHtml, refresh: render });
+const leaderboards = createLeaderboards({ client: supabase, state, escapeHtml, refresh: render });
 const dashboards = createDashboards({ client: supabase, state, escapeHtml, collaboration });
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
@@ -466,6 +469,8 @@ async function resolveRoute(path) {
   if (scoringRoute !== undefined) return scoringRoute;
   const advancementRoute = await advancement.resolve(path);
   if (advancementRoute !== undefined) return advancementRoute;
+  const leaderboardRoute = await leaderboards.resolve(path);
+  if (leaderboardRoute !== undefined) return leaderboardRoute;
   const collaborationRoute = await collaboration.resolve(path);
   if (collaborationRoute !== undefined) return collaborationRoute;
   const dashboardRoute = await dashboards.resolve(path);
@@ -530,6 +535,7 @@ async function render() {
     if (route && /^\/competition\/[a-z0-9-]+\/questions(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = questions.subscribe(path);
     if (route && /^\/competition\/[a-z0-9-]+\/meeting\/[a-z0-9-]+$/.test(path)) cleanup = meetings.subscribe();
     if (route && /^\/(?:competition|organiser\/competition)\/[a-z0-9-]+\/submissions(?:\/[a-z0-9-]+)?$/.test(path)) cleanup = submissions.subscribe();
+    if (route && /^\/(?:competition\/[a-z0-9-]+\/leaderboard\/[a-z0-9-]+|organiser\/competition\/[a-z0-9-]+\/leaderboards)$/.test(path)) cleanup = leaderboards.subscribe();
     if (!initialRender) document.querySelector('#main-content')?.focus({ preventScroll: true });
     initialRender = false; scrollTo(0, 0);
     if (path === '/') cleanup = opportunityLandscape();
