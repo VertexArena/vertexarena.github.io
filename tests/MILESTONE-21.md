@@ -113,4 +113,13 @@ were preserved. Temporary native app registration was uninstalled.
 Pages workflow packages only public application files, pins official actions to
 immutable commits and limits deployment permissions. `README.md`, `DEPLOYMENT.md`
 and the replaced `CHECKS.md` cover maintenance and remaining device review.
-Live deployment evidence is recorded after the final publication check.
+Production deployment succeeded for commit `647d789001446d3dd2e7079cc70d43d1def37eb4`:
+[Publish Vertex workflow](https://github.com/VertexArena/vertexarena.github.io/actions/runs/36870272200).
+The real-CDN Chrome production check passed on `https://vertexarena.github.io`
+in 17.5 seconds. Public discovery, direct competition details and refresh,
+login return-path refresh, invalid mobile routes, reduced motion, actual font/
+icon/GSAP loading and return-home behavior all passed. The production mobile
+screenshot was inspected. Manifest and release CSS returned HTTP 200; the worker
+served `vertex-static-m21-v1`. SQL and test files returned HTTP 404, confirming
+that they were excluded from the deployed artifact. No production test account
+or record was created by this final check.

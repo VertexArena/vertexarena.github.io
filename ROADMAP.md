@@ -1396,11 +1396,13 @@ feat: add PWA installation and push notifications
 
 # Milestone 21 â€” Final Integration, Accessibility, Performance, and Release Validation
 
-**Status: Release ready — 1 October 2026.** All browser-verifiable milestone
+**Status: Complete — 1 October 2026.** All browser-verifiable milestone
 flows passed after regression fixture corrections. Accessibility, large-data,
 cross-tab privacy and Realtime lifecycle checks passed; release migration applied.
-Test data cleaned and Pages publication prepared. Fresh-project validation was
-explicitly waived by the user. Live release verification follows publication.
+Test data cleaned and GitHub Pages deployment succeeded for release `647d789`.
+Production Chrome checks passed for real CDN loading, direct competition routes,
+nested refreshes and mobile custom-404 recovery. Fresh-project validation was
+explicitly waived by the user; it is not claimed as tested.
 Evidence: `tests/MILESTONE-21.md`.
 
 ## User-visible result
