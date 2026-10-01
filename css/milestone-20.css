@@ -1,0 +1,29 @@
+.device-page { max-width: 980px; }
+.device-install-card,.device-controls { border: 1px solid var(--border); background: var(--surface); border-radius: 18px; padding: clamp(22px,4vw,36px); margin-bottom: 24px; }
+.device-install-card h2,.device-controls h2 { font-size: clamp(1.4rem,3vw,2rem); letter-spacing: -.04em; margin: 8px 0 14px; }
+.device-install-card p,.device-controls p { color: var(--muted); line-height: 1.65; max-width: 740px; }
+.device-control-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.device-control-heading h2 { margin-bottom: 0; }
+.device-state { border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-size: .8rem; font-weight: 600; }
+.device-state.is-on { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+.device-controls .device-privacy { font-size: .83rem; margin-bottom: 24px; }
+.device-controls > .button { margin: 0 8px 8px 0; }
+.device-preference { display: flex; justify-content: space-between; align-items: center; gap: 28px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+.device-preference strong,.device-preference small { display: block; }
+.device-preference small { color: var(--muted); line-height: 1.6; margin-top: 6px; font-size: .83rem; }
+.device-preference input { width: 22px; height: 22px; flex-shrink: 0; accent-color: var(--accent); }
+[data-push-preferences] .button { margin: 22px 0 16px; }
+.device-status { min-height: 1.5em; font-size: .88rem; }
+.device-offline-note { display: flex; gap: 22px; padding: 20px 0; }
+.device-offline-note > i { color: var(--accent); margin-top: 5px; }
+.device-offline-note h2 { font-size: 1.15rem; margin: 0 0 10px; }
+.device-offline-note p { color: var(--muted); line-height: 1.7; margin: 0; }
+.device-banner-area { position: fixed; bottom: max(20px,env(safe-area-inset-bottom)); right: 24px; left: 24px; z-index: 120; pointer-events: none; display: flex; justify-content: center; }
+.device-banner { pointer-events: auto; display: flex; gap: 18px; align-items: center; max-width: 760px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 32px #0f172a18; }
+.device-banner img { width: 44px; height: 44px; object-fit: contain; }
+.device-banner strong { font-size: .94rem; }
+.device-banner p { margin: 5px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
+.device-banner .button { white-space: nowrap; flex-shrink: 0; }
+.device-dismiss { align-self: flex-start; background: transparent; color: var(--muted); border: 0; width: 32px; height: 32px; flex-shrink: 0; cursor: pointer; }
+.footer-app-link { margin-left: 20px; }
+@media(max-width:600px){.device-banner-area{left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom))}.device-banner{flex-wrap:wrap;gap:12px;padding:16px;position:relative}.device-banner img{width:36px;height:36px}.device-banner>div{flex:1;padding-right:24px}.device-banner .button{width:100%}.device-dismiss{position:absolute;right:8px;top:8px}.device-preference{gap:18px}.footer-app-link{margin-left:0}}

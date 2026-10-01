@@ -1,0 +1,3 @@
+[functions.push-dispatch]
+# The function validates a Vault-backed worker credential before any delivery.
+verify_jwt = false

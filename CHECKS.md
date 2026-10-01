@@ -1,34 +1,46 @@
-# Milestone 19 — manual review
+# Milestone 20 — manual review
 
-Browser tests cover earning rules, team awards, progress, privacy, permissions,
-notifications, refreshes and retries. Use your normal account for these checks
-that need human judgment.
+Automated tests cover installation, real push delivery, preferences, privacy,
+offline recovery, updates and responsive layouts. These checks cover your own
+device's presentation and browser or operating-system controls.
 
-## Meaning and usefulness
+Use a preview containing Milestone 20. Installation and notifications require
+HTTPS, or localhost on the computer running Vertex. A phone opening a computer's
+ordinary HTTP network address will not have the same installation support.
 
-- [ ] Log in as a participant and open your public profile while signed in.
-      Scroll to **Achievements**. Read the titles and descriptions. Check that
-      each requirement is easy to understand and that earned dates, unfinished
-      progress and earned awards are easy to tell apart.
-- [ ] Open **Dashboard** and read its compact **Achievements** panel. Decide
-      whether the recent awards and next milestone feel useful alongside your
-      competition tasks. Use **View all achievements** to review the full set.
-- [ ] During your next real registration, submission or published result, keep
-      your profile open in another tab. Watch the award feedback. Check that it
-      feels noticeable and rewarding without distracting from your work.
+## Installation on your device
 
-## Sharing and presentation
+- [ ] Open **Vertex app** in the footer. Read the installation instructions.
+      Check that they match the menus in your usual browser and are easy to follow.
+- [ ] Install Vertex and open it from your apps or home screen. Look at its icon
+      in your launcher and app switcher. Check that the mountain logo is clear,
+      centred and not clipped by your device's icon shape.
+- [ ] On your phone, review **On this device** in light and dark mode and both
+      orientations. Check that headings, controls and installation guidance feel
+      comfortable to read and tap. Physical iPhone/Safari installation still needs
+      this device review; automated installation used Windows Chrome.
 
-- [ ] On your signed-in profile, read **Show earned achievements on my public
-      profile** and its explanation. Decide whether the distinction between
-      shared awards and private progress is clear. Choose the setting you want
-      to keep; sharing is off by default.
-- [ ] Open your profile on your phone in light mode, then switch to dark mode.
-      Check that longer descriptions, award dates and progress numbers remain
-      comfortable to read, with enough spacing between cards.
-- [ ] With your usual internet connection, review the achievement icons and
-      typography. Check that the symbols fit their awards and that the section
-      feels consistent with the rest of Vertex.
-- [ ] If you use reduced motion or a screen reader, review the same profile
-      using your normal accessibility settings. Check that earning feedback is
-      calm, understandable and easy to follow.
+## Native alerts and privacy
+
+- [ ] In the installed app, log in and open **Device notifications**. Enable
+      notifications. Read the browser's permission prompt and your operating
+      system's notification settings. Choose the lock-screen preview, sound and
+      quiet-mode settings you want. Check that Vertex's privacy explanation makes
+      sense with those settings.
+- [ ] When a competition you entered next publishes an announcement or results,
+      open its alert from your operating system's notification centre. Check that
+      the wording fits the alert, its icon is recognisable and clicking it opens
+      the correct competition update. Native alert clicks could not be automated
+      on this host; actual receipt and displayed alert contents were automated.
+- [ ] Use Tab and Space to review the four notification choices. Check that the
+      labels explain what you want to receive and that keyboard focus stays easy
+      to see. Save the choices you want to keep.
+
+## Offline and update experience
+
+- [ ] Briefly turn off your connection and reopen Vertex. Read the offline page.
+      Decide whether its explanation and recovery actions are clear. Reconnect
+      and continue your work.
+- [ ] When the next real app update offers **Reload to update**, read the warning
+      before clicking. Check that it is noticeable without making you feel rushed
+      to abandon unsaved work. Save your work, then update.

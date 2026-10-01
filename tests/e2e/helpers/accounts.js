@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
+import { appendFileSync,mkdirSync } from 'node:fs';
 
 export async function createAccount(page, accountType = 'organiser', prefix = 'changes', birthday = '2009-03-14') {
   const identifier = randomUUID().replaceAll('-', '').slice(0, 14);
@@ -23,6 +24,10 @@ export async function createAccount(page, accountType = 'organiser', prefix = 'c
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Create account' }).click();
   await expect(page).toHaveURL(accountType === 'organisation' ? /\/organisation\/edit$/ : /\/profile\/edit$/, { timeout: 20000 });
+  // Secondary and native app pages also need exact IDs for connector cleanup.
+  const session=await sessionCredentials(page);
+  mkdirSync('.test-data',{recursive:true});
+  appendFileSync('.test-data/accounts.ndjson',JSON.stringify({id:session.userId,email:account.email})+'\n');
   return account;
 }
 

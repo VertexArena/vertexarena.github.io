@@ -214,3 +214,38 @@ size and MIME metadata are final, so the upload policy permits absent metadata
 during that phase and the RPC performs final validation. File reads require
 ownership or a recorded submission accessible to an organiser or team member.
 Submission confirmations use the existing notification system.
+
+## Applied Milestone 20 migrations and worker
+
+`018_push_subscriptions` and immutable corrections `018a`–`018d` were applied
+through the connected Supabase app. `SCHEMA.sql` includes all of them. Corrections
+cover PostgREST's explicit update predicate, PostgreSQL regex bounds, Google push
+token paths and finalised-round reminders. The existing Vertex project has an
+active `push-dispatch` Edge Function and `vertex-push-delivery` minute cron job.
+
+Subscriptions use own-row read RLS and guarded mutation RPCs. Settings, delivery
+jobs and deadline receipts are private. The worker token and VAPID private key
+are stored in Vault; neither belongs in `config.js`, Git, browser storage or an
+automation prompt. The Edge Function reads its server-role key from Supabase's
+runtime. Its `verify_jwt = false` configuration is intentional: it checks the
+custom Vault worker credential before calling any delivery operation. Public
+anon keys and ordinary Auth JWTs cannot invoke the worker.
+
+For a clean installation, deploy `supabase/functions/push-dispatch/index.ts`
+through the connected Supabase app after applying `SCHEMA.sql`. Configure the
+private singleton's `worker_url` with that project's
+`https://PROJECT_REF.supabase.co/functions/v1/push-dispatch` URL using an
+administrative connector query. The next cron run initialises the signing keys
+inside the Edge runtime. Verify an HTTP 200 worker response, a non-null public
+signing key and the active cron job. Do not retrieve or print Vault secrets.
+
+The subscription origin allowlist includes `https://vertexarena.github.io` and
+the repository's localhost HTTP test origins on port 4173. A different production
+origin requires a reviewed migration. The worker permits only supported browser
+push service hosts. Delivery status, bounded retries and expired subscriptions
+are maintained in the private queue. No generated private certificate or
+submission files are added to the offline cache.
+
+Actual Chrome installation, browser subscription and announcement/result/deadline
+delivery passed against this project. Google returned HTTP 201 and the browser
+displayed decrypted notifications. Evidence: `tests/MILESTONE-20.md`.

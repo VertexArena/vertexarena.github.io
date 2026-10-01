@@ -5,6 +5,7 @@ import { createRegistration } from './registration.js';
 import { createTeams } from './teams.js';
 import { createDashboards } from './dashboards.js';
 import { createAchievements } from './achievements.js';
+import { createPWA } from './pwa.js';
 import { createOrganiserCollaboration } from './organiser-collaboration.js';
 import { createAnnouncements } from './announcements.js';
 import { createQuestions } from './questions.js';
@@ -81,11 +82,11 @@ function header(path) {
 }
 
 function footer() {
-  return `<footer class="footer"><div class="footer-in"><div class="brand"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></div><span>Student competitions, clearly organised.</span><a data-link href="/discover">Discover</a></div></footer>`;
+  return `<footer class="footer"><div class="footer-in"><div class="brand"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></div><span>Student competitions, clearly organised.</span><a data-link href="/discover">Discover</a><a class="footer-app-link" data-link href="/app">Vertex app</a></div></footer>`;
 }
 
 function shell(content, path, noFooter = false) {
-  return `${header(path)}<div class="navigation-progress" data-route-progress role="status" hidden>Opening page…</div><main id="main-content" class="shell" tabindex="-1">${content}</main>${noFooter ? '' : footer()}`;
+  return `${header(path)}<div class="navigation-progress" data-route-progress role="status" hidden>Opening page…</div><main id="main-content" class="shell" tabindex="-1">${content}</main>${noFooter ? '' : footer()}${pwa.banner()}`;
 }
 
 function home() {
@@ -271,6 +272,7 @@ async function saveProfile(form) {
 }
 
 async function logout() {
+  await pwa.beforeLogout().catch(console.error);
   if (supabase) await supabase.auth.signOut();
   state.session = null;
   state.profile = null;
@@ -278,6 +280,7 @@ async function logout() {
 }
 
 function bind() {
+  pwa.bind();
   notifications.bind();
   announcements.bind();
   questions.bind();
@@ -446,7 +449,8 @@ const discoveryDirectory = createDiscovery({ client: supabase, state, escapeHtml
 const registration = createRegistration({ client: supabase, state, escapeHtml, navigate, setStatus });
 const teams = createTeams({ client: supabase, state, escapeHtml, setStatus, refresh: render });
 const collaboration = createOrganiserCollaboration({ client: supabase, state, escapeHtml, setStatus, refresh: render });
-const notifications = createNotifications({ client: supabase, state, escapeHtml, refresh: render });
+const pwa = createPWA({ client: supabase, state, escapeHtml });
+const notifications = createNotifications({ client: supabase, state, escapeHtml, refresh: render, pwa });
 const announcements = createAnnouncements({ client: supabase, state, escapeHtml, refresh: render });
 const questions = createQuestions({ client: supabase, state, escapeHtml, refresh: render });
 const meetings = createMeetings({ client: supabase, state, escapeHtml, refresh: render, navigate });
@@ -460,6 +464,7 @@ const dashboards = createDashboards({ client: supabase, state, escapeHtml, colla
 const organisations = createOrganisations({ client: supabase, state, escapeHtml, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList: competitions.organisationList });
 
 async function resolveRoute(path) {
+  if (path === '/app') return pwa.view();
   const certificateRoute = await certificates.resolve(path);
   if (certificateRoute !== undefined) return certificateRoute;
   const notificationRoute = await notifications.resolve(path);
@@ -598,6 +603,7 @@ async function bootstrap() {
   const { data, error } = await supabase.auth.getSession();
   if (error) console.error(error);
   state.session = data.session;
+  pwa.setUser(data.session?.user.id || null).catch(console.error);
   if (state.session) {
     try { await loadOwnProfile(); } catch (profileError) { console.error(profileError); }
   }
@@ -607,11 +613,13 @@ async function bootstrap() {
     state.session = session;
     if (event === 'SIGNED_OUT') state.profile = null;
     notifications.start(session?.user.id);
+    setTimeout(() => pwa.setUser(session?.user.id || null).catch(console.error), 0);
   });
   await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));
   await render();
 }
 
+pwa.start();
 bootstrap().finally(async () => {
   const splash = document.querySelector('#vertex-splash');
   await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));

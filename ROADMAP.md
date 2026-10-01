@@ -1333,6 +1333,13 @@ feat: add participant achievements
 
 # Milestone 20 â€” PWA Installation and Push Notifications
 
+**Status: Complete — 1 October 2026.** Real Chrome installation and encrypted
+announcement, result and deadline pushes verified. Device preferences, logout
+privacy, offline recovery and deliberate update activation passed. Connected
+Supabase migrations 018 and immutable corrections applied; worker deployed.
+Core and achievement regressions passed. Screenshots reviewed, test data removed.
+Evidence: `tests/MILESTONE-20.md`.
+
 ## User-visible result
 
 Vertex is installable, provides a clean install experience, and supports push notifications only when installed.
