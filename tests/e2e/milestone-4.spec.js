@@ -120,7 +120,9 @@ test('complete competition authoring, publication, validation and access boundar
   await guest.screenshot({path:`test-results/m4-public-${info.project.name}.png`,fullPage:true});
   await guest.screenshot({path:`test-results/m4-public-viewport-${info.project.name}.png`});
   expect(await guest.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await guest.goto('/discover');await expect(guest.locator(`a[href="/competition/${slug}-team"]`).first()).toBeVisible();
+  await guest.goto('/discover');
+  await guest.getByRole('searchbox', { name: 'Search competitions by name' }).fill('Team Design Challenge');
+  await expect(guest.locator(`a[href="/competition/${slug}-team"]`).first()).toBeVisible();
   await guest.goto(`/organiser/competition/${slug}-team`);await expect(guest).toHaveURL(/\/login\?returnTo=/);
   await publicContext.close();
   // Replace the test upload through the actual editor; application removes the old object.

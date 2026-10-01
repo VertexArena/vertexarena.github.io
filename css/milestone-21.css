@@ -1,0 +1,25 @@
+/* Tinted surfaces need slightly stronger body contrast than white surfaces. */
+.journey-section p, .student-card p, .closing-card p {
+  color: color-mix(in srgb, var(--text) 15%, var(--muted));
+}
+.difference-in .eyebrow { color: #93c5fd; }
+.account-type small { color: color-mix(in srgb, var(--text) 20%, var(--muted)); }
+.discovery-art-mark span { color: #fff; background: #0f172a; padding: 3px 7px; border-radius: 5px; opacity: 1; }
+:root[data-theme='dark'] .primary { color: #0b1120; }
+:root[data-theme='dark'] .nav a[aria-current='page'],
+:root[data-theme='dark'] .drawer a[aria-current='page'],
+:root[data-theme='dark'] .eyebrow { color: #60a5fa; }
+:root[data-theme='dark'] .difference-in .eyebrow { color: #2563eb; }
+:root[data-theme='dark'] .discovery-state.is-open { color: #60a5fa; }
+.leaderboard-round small, .leaderboard-podium-card small, .leaderboard-entry-status.eliminated {
+  color: color-mix(in srgb, var(--text) 20%, var(--muted));
+}
+:root[data-theme='dark'] .avatar-fallback,
+:root[data-theme='dark'] .account-badge,
+:root[data-theme='dark'] .leaderboard-round > span,
+:root[data-theme='dark'] .scoring-round > span { color: #60a5fa; }
+:root[data-theme='dark'] [data-step][aria-current='step'] { color: #60a5fa; }
+.global-error { position: fixed; z-index: 150; bottom: 24px; right: 24px; width: min(420px, calc(100% - 32px)); padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: var(--shadow-low); }
+.global-error p { margin: 0 0 16px; line-height: 1.5; }
+.global-error > div { display: flex; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 600px) { .global-error { right: 16px; bottom: 16px; } }

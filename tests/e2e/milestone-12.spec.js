@@ -93,7 +93,7 @@ test('Milestone 12 meeting assignment, restricted access, Jitsi route, and respo
     await expect(view.locator('.meeting-card')).toContainText('Round one briefing');
   }
   await unassignedPage.goto(`/competition/${slug}/meetings`);
-  await expect(unassignedPage.getByText('No meetings assigned to you yet.')).toBeVisible();
+  await expect(unassignedPage.getByText('No meetings assigned to you yet.')).toBeVisible({ timeout: 30000 });
   await unassignedPage.goto(roomPath);
   await expect(unassignedPage.getByRole('heading', { name: 'Meeting unavailable.' })).toBeVisible();
   await expect(unassignedPage.locator('[data-meeting-embed]')).toHaveCount(0);

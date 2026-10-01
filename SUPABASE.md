@@ -14,6 +14,12 @@ Configure these hosted dashboard settings manually because SQL migrations cannot
 
 Signup must return an active session immediately. If it does not, verify **Confirm email** remains disabled before changing application code.
 
+The final security advisor review also reports hosted Auth's existing
+leaked-password protection setting as disabled. That hosted setting is separate
+from SQL and application permissions. Review availability and enablement in Auth's
+password-security settings as appropriate for the project's plan. See
+[Supabase password security](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
 ## Browser credentials
 
 `config.js` contains only:

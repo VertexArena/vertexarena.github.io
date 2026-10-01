@@ -27,7 +27,7 @@ export async function createAccount(page, accountType = 'organiser', prefix = 'c
   // Secondary and native app pages also need exact IDs for connector cleanup.
   const session=await sessionCredentials(page);
   mkdirSync('.test-data',{recursive:true});
-  appendFileSync('.test-data/accounts.ndjson',JSON.stringify({id:session.userId,email:account.email})+'\n');
+  appendFileSync('.test-data/accounts.ndjson',JSON.stringify({id:session.userId,email:account.email,created_at:session.createdAt})+'\n');
   return account;
 }
 
@@ -43,6 +43,6 @@ export async function sessionCredentials(page) {
   return page.evaluate(() => {
     const key = Object.keys(localStorage).find(name => name.endsWith('-auth-token'));
     const session = JSON.parse(localStorage.getItem(key));
-    return { userId: session.user.id, token: session.access_token, ...window.VERTEX_CONFIG };
+    return { userId: session.user.id, createdAt: session.user.created_at, token: session.access_token, ...window.VERTEX_CONFIG };
   });
 }

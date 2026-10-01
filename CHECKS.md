@@ -1,46 +1,56 @@
-# Milestone 20 — manual review
+# Milestone 21 — your device review
 
-Automated tests cover installation, real push delivery, preferences, privacy,
-offline recovery, updates and responsive layouts. These checks cover your own
-device's presentation and browser or operating-system controls.
+Automated browser tests cover application behavior, permission boundaries,
+responsive routes, both themes, keyboard controls, error recovery, large lists,
+Realtime cleanup, installation and real encrypted push delivery. Review these
+remaining device and presentation details on the deployed Vertex site.
 
-Use a preview containing Milestone 20. Installation and notifications require
-HTTPS, or localhost on the computer running Vertex. A phone opening a computer's
-ordinary HTTP network address will not have the same installation support.
+## Readability and input
 
-## Installation on your device
+- [ ] Open discovery and a competition on your usual phone. Check that names,
+      dates, prizes and action labels remain readable without sideways scrolling.
+- [ ] Switch light/dark mode. Inspect icons, active tabs, muted text and result
+      badges. Increase browser zoom to 200% and check that controls remain usable.
+- [ ] Navigate with Tab and Shift+Tab. Open and close a competition preview with
+      the keyboard. Check that focus is visible and returns to a useful control.
+- [ ] With your screen reader, check form labels, errors, unread notification
+      count, team membership and advancement status. Confirm announcements of
+      updates are understandable and do not repeat the entire page unnecessarily.
 
-- [ ] Open **Vertex app** in the footer. Read the installation instructions.
-      Check that they match the menus in your usual browser and are easy to follow.
-- [ ] Install Vertex and open it from your apps or home screen. Look at its icon
-      in your launcher and app switcher. Check that the mountain logo is clear,
-      centred and not clipped by your device's icon shape.
-- [ ] On your phone, review **On this device** in light and dark mode and both
-      orientations. Check that headings, controls and installation guidance feel
-      comfortable to read and tap. Physical iPhone/Safari installation still needs
-      this device review; automated installation used Windows Chrome.
+## Meeting hardware
 
-## Native alerts and privacy
+- [ ] Assign two of your test accounts to one meeting. Join from two different
+      browser profiles or devices. Confirm camera, microphone, sound and leaving
+      work with your browser's actual permission prompts.
+- [ ] Try the same meeting URL as an unassigned participant. Vertex should deny
+      access before loading the room. Jitsi's host may ask its moderator to sign
+      in; check that behavior using your usual meeting account.
 
-- [ ] In the installed app, log in and open **Device notifications**. Enable
-      notifications. Read the browser's permission prompt and your operating
-      system's notification settings. Choose the lock-screen preview, sound and
-      quiet-mode settings you want. Check that Vertex's privacy explanation makes
-      sense with those settings.
-- [ ] When a competition you entered next publishes an announcement or results,
-      open its alert from your operating system's notification centre. Check that
-      the wording fits the alert, its icon is recognisable and clicking it opens
-      the correct competition update. Native alert clicks could not be automated
-      on this host; actual receipt and displayed alert contents were automated.
-- [ ] Use Tab and Space to review the four notification choices. Check that the
-      labels explain what you want to receive and that keyboard focus stays easy
-      to see. Save the choices you want to keep.
+## Certificate output
 
-## Offline and update experience
+- [ ] Use your own template and a long participant full name. Inspect the preview,
+      downloaded image and PDF at full size. Confirm line wrapping, font, colour,
+      placement and names match your intended artwork.
+- [ ] Open the PDF in your normal viewer and print-preview it. Check margins and
+      image sharpness. A team member's certificate must use that member's name.
 
-- [ ] Briefly turn off your connection and reopen Vertex. Read the offline page.
-      Decide whether its explanation and recovery actions are clear. Reconnect
-      and continue your work.
-- [ ] When the next real app update offers **Reload to update**, read the warning
-      before clicking. Check that it is noticeable without making you feel rushed
-      to abandon unsaved work. Save your work, then update.
+## Installed app and operating-system notifications
+
+- [ ] Install Vertex from the footer's **Vertex app** page. Check home-screen or
+      launcher icon, splash screen and application name on your device.
+- [ ] Open installed Vertex and switch themes. Check the actual window/title bar
+      follows the theme, then close and reopen the app.
+- [ ] Enable notifications in installed Vertex. Send an announcement from an
+      organiser account. Check the native alert, then click it and confirm Vertex
+      opens the correct competition update.
+- [ ] Repeat with results and a meeting assignment. Test your operating system's
+      notification permission settings, including denial and re-enablement.
+- [ ] On iPhone/iPad, install through Safari's Add to Home Screen and open from
+      that icon before enabling push. Review the physical device's presentation.
+- [ ] Disconnect the network and open a nested route. Read the offline guidance,
+      reconnect and use **Try again**. When a later release offers **Reload to
+      update**, save your work first and check that reload opens the new version.
+
+Fresh-project Supabase validation was skipped at your request. No new-project
+bootstrap test is claimed. Prize distribution intentionally remains Coming Soon,
+as required by the specification.

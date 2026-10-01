@@ -4,5 +4,6 @@ test-results/
 test-results-regression/
 .test-data/
 .env
+supabase/.temp/
 .agents/
 mobile-home-review.png

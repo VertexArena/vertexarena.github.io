@@ -26,6 +26,8 @@ test('prepare Milestone 8 dashboard fixture', async ({ page, browser, request })
   const headers = token => ({ apikey: owner.SUPABASE_ANON_KEY, Authorization: `Bearer ${token}`, 'content-type': 'application/json' });
   const root = `m8-${organiser.username.replaceAll('_', '-')}`;
   const competitions = {};
+  const base = Date.now();
+  const soon = seconds => new Date(base + seconds * 1000).toISOString();
   for (const key of ['upcoming', 'active', 'completed', 'team', 'invitation']) {
     const id = randomUUID(), slug = `${root}-${key}`;
     competitions[key] = { id, slug };
@@ -39,11 +41,15 @@ test('prepare Milestone 8 dashboard fixture', async ({ page, browser, request })
       categories: [], structure: 'direct3', banner_kind: 'colour',
       banner_colour: '#2563eb', banner_colour_end: '#0b1120', banner_path: null,
       certificate_status: key === 'team' ? 'planned' : 'not_planned',
-      registration_opens_at: stamp(-2), registration_closes_at: stamp(2), starts_at: stamp(3)
+      registration_opens_at: stamp(-2),
+      registration_closes_at: ['active', 'completed'].includes(key) ? soon(180) : stamp(2),
+      starts_at: ['active', 'completed'].includes(key) ? soon(181) : stamp(3)
     };
     const rounds = [{ id: randomUUID(), name: 'Final round', slug: 'final-round',
-      sequence: 1, advancement_count: 3, opens_at: stamp(4),
-      submission_deadline: stamp(5), leaderboard_releases_at: stamp(6) }];
+      sequence: 1, advancement_count: 3,
+      opens_at: ['active', 'completed'].includes(key) ? soon(182) : stamp(4),
+      submission_deadline: key === 'completed' ? soon(183) : stamp(5),
+      leaderboard_releases_at: key === 'completed' ? soon(185) : stamp(6) }];
     const response = await request.post(`${owner.SUPABASE_PROJECT_URL}/rest/v1/rpc/save_competition`, { headers: headers(owner.token), data: { details, rounds } });
     expect(response.ok(), await response.text()).toBeTruthy();
   }
@@ -73,6 +79,8 @@ test('prepare Milestone 8 dashboard fixture', async ({ page, browser, request })
   writeFileSync(fixturePath, JSON.stringify({ organiser, participant, teammate, ids: [owner.userId, participantSession.userId, teammateSession.userId], competitions }, null, 2));
   await participantPage.close();
   await teammatePage.close();
+  // Exercise actual datetime transitions; no out-of-band fixture editing.
+  await page.waitForTimeout(Math.max(0, base + 190000 - Date.now()));
 });
 
 test('Milestone 8 dashboards show actual state and stay usable across routes', async ({ page, browser, request }, info) => {

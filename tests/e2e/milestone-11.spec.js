@@ -81,7 +81,11 @@ test('Milestone 11 question, organiser reply, notifications, realtime, RLS, and 
   await expect(page.getByText('Reply posted. Participant notified.')).toBeVisible();
   await expect(participantPage.getByText('Yes. Credit each asset and follow its licence.')).toBeVisible({ timeout: 20000 });
   await expect(secondPage.getByText('Yes. Credit each asset and follow its licence.')).toBeVisible({ timeout: 20000 });
-  await expect(participantPage.locator('[data-notification-count]')).toHaveText('2', { timeout: 20000 });
+  // Registrations also award achievements; assert the current authoritative
+  // unread total rather than the count from before achievements existed.
+  const unread = await request.get(`${root}/notifications?select=id&recipient_id=eq.${participantSession.userId}&read_at=is.null`, { headers: headers(participantSession.token) });
+  expect(unread.ok()).toBeTruthy();
+  await expect(participantPage.locator('[data-notification-count]')).toHaveText(String((await unread.json()).length), { timeout: 20000 });
   await participantPage.goto('/notifications');
   await expect(participantPage.getByText('Your question has a reply', { exact: true })).toBeVisible();
   await participantPage.locator('.notice-row').filter({ hasText: 'Your question has a reply' }).getByRole('link', { name: 'Open update' }).click();

@@ -1,4 +1,5 @@
 import { createCertificates } from './certificates.js';
+import { startErrorFeedback } from './errors.js';
 import { createCompetitions } from './competitions.js';
 import { createDiscovery } from './discovery.js';
 import { createRegistration } from './registration.js';
@@ -31,6 +32,7 @@ const publicNav = [['/', 'Home'], ['/discover', 'Discover'], ['/people', 'People
 let cleanup = () => {};
 let initialRender = true;
 let renderRevision = 0;
+let localAuthChange = false;
 
 const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -66,7 +68,7 @@ function header(path) {
   const dark = document.documentElement.dataset.theme === 'dark';
   const authPage = ['/login', '/signup'].includes(path);
   const identity = authPage
-    ? `<a class="back-home" data-link href="/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Vertex</span></a>`
+    ? `<a class="back-home" data-link href="/" aria-label="Back to Vertex"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Vertex</span></a>`
     : `<a class="brand" data-link href="/" aria-label="Vertex home"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></a>`;
   const organisationAccount = state.profile?.account_type === 'organisation';
   const accountPath = organisationAccount ? '/organisation/edit' : '/profile/edit';
@@ -144,16 +146,16 @@ function errorView(title, message, retry = location.pathname) {
 
 async function loadOwnProfile() {
   if (!state.session || !supabase) { state.profile = null; return null; }
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', state.session.user.id).single();
+  const userId = state.session.user.id;
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
   if (error) throw error;
-  state.profile = data;
   if (data.account_type === 'organisation') {
     const organisation = await supabase.from('organisations').select('*').eq('management_profile_id', data.id).maybeSingle();
     if (organisation.error) throw organisation.error;
     data.organisation = organisation.data;
     data.full_name = organisation.data?.name || data.full_name || 'Set up organisation';
   }
-  state.profile = data;
+  if (state.session?.user.id === userId) state.profile = data;
   return data;
 }
 
@@ -188,6 +190,7 @@ async function submitAuth(form) {
   const mode = form.dataset.authForm;
   setStatus(status, '');
   setSubmitting(form, true, mode === 'login' ? 'Logging in' : 'Creating account');
+  localAuthChange = true;
   try {
     if (!supabase) throw new Error('Supabase configuration is unavailable.');
     if (mode === 'signup') {
@@ -225,7 +228,7 @@ async function submitAuth(form) {
   } catch (error) {
     setStatus(status, authMessage(error), 'error');
     setSubmitting(form, false);
-  }
+  } finally { localAuthChange = false; }
 }
 
 async function saveProfile(form) {
@@ -610,15 +613,34 @@ async function bootstrap() {
   notifications.start(state.session?.user.id);
   state.authReady = true;
   supabase.auth.onAuthStateChange((event, session) => {
+    const previousUser = state.session?.user.id || null;
+    const userId = session?.user.id || null;
+    const changed = previousUser !== userId;
+    const syncIdentity = changed && !localAuthChange;
     state.session = session;
-    if (event === 'SIGNED_OUT') state.profile = null;
+    if (changed || event === 'SIGNED_OUT') state.profile = null;
+    if (syncIdentity) {
+      ++renderRevision;
+      cleanup(); cleanup = () => {};
+      app.innerHTML = shell(loadingView('Updating your session'), location.pathname, true);
+      app.setAttribute('aria-busy', 'true');
+    }
     notifications.start(session?.user.id);
-    setTimeout(() => pwa.setUser(session?.user.id || null).catch(console.error), 0);
+    // Auth callbacks hold the client's session lock. Defer profile queries and
+    // rendering so another tab can change identity without leaving stale data.
+    setTimeout(async () => {
+      if ((state.session?.user.id || null) !== userId) return;
+      await pwa.setUser(userId).catch(console.error);
+      if (!syncIdentity) return;
+      if (userId) await loadOwnProfile().catch(console.error);
+      if ((state.session?.user.id || null) === userId) await render();
+    }, 0);
   });
   await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));
   await render();
 }
 
+startErrorFeedback();
 pwa.start();
 bootstrap().finally(async () => {
   const splash = document.querySelector('#vertex-splash');

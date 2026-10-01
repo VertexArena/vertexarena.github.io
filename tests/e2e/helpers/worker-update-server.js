@@ -14,7 +14,7 @@ export async function workerUpdateServer() {
     if(!target.startsWith(root.endsWith(sep)?root:root+sep)){response.writeHead(403).end();return;}
     try{
       let body=await readFile(target);
-      if(path==='/service-worker.js'&&updated)body=Buffer.from(body.toString().replace('vertex-static-m20-v1','vertex-static-m20-test-update'));
+      if(path==='/service-worker.js'&&updated)body=Buffer.from(body.toString().replace(/vertex-static-m\d+-v\d+/, 'vertex-static-test-update'));
       const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.webmanifest':'application/manifest+json'};
       response.writeHead(200,{'content-type':types[extname(target)]||'application/octet-stream','cache-control':'no-store'}).end(body);
     }catch{response.writeHead(404,{'content-type':'text/html'}).end(await readFile(resolve(root,'404.html')));}

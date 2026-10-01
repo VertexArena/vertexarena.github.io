@@ -1,4 +1,4 @@
-const VERSION = 'vertex-static-m20-v1';
+const VERSION = 'vertex-static-m21-v1';
 const OFFLINE = '/offline.html';
 const SHELL = [OFFLINE, '/assets/logo.png', '/assets/icon-192.png', '/assets/icon-512.png', '/assets/icon-maskable-512.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(SHELL))));

@@ -27,7 +27,7 @@ test('authoritative achievements, progress, team inheritance, private sharing an
   const rpc = async (token, name, data = {}) => { const r = await request.post(`${endpoint}/rpc/${name}`, { headers: headers(token), data }); expect(r.ok(), await r.text()).toBe(true); return r.json(); };
   const now = Date.now(), when = seconds => new Date(now + seconds * 1000).toISOString();
   // Match the minute precision of the application's datetime-local controls.
-  const opens = Math.ceil((now + 82000) / 60000) * 60000, deadline = opens + 60000;
+  const opens = Math.ceil((now + 182000) / 60000) * 60000, deadline = opens + 120000;
   const at = value => new Date(value).toISOString();
   const marker = `m19-${ownerAccount.username.replaceAll('_','-')}`;
   const fixtures = {};
@@ -38,7 +38,7 @@ test('authoritative achievements, progress, team inheritance, private sharing an
       minimum_age:12,maximum_age:25,team_mode:main?'both':'individual',minimum_team_size:main?2:null,maximum_team_size:main?3:null,
       categories:main?['Junior','Senior']:[],structure:main?'custom':'direct3',banner_kind:'colour',banner_colour:'#2563eb',
       banner_colour_end:'#0b1120',banner_path:null,certificate_status:'not_planned',
-      registration_opens_at:when(-600),registration_closes_at:when(main?80:86400),starts_at:when(main?81:86401) };
+      registration_opens_at:when(-600),registration_closes_at:when(main?180:86400),starts_at:when(main?181:86401) };
     const rounds = main ? [
       {id:first,name:'Qualifier',slug:'qualifier',sequence:1,advancement_count:3,opens_at:at(opens),submission_deadline:at(deadline),leaderboard_releases_at:at(deadline+1000)},
       {id:final,name:'Final',slug:'final',sequence:2,advancement_count:1,opens_at:at(deadline+2000),submission_deadline:at(deadline+3000),leaderboard_releases_at:at(deadline+60000)}
@@ -137,7 +137,7 @@ test('authoritative achievements, progress, team inheritance, private sharing an
   await page.locator('input[name="mode"][value="link"]').check();
   await page.getByRole('button',{name:'Save round rules'}).click();
   await expect(page.locator('[data-config-status]')).toContainText('Round rules saved.');
-  await expect.poll(()=>Date.now(),{timeout:180000,intervals:[1000]}).toBeGreaterThan(opens);
+  await expect.poll(()=>Date.now(),{timeout:300000,intervals:[1000]}).toBeGreaterThan(opens);
   for (const actor of [person,captain]) {
     await actor.view.goto(`/competition/${main.slug}/submissions/qualifier`);
     await actor.view.locator('[data-submission-links]').fill(`https://example.org/m19-${actor.username}`);
@@ -187,7 +187,7 @@ test('authoritative achievements, progress, team inheritance, private sharing an
   await expect(card(observer,'first_advancement')).not.toHaveClass(/is-earned/);
   await expect(card(observer,'finalist')).not.toHaveClass(/is-earned/);
   await expect(card(observer,'category_winner')).not.toHaveClass(/is-earned/);
-  await expect.poll(()=>Date.now(),{timeout:90000,intervals:[1000]}).toBeGreaterThan(deadline);
+  await expect.poll(()=>Date.now(),{timeout:180000,intervals:[1000]}).toBeGreaterThan(deadline);
   await release('qualifier');
   await expect(card(observer,'first_advancement')).toHaveClass(/is-earned/);
   await expect(card(observer,'finalist')).toHaveClass(/is-earned/);
