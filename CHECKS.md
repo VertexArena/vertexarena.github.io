@@ -35,9 +35,23 @@ These checks cover details that need your usual hardware and assistive tools.
 - [ ] In the installed app, review title-bar theme, safe-area spacing and the
       on-screen keyboard. A physical installed-app review was not repeated here.
 
-## Management limitation
+## Optional disposable-draft review
 
-Competition deletion is not available yet. It needs a verified owner-only
-Supabase function that safely removes unused drafts and preserves published
-history. Connector access failed during this refinement; no RLS or schema change
-was applied. See UX-REFINEMENT.md for the required database work.
+The migration and SQL permission checks passed. Browser audits opened and cancelled
+the dialog on existing data. They did not delete your competitions or upload artwork.
+Use a new disposable draft for these checks, never an existing competition you need.
+
+- [ ] Log in as an organiser. Choose Create competition, name it “Device review
+      draft”, and Save draft. Do not publish it or invite anyone.
+- [ ] On your phone with the keyboard open, scroll below the editor and choose
+      Delete draft. Type the saved name. Check that the explanation and both actions
+      remain reachable without sideways scrolling or covered text.
+- [ ] For an actual deletion check, choose Delete permanently on this disposable
+      draft only. Confirm “Draft deleted” appears and it leaves your dashboard.
+      Open its old editor address; it should say Competition unavailable.
+- [ ] If you want to check artwork cleanup, create another disposable draft, add
+      a banner in Appearance and save it. Delete that draft. Confirm it disappears
+      without a cleanup error. This live upload/removal check was not repeated here.
+- [ ] During normal competition management, confirm published entries, results
+      and certificates still work. Published competitions deliberately have no
+      Delete draft action.

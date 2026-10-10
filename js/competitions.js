@@ -1,5 +1,6 @@
 import { fields, newCompetition, newRound, slugify, localDate, timestamp, validate, cleanRound, roundDateKeys, competitionDateKeys } from './competition-model.js';
 import { competitionLifecycle, lifecycleMarkup } from './lifecycle.js';
+import { draftManagement, openDraftDeletion } from './draft-deletion.js';
 
 export function createCompetitions({ client, state, escapeHtml: h, navigate, setStatus }) {
   const steps = ['Essentials', 'Participation', 'Timeline', 'Appearance', 'Review'];
@@ -46,7 +47,7 @@ export function createCompetitions({ client, state, escapeHtml: h, navigate, set
     const memberships=await result(client.from('organisation_memberships').select('organisations(id,name,slug)').eq('organiser_id',state.session.user.id).eq('status','accepted'));
     const orgs=memberships.map(m=>m.organisations).filter(Boolean);
     if(c.organisation_id&&!orgs.some(o=>o.id===c.organisation_id)) { const org=await result(client.from('organisations').select('id,name,slug').eq('id',c.organisation_id).single());orgs.push(org); }
-    editor={c,rounds,orgs,step:0,busy:false,file:null,url:await bannerUrl(c),savedPath:c.banner_path,dirty:false};
+    editor={c,saved:{...c},rounds,orgs,step:0,busy:false,file:null,url:await bannerUrl(c),savedPath:c.banner_path,dirty:false};
     return {title:`${c.version?'Edit':'Create'} competition - Vertex`,content:`<div class="page competition-editor"><a class="back-link" data-link href="/organiser"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Your competitions</a><div class="page-head compact-head"><span class="eyebrow">Organiser studio</span><h1>${c.version?'Shape what comes next.':'Build a worthy challenge.'}</h1><p>Define the opportunity. Set a clear path from registration to results.</p>${c.version?`<a class="button secondary" data-link href="/organiser/competition/${h(c.slug)}/participants">View participants</a>`:''}</div><div class="editor-shell"><nav class="editor-steps" aria-label="Competition setup steps">${steps.map((s,i)=>`<button type="button" data-step="${i}"><span>${i+1}</span>${s}</button>`).join('')}<div class="editor-save-state" data-save-state>${c.version?'Saved '+h(date(c.updated_at)):'Not saved yet'}</div></nav><div class="editor-main"><div class="form-status" role="status" aria-live="polite" data-competition-status></div><form data-competition-form novalidate><div data-editor-panel></div><div class="editor-actions"><button class="button secondary" type="button" data-editor-back>Back</button><button class="button secondary" type="button" data-save-draft>${c.status==='published'?'Save changes':'Save draft'}</button><button class="button primary" type="submit" data-editor-next>Continue</button></div></form></div></div></div>`};
   }
   async function resolve(path) {
@@ -159,7 +160,8 @@ export function createCompetitions({ client, state, escapeHtml: h, navigate, set
       if(c.banner_kind==='image'&&editor.file){uploaded=`${state.session.user.id}/${c.id}/${crypto.randomUUID()}.${imageTypes[editor.file.type]}`;await result(client.storage.from('competition-banners').upload(uploaded,editor.file,{contentType:editor.file.type,upsert:false}));c.banner_path=uploaded;}
       if(c.banner_kind!=='image')c.banner_path=null;
       const saved=await result(client.rpc('save_competition',{details:c,rounds:editor.rounds,expected_version:editor.c.version??null}));persisted=true;
-      const oldPath=editor.savedPath;editor.c=saved;editor.savedPath=saved.banner_path;editor.file=null;editor.dirty=false;
+      const oldPath=editor.savedPath;editor.c=saved;editor.saved={...saved};editor.savedPath=saved.banner_path;editor.file=null;editor.dirty=false;
+      document.querySelector('[data-draft-management]').innerHTML=draftManagement(saved,state.session.user.id,h);
       // Read the server's timestamp representation, so published round comparisons stay exact.
       editor.rounds=(await result(client.from('competition_rounds').select('*').eq('competition_id',saved.id).order('sequence'))).map(cleanRound);
       let cleanupFailed=false;
@@ -181,7 +183,24 @@ export function createCompetitions({ client, state, escapeHtml: h, navigate, set
     const tick = () => document.querySelectorAll('[data-competition-countdown]').forEach(el => { el.textContent = registrationState({registration_opens_at:el.dataset.registrationOpens,registration_closes_at:el.dataset.competitionCountdown}); });
     tick(); timer = setInterval(tick, 60000);
     const form=document.querySelector('[data-competition-form]');
-    if(!form){editor=null;if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}return;}
+    if(!form){editor=null;document.querySelectorAll('.draft-delete-dialog').forEach(dialog=>dialog.remove());if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}return;}
+    const management=document.createElement('div');management.dataset.draftManagement='';
+    management.innerHTML=draftManagement(editor.saved,state.session.user.id,h);
+    document.querySelector('.competition-editor').append(management);
+    management.addEventListener('click',event=>{
+      if(!event.target.closest('[data-delete-draft]')||editor.busy)return;
+      openDraftDeletion({client,saved:{...editor.saved},dirty:editor.dirty,h,setStatus,
+        onBusy:busy=>{if(!editor)return;editor.busy=busy;form.inert=busy;document.querySelectorAll('[data-step],[data-delete-draft]').forEach(button=>button.disabled=busy);},
+        onPrepared:saved=>{
+          editor.saved={...saved};editor.c.version=saved.version;editor.c.banner_path=saved.banner_path;editor.c.banner_kind=saved.banner_kind;editor.savedPath=saved.banner_path;editor.url=null;
+          const preview=document.querySelector('[data-banner-preview]');if(preview)preview.innerHTML=banner(editor.c,null);
+          const style=document.querySelector('[name="banner_kind"]');if(style)style.value=saved.banner_kind;
+          const colours=document.querySelector('[data-banner-colours]');if(colours)colours.hidden=saved.banner_kind==='image';
+          const upload=document.querySelector('[data-banner-upload]');if(upload)upload.hidden=saved.banner_kind!=='image';
+        },
+        onDeleted:async()=>{editor.dirty=false;editor=null;await navigate('/organiser');const notice=document.createElement('div');notice.className='form-status';notice.setAttribute('role','status');document.querySelector('.organiser-dashboard .dashboard-heading')?.after(notice);setStatus(notice,'Draft deleted. Your other competitions are unchanged.','success');}
+      });
+    });
     showStep();
     const go=async step=>{try{readPanel();editor.step=step;await showStep(true);setStatus(document.querySelector('[data-competition-status]'),'');}catch(error){setStatus(document.querySelector('[data-competition-status]'),errorMessage(error),'error');}};
     form.addEventListener('input',markDirty);
@@ -191,6 +210,6 @@ export function createCompetitions({ client, state, escapeHtml: h, navigate, set
     form.addEventListener('submit',e=>{e.preventDefault();if(editor.step===4)save(true);else go(editor.step+1);});
   }
   // Browser refresh/close guards unsaved work; saved drafts are recoverable on any device.
-  addEventListener('beforeunload',e=>{if(editor?.dirty){e.preventDefault();e.returnValue='';}});
-  return { resolve,bind,publicList:()=>list(),organisationList:id=>list(false,id),canLeave:()=>!editor?.dirty||confirm('Leave without saving these competition changes?') };
+  addEventListener('beforeunload',e=>{if(editor?.dirty||editor?.busy){e.preventDefault();e.returnValue='';}});
+  return { resolve,bind,publicList:()=>list(),organisationList:id=>list(false,id),canLeave:()=>!editor?.busy&&(!editor?.dirty||confirm('Leave without saving these competition changes?')) };
 }

@@ -255,3 +255,29 @@ submission files are added to the offline cache.
 Actual Chrome installation, browser subscription and announcement/result/deadline
 delivery passed against this project. Google returned HTTP 201 and the browser
 displayed decrypted notifications. Evidence: `tests/MILESTONE-20.md`.
+
+## Safe draft deletion refinement
+
+The connected Vertex app applied `safe_draft_deletion` and
+`serialize_banner_cleanup` on 10 October 2026. The corresponding immutable files
+are `20261010122050_safe_draft_deletion.sql` and
+`20261010130846_serialize_banner_cleanup.sql`; both are in SCHEMA.sql.
+
+Only the owning organiser can prepare/delete an unused, unpublished draft, using
+its exact saved name and version. SQL protects collaborators, invitations, entries,
+activity, results, certificate records and all remaining artwork. The browser
+detaches then removes unused banners through Storage API before atomic deletion;
+SQL never removes Storage metadata directly. Save/upload/cleanup/deletion share an
+ID lock; private retired IDs deny late upload or recreation. Legacy manager banner
+policy column qualification is corrected. Direct competition DELETE remains denied.
+
+Exposed deletion wrappers use SECURITY INVOKER. Guarded private helpers hold
+elevated writes; authenticated receives schema usage and only explicit helper
+execution. The retired-ID table has RLS, no client policies and no client grants.
+This produces an intentional default-deny informational advisor notice.
+
+Rollback transaction permission/integrity tests passed with existing authorised
+profiles. No test Auth accounts or Storage objects were created. Both original
+competitions, their versions and all five Storage objects were verified unchanged.
+Browser visual/confirmation/failure-retry checks passed; destructive browser and
+live artwork cleanup checks remain optional manual checks in CHECKS.md.

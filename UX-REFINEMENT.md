@@ -43,25 +43,81 @@ Major visual reasons:
   functionality instead of replacing it with a restricted list.
 - Motion uses small translations, with readable text and reduced-motion support.
 
-## Database change required for competition deletion
+## Safe draft deletion implemented
 
-Current competition writes are atomic RPCs; application users have no direct
-DELETE grant. The connected Supabase app returned `Unknown tool` for project
-access. The user asked to continue frontend work and report required RLS changes.
-No migration was applied, no schema was changed, and no dead Delete button ships.
+Supabase access was restored by selecting the named Vertex account link. The
+earlier `Unknown tool` report came from the wrong connector link identifier.
+Both `safe_draft_deletion` and `serialize_banner_cleanup` were applied through
+the connected app to the existing Vertex project. Their immutable CLI-generated
+files are consolidated in SCHEMA.sql; no earlier migration was edited.
 
-A safe follow-up should add an authenticated, owner-only draft-deletion RPC. It
-must lock the competition, re-check draft status and exact confirmation name,
-reject registrations/team membership/invitations/submissions/scoring/results/
-certificates or other retained history, and reject remaining Storage objects.
-Remove referenced draft banner artwork through the Storage API with retry before
-the final atomic deletion. Keep the owner/version checks in SQL, revoke PUBLIC
-and anon execution, and verify owner/manager/participant/organisation denials.
-Published competitions must retain their records and stable results/certificates.
-Cancellation/archive/duplication are not indiscriminately added: each requires a
-separate state/access model and historical-integrity decision.
+The owner finds Delete draft below the saved competition editor. The native
+dialog explains permanent loss, requires the exact saved name and warns about
+unsaved edits. Keep draft and Escape restore focus without losing those edits.
+Loading blocks duplicate actions; a connection failure preserves the dialog,
+explains that the draft remains, and offers retry or cancellation.
+If the final request loses its response, the outcome is explicitly unconfirmed;
+Check deletion verifies the signed-in owner and retained row before retrying.
 
-## Verification record
+SQL locks and rechecks the owner, organiser role, draft/publication state, version,
+confirmation name and all retained collaboration/entry/activity/result/certificate
+records. Published competitions display a retention explanation instead of Delete.
+Shared drafts and drafts with history are rejected. Direct table DELETE remains
+ungranted. Public endpoints are SECURITY INVOKER; elevation stays in guarded
+private functions with explicit execute grants and fixed search paths.
+
+Preparation detaches referenced banner artwork and updates the saved version.
+The browser removes unused banners through Storage API, in bounded batches. Final
+deletion refuses remaining artwork. A failed cleanup leaves the draft recoverable,
+possibly with a solid-colour banner, and retries scan remaining paths again.
+Save, upload, cleanup and deletion use the same competition lock. Private retired
+IDs prevent late uploads or stale first-save requests from recreating deleted
+drafts. Manager banner read/delete policies also repair legacy outer-column
+qualification errors without granting access to another competition's artwork.
+
+Published competitions retain stable records, results and certificates.
+Cancellation/archive/duplication require separate lifecycle rules and are not
+indiscriminately introduced by this refinement.
+
+### Follow-up verification
+
+- Chrome confirmation audit: desktop, 390 px dark and 320 px light screenshots,
+  exact-name gating, keyboard focus, Escape, cancellation, refresh and unchanged
+  unsaved title; zero Axe findings and no requests that mutate existing records.
+- Transport failure was deliberately injected before the RPC reached Supabase.
+  Error focus, retained confirmation, retry and cancellation passed. No live
+  competition was deleted to test failure handling.
+- Final browser regression: four tests passed in 44.9 seconds, covering draft
+  management, public controls/lifecycle, organiser navigation and file-type settings.
+  Final draft-only rerun passed in 22.1 seconds, including error-state Axe checks
+  and the phone input-size correction.
+  Dialog and connection-error screenshots were inspected for layout and readability.
+- `tests/sql/draft-deletion.sql` passed on Vertex using actual authenticated/anon
+  roles and existing authorised profiles. Owner deletion, participant/organisation/
+  manager/anonymous denials, direct DELETE denial, history/publication/version
+  protection, banner detachment, reference cleanup guards, configuration cascades
+  and deleted-ID upload/recreation denial all passed. Fixtures were rolled back.
+  The manager fixture tests permission boundaries, not the creation wizard.
+- Baseline retained: Sustainability Hackathon version 1, Socratic Marathon version
+  4, two competitions, five Storage objects, zero fixture rows or retired fixture
+  IDs. No accounts, images, logos or permanent test records were created.
+- Syntax, diff and release checks passed; all 41 migrations are consolidated.
+
+Live Storage upload/removal and a successful destructive browser flow were not
+repeated, following the user's visual-audit/existing-account instruction. SQL
+transaction checks verify successful deletion separately. No simultaneous-tab
+race test or fresh Supabase project was run. Remaining physical-device and optional
+disposable-draft review steps are in CHECKS.md.
+
+Security/performance advisors were reviewed after migration. New private retired
+IDs intentionally have RLS with no client policy or table grant, giving default
+denial. Existing public-profile view and role-checked public RPC notices remain;
+leaked-password protection remains a hosted Auth setting. No new public definer
+endpoint or performance warning was introduced. See [view guidance](https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view),
+[RPC guidance](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)
+and [password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
+## Original frontend verification record
 
 Use real Chrome and the local HTTP server. `VERTEX_BROWSER_CHANNEL=chrome` selects
 the installed engine when downloaded Playwright browsers are unavailable.
@@ -120,7 +176,7 @@ reader and mobile-keyboard checks were not repeated. See CHECKS.md.
 - R-25 PASS: final sampled account/public views report zero Axe contrast
   violations; control-boundary and text ratios were calculated separately.
 - R-26 PASS: card click navigates, preview opens/closes, file choices update the
-  configuration text, and destructive deletion has no nonfunctional control.
+  configuration text, and draft deletion uses applied, permission-checked RPCs.
 - R-27 PASS: existing empty/loading/error states remain; loading navigation
   disables stale content and banner loading/failure has a branded fallback.
 - R-28 PASS: no generic FAQ was introduced.
@@ -150,8 +206,8 @@ reader and mobile-keyboard checks were not repeated. See CHECKS.md.
 - PASS: ENERGY 1 / RHYTHM 2 / MOTION 1 declared before UI refinement; hierarchy,
   blue action accent and structural whitespace preserve the product's character.
 - C-1/R-31 PASS: each major decision has its one-line reason above.
-- C-2 PASS: new controls perform actual local/navigation actions; SQL-dependent
-  deletion is explicitly pending instead of represented by a dead button.
+- C-2 PASS: new controls perform actual local/navigation actions; safe draft
+  deletion now has applied SQL, permission tests and a recoverable confirmation flow.
 - C-3/R-05 PASS: section order follows the competition lifecycle, not a new
   dashboard or landing-page template.
 - C-4 PASS for tested states: both themes, narrow/tablet/landscape, empty data,

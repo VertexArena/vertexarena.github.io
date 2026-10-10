@@ -611,7 +611,7 @@ function navigate(path) {
   if (!competitions.canLeave() || !certificates.canLeave() || !formRecovery.canLeave()) return;
   history.pushState({}, '', path);
   lastAllowedPath = path;
-  render({ force: true });
+  return render({ force: true });
 }
 
 document.addEventListener('click', event => {
