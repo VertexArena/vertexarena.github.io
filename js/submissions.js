@@ -1,3 +1,5 @@
+import { markFormChanged, markFormSaved } from './experience.js';
+
 export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
   const bucket = client?.storage.from('submissions');
   const maxBytes = 25 * 1024 * 1024;
@@ -246,6 +248,7 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
         if (error) cleanupWarning = ' Older file cleanup failed; contact an organiser if needed.';
       }
       sessionStorage.setItem('vertex-submission-flash', `${submission ? 'Submission updated.' : 'Submission confirmed.'} Your entry and team have been notified.${cleanupWarning}`);
+      markFormSaved(form);
       await refresh();
     } catch (error) {
       if (uploaded.length) await bucket.remove(uploaded);
@@ -275,6 +278,7 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
         submission_opens_at: opens.toISOString(), submission_closes_at: closes.toISOString(), edits_allowed: values.has('allow_edits')
       }));
       status.textContent = 'Round rules saved.';
+      markFormSaved(form);
       const updated = await result(client.from('round_submission_configs').select('round_id,enabled,mode,allowed_mime_types,max_file_bytes,instructions,opens_at,closes_at,allow_edits').eq('round_id', active.selected.id).single());
       active.configs = active.configs.filter(item => item.round_id !== updated.round_id).concat(updated);
       button.disabled = false;
@@ -342,9 +346,9 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
       const download = event.target.closest('[data-submission-download], [data-submission-view]');
       if (download) { openStoredFile(download.dataset.submissionDownload || download.dataset.submissionView, download.dataset.fileName, download.dataset.fileType, Boolean(download.dataset.submissionView)); return; }
       const removeOld = event.target.closest('[data-submission-remove]');
-      if (removeOld) { removed.add(removeOld.dataset.submissionRemove); preview(); return; }
+      if (removeOld) { removed.add(removeOld.dataset.submissionRemove); markFormChanged(page.querySelector('[data-submission-form]')); preview(); return; }
       const removeNew = event.target.closest('[data-remove-new]');
-      if (removeNew) { filesChosen.splice(Number(removeNew.dataset.removeNew), 1); preview(); return; }
+      if (removeNew) { filesChosen.splice(Number(removeNew.dataset.removeNew), 1); markFormChanged(page.querySelector('[data-submission-form]')); preview(); return; }
       const tab = event.target.closest('[data-submission-round-tab]');
       if (tab) { history.replaceState({}, '', `/organiser/competition/${active.c.slug}/submissions?round=${encodeURIComponent(tab.dataset.submissionRoundTab)}`); refresh(); return; }
       const paginate = event.target.closest('[data-review-page]');
@@ -360,6 +364,21 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
     }
     const config = page.querySelector('[data-submission-config]');
     if (config) {
+      const mime = config.elements.namedItem('mime_types');
+      const typeNames = { 'application/pdf': 'PDF', 'image/png': 'PNG image', 'image/jpeg': 'JPEG image', 'image/webp': 'WebP image', 'text/plain': 'Text file', 'text/csv': 'CSV', 'application/zip': 'ZIP archive', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word document' };
+      const chosen = () => mime.value.split(/\r?\n/).map(type => type.trim()).filter(Boolean);
+      const picker = document.createElement('fieldset'); picker.className = 'file-type-picker';
+      picker.innerHTML = `<legend>Allowed file types</legend><div>${presets.map(type => `<label><input type="checkbox" data-type-preset="${h(type)}" ${chosen().includes(type) ? 'checked' : ''}><span>${h(typeNames[type])}</span></label>`).join('')}</div>`;
+      const label = mime.closest('label'); label.before(picker);
+      const advanced = document.createElement('details'); advanced.className = 'file-type-advanced';
+      advanced.open = chosen().some(type => !presets.includes(type));
+      const summary = document.createElement('summary'); summary.textContent = 'Advanced file types'; advanced.append(summary); label.replaceWith(advanced); advanced.append(label);
+      picker.addEventListener('change', () => {
+        const custom = chosen().filter(type => !presets.includes(type));
+        mime.value = [...picker.querySelectorAll('input:checked')].map(input => input.dataset.typePreset).concat(custom).join('\n');
+        mime.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      mime.addEventListener('input', () => picker.querySelectorAll('input').forEach(input => { input.checked = chosen().includes(input.dataset.typePreset); }));
       config.addEventListener('change', event => { if (event.target.name === 'mode') config.querySelector('[data-file-rules]').hidden = event.target.value === 'link'; });
       config.addEventListener('submit', event => { event.preventDefault(); saveConfig(config); });
       page.querySelectorAll('[data-review-status], [data-review-entry]').forEach(node => node.addEventListener('change', () => loadReview(0)));

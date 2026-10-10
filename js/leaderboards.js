@@ -1,3 +1,5 @@
+import { markFormSaved } from './experience.js';
+
 export function createLeaderboards({ client, state, escapeHtml: h, refresh }) {
   const result = async query => { const { data, error } = await query; if (error) throw error; return data; };
   const managerPath = slug => `/organiser/competition/${encodeURIComponent(slug)}/leaderboards`;
@@ -101,7 +103,7 @@ export function createLeaderboards({ client, state, escapeHtml: h, refresh }) {
       const entry = group?.entries.find(item => item.id === id);
       const button = form.querySelector('button[type=submit]'); button.disabled = true;
       const status = root.querySelector('[data-publication-status]'); status.textContent = 'Saving category winner…';
-      try { await result(client.rpc('set_round_category_winner',{target_round_id:active.round.id,target_category:group.category,target_participant_id:entry?.participant_id || null,target_team_id:entry?.team_id || null})); await refresh(); }
+      try { await result(client.rpc('set_round_category_winner',{target_round_id:active.round.id,target_category:group.category,target_participant_id:entry?.participant_id || null,target_team_id:entry?.team_id || null})); markFormSaved(form); status.textContent = 'Category winner saved.'; await refresh(); if (form.isConnected) button.disabled = false; }
       catch (error) { status.textContent = error.message; button.disabled = false; }
     }));
     root.querySelectorAll('[data-publish-mode]').forEach(button => button.addEventListener('click', async () => {
@@ -113,6 +115,7 @@ export function createLeaderboards({ client, state, escapeHtml: h, refresh }) {
       button.disabled = true; status.textContent = mode === 'draft' ? 'Saving draft…' : mode === 'scheduled' ? 'Scheduling release…' : 'Publishing results…';
       try {
         await result(client.rpc('configure_round_leaderboard',{target_round_id:active.round.id,publish_mode:mode,release_at:releaseValue ? new Date(releaseValue).toISOString() : null,score_visible:form.elements.namedItem('show_scores').checked}));
+        markFormSaved(form);
         await refresh();
       } catch (error) { status.textContent = error.message; button.disabled = false; }
     }));

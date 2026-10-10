@@ -1,0 +1,88 @@
+/* Shared interaction primitives. Information cards stay still; only real links
+   and controls receive hover/press feedback. Preserve Vertex's existing palette. */
+:root { --control-border: #7c8ba1; --focus-ring: #1d4ed8; --state-ink: #475569; --warning-ink: #854d0e; --warning-surface: #fffbeb; --interaction-fast: 140ms; }
+:root[data-theme='dark'] { --control-border: #64748b; --focus-ring: #93c5fd; --state-ink: #cbd5e1; --warning-ink: #fde68a; --warning-surface: #422006; }
+:where(button, summary, select, input[type='checkbox'], input[type='radio'], label:has(input[type='file'])) { cursor: pointer; }
+:where(button, .button, a, input, textarea, select, summary) { -webkit-tap-highlight-color: transparent; }
+:where(button, .button, select, input, textarea) { transition: background-color var(--interaction-fast), border-color var(--interaction-fast), color var(--interaction-fast), box-shadow var(--interaction-fast); }
+:where(button, .button):disabled { cursor: not-allowed; transform: none; opacity: .6; }
+:where(button, .button)[aria-busy='true'] { cursor: progress; }
+.shell :is(input, textarea, select):not([type='checkbox'],[type='radio'],[type='color'],[type='file'],[type='hidden']) { border-color: var(--control-border); }
+:where(input, textarea, select):focus-visible { border-color: var(--focus-ring); }
+:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; scroll-margin-block: calc(var(--header) + 24px) 80px; }
+:where(a, button, input, textarea, select, summary) { scroll-margin-block: calc(var(--header) + 24px) 80px; }
+:where(.text-link, .back-link, .back-home, .notice-actions a, .notice-actions button, .competition-community-links a, .dashboard-actions a, .discovery-card-actions a, .discovery-preview-button) { text-decoration-thickness: 1px; text-underline-offset: 4px; }
+:where(.discovery-bookmark, .dashboard-competition-tail a, .dashboard-deadlines a, .notice-actions button, .notice-actions a) { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.discovery-card { position: relative; transform: none; }
+.discovery-card:hover { transform: none; border-color: var(--border); }
+.discovery-card h3 a::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-card); }
+.discovery-card-actions, .discovery-bookmark { position: relative; z-index: 2; }
+.discovery-card:focus-within { border-color: var(--focus-ring); }
+.discovery-description, .discovery-meta dd, .notice-content, .notice-content p, .meeting-card h3, .dashboard-competition h3, .dashboard-competition p { overflow-wrap: anywhere; }
+.page-head > p { color: var(--muted); }
+.organisation-empty p, .dashboard-empty p, .certificate-empty p, .submission-empty p, .leaderboard-empty p, .leaderboard-state { color: var(--state-ink); }
+.dashboard-state.draft, .leaderboard-state.scheduled { color: var(--warning-ink); background: var(--warning-surface); }
+:root[data-theme='dark'] :is(.meeting-step, .submission-tab, .submission-mode input:checked + span) { color: var(--accent-strong); }
+.lifecycle-status { display: inline-flex; align-items: center; width: fit-content; padding: 7px 10px; border-radius: 6px; background: var(--soft); color: var(--state-ink); font-size: .78rem; font-weight: 700; line-height: 1.35; }
+.lifecycle-status.registration-open, .lifecycle-status.in-progress { color: var(--accent-strong); background: var(--accent-soft); }
+.lifecycle-status.completed { border: 1px solid var(--control-border); background: var(--surface); }
+.lifecycle-status.completed::before { content: '\2713'; margin-right: 6px; }
+.discovery-card[data-lifecycle='completed'] .discovery-art { filter: saturate(.55); }
+.lifecycle-context { padding: 20px; margin-block: 20px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--soft); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.lifecycle-context p { margin: 10px 0 0; color: var(--state-ink); line-height: 1.6; max-width: 64ch; }
+.lifecycle-context .button { flex: none; }
+.form-recovery-note { color: var(--state-ink); font-size: .85rem; margin: 0 0 12px; }
+.validation-summary { border: 2px solid var(--control-border); border-left: 4px solid var(--accent-strong); border-radius: 10px; padding: 16px; margin-bottom: 20px; background: var(--surface); }
+.validation-summary h2 { font-size: 1rem; margin: 0 0 8px; }
+.validation-summary ul { margin: 0; padding-left: 20px; }
+.validation-summary a { text-decoration: underline; }
+.field-error { display: block; font-size: .85rem; line-height: 1.5; color: var(--text); margin-top: 6px; }
+[aria-invalid='true'] { border-color: var(--accent-strong); border-width: 2px; }
+.management-note { border-top: 1px solid var(--border); margin-top: 28px; padding-top: 20px; color: var(--state-ink); line-height: 1.6; }
+.management-note h2 { font-size: 1.1rem; margin-bottom: 8px; }
+.file-type-picker { border: 0; padding: 0; margin: 0 0 12px; }
+.file-type-picker legend { font-size: .85rem; font-weight: 650; margin-bottom: 8px; }
+.file-type-picker > div { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+.file-type-picker label { display: flex; align-items: center; gap: 8px; padding: 10px; min-height: 44px; border: 1px solid var(--control-border); border-radius: 8px; font-size: .8rem; cursor: pointer; }
+.file-type-picker label:has(input:checked) { background: var(--accent-soft); color: var(--accent-strong); border-color: var(--accent-strong); }
+.file-type-picker input { accent-color: var(--accent); }
+.file-type-advanced summary { padding: 12px 0; color: var(--state-ink); font-size: .85rem; min-height: 44px; }
+.file-type-advanced .field { margin-block: 12px; }
+.meeting-card[data-meeting-time='past'] { background: var(--bg); }
+.meeting-time-state { font-size: .8rem; font-weight: 650; color: var(--state-ink); display: block; margin-bottom: 8px; }
+.notice-dot { width: auto; height: auto; background: transparent; color: var(--accent-strong); font-size: .75rem; font-weight: 700; }
+.notice-dot::after { content: 'Unread'; }
+.drawer { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+.criterion-actions { width: 96px; }
+.criterion-actions button, .certificate-toolbar button, .editor-canvas-controls button { min-width: 44px; min-height: 44px; }
+.discovery-fields label { min-height: 44px; display: inline-flex; align-items: center; }
+.competition-context-nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; margin: 0 0 24px; border-bottom: 1px solid var(--border); }
+.competition-context-nav a { padding: 11px 13px; min-height: 44px; border-radius: 8px; font-size: .85rem; color: var(--state-ink); display: inline-flex; align-items: center; }
+.competition-context-nav a[aria-current='page'] { color: var(--accent-strong); background: var(--accent-soft); font-weight: 650; }
+@media (hover: hover) and (pointer: fine) {
+  .discovery-card:hover { border-color: var(--accent-strong); }
+  :where(.text-link, .back-link, .notice-actions a, .notice-actions button, .discovery-card-actions a, .discovery-preview-button):hover { text-decoration: underline; color: var(--accent-strong); }
+  :where(button:not(:disabled), .button):hover { border-color: var(--accent-strong); }
+  :where(a.competition-card, .organisation-row, .person-row, .registration-notice):hover { border-color: var(--accent-strong); }
+}
+:where(button:not(:disabled), .button):active { filter: brightness(.94); }
+@media (max-width: 600px) {
+  .drawer { transition: transform .3s var(--ease); }
+  .shell :is(input, textarea, select):not([type='checkbox'],[type='radio'],[type='color']) { font-size: 1rem; }
+  .lifecycle-context { align-items: stretch; flex-direction: column; gap: 16px; padding: 16px; }
+  .lifecycle-context .button { justify-content: center; }
+  .competition-community-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .competition-community-links .button { min-width: 0; white-space: normal; text-align: center; }
+  :where(.notice-actions a, .notice-actions button, .discovery-card-actions a, .discovery-preview-button) { min-height: 44px; }
+  .global-error { bottom: max(16px, env(safe-area-inset-bottom)); }
+  .competition-context-nav { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .competition-context-nav a { justify-content: center; padding-inline: 5px; font-size: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+  :where(button, .button, select, input, textarea) { transition: none; }
+}
+@media (forced-colors: active) {
+  .lifecycle-status, .validation-summary, .notice-unread { border: 1px solid CanvasText; }
+  :focus-visible { outline-color: Highlight; }
+}

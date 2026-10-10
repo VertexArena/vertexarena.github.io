@@ -85,6 +85,7 @@ test('Milestone 13 file, link, and team submissions with private review', async 
     await page.getByLabel('Accept submissions for this round').check();
     await page.locator(`input[name="mode"][value="${mode}"]`).check();
     if (mode !== 'link') {
+      await page.getByText('Advanced file types', { exact: true }).click();
       await page.getByLabel('Allowed MIME types').fill('text/plain');
       await page.getByLabel('Maximum size per file (MB)').fill(String(limit));
     }

@@ -1,3 +1,5 @@
+import { competitionLifecycle } from './lifecycle.js';
+
 export function createDashboards({ client, state, escapeHtml: h, collaboration, achievements }) {
   const result = async query => { const { data, error } = await query; if (error) throw error; return data; };
   const date = value => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Date not set';
@@ -10,10 +12,9 @@ export function createDashboards({ client, state, escapeHtml: h, collaboration, 
   const path = slug => `/competition/${encodeURIComponent(slug)}`;
   const workspacePath = slug => `/organiser/competition/${encodeURIComponent(slug)}/workspace`;
   const statusOf = (competition, rounds, now) => {
-    if (competition.status === 'draft') return 'draft';
-    if (Date.parse(competition.starts_at) > now) return 'upcoming';
-    const lastRelease = Math.max(...rounds.map(round => Date.parse(round.leaderboard_releases_at) || 0), 0);
-    return lastRelease && lastRelease <= now ? 'completed' : 'in-progress';
+    const lifecycle = competitionLifecycle(competition, rounds, now);
+    if (['draft', 'completed'].includes(lifecycle.key)) return lifecycle.key;
+    return ['upcoming', 'registration-open', 'registration-closed'].includes(lifecycle.key) ? 'upcoming' : 'in-progress';
   };
   const statusName = { upcoming: 'Upcoming', 'in-progress': 'In progress', completed: 'Completed', draft: 'Draft' };
   const deadlineItems = (competition, rounds, now, registrationLabel = null) => {
@@ -28,7 +29,7 @@ export function createDashboards({ client, state, escapeHtml: h, collaboration, 
     return items.filter(item => Date.parse(item.at) > now).sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
   };
   const deadlineList = (items, none) => items.length ? `<ol class="dashboard-deadlines">${items.map(item => `<li><time datetime="${h(item.at)}"><strong>${h(day(item.at))}</strong><span>${h(new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(item.at)))}</span></time><div><strong>${h(item.label)}</strong><span>${h(item.name)}</span></div><a data-link href="${h(item.href)}" aria-label="Open ${h(item.name)}">${icon('arrow-up-right-from-square')}</a></li>`).join('')}</ol>` : empty('Nothing due soon.', none);
-  const competitionCard = item => `<article class="dashboard-competition registration-dashboard-card"><div><span class="dashboard-state ${h(item.status)}">${h(statusName[item.status])}</span><h3><a data-link href="${h(item.editHref || item.href)}">${h(item.name)}</a></h3><p>${h(item.detail)}</p></div><div class="dashboard-competition-tail"><span>${h(item.next)}</span><a data-link href="${h(item.href)}" aria-label="${item.editHref ? 'Open workspace' : 'Open entry'}">${icon('arrow-right')}</a></div></article>`;
+  const competitionCard = item => `<article class="dashboard-competition registration-dashboard-card"><div><span class="dashboard-state ${h(item.status)}">${h(item.stateLabel || statusName[item.status])}</span><h3><a data-link href="${h(item.href)}">${h(item.name)}</a></h3><p>${h(item.detail)}</p></div><div class="dashboard-competition-tail"><span>${h(item.next)}</span><a data-link href="${h(item.href)}" aria-label="${item.editHref ? 'Open workspace' : 'Open entry'}">${icon('arrow-right')}</a></div></article>`;
   const notices = rows => rows.length ? `<div class="dashboard-notices">${rows.map(row => `<a class="registration-notice" data-link href="${h(safe(row.link_path))}">${icon('circle-info')}<span><strong>${h(row.title)}</strong><small>${h(row.body)}</small></span><time datetime="${h(row.created_at)}">${h(date(row.created_at))}</time></a>`).join('')}</div>` : empty('No recent updates.', 'Registration and team updates appear here.');
   const dashboardLayout = (kind, title, description, hero, main, aside) => `<div class="page operational-dashboard ${kind}-dashboard ${kind === 'participant' ? 'registration-dashboard' : ''}"><div class="dashboard-heading"><div><span class="eyebrow">${kind === 'participant' ? 'Participant dashboard' : 'Organiser dashboard'}</span><h1>${h(title)}</h1><p>${h(description)}</p></div>${kind === 'organiser' ? `<a class="button primary" data-link href="/organiser/competition/new">Create competition ${icon('plus')}</a>` : `<a class="button secondary" data-link href="/discover">Discover competitions ${icon('arrow-right')}</a>`}</div>${hero}<div class="dashboard-columns"><div class="dashboard-main">${main}</div><aside class="dashboard-aside">${aside}</aside></div></div>`;
 
@@ -62,7 +63,8 @@ export function createDashboards({ client, state, escapeHtml: h, collaboration, 
       const c = item.competition, competitionRounds = byCompetition.get(c.id) || [];
       const status = statusOf(c, competitionRounds, now);
       const next = deadlineItems(c, competitionRounds, now)[0];
-      groups[status]?.push({ ...item, status, name: c.name, next: next ? `${next.label} · ${day(next.at)}` : status === 'completed' ? 'Journey finished' : 'No upcoming date' });
+      const lifecycle = competitionLifecycle(c, competitionRounds, now);
+      groups[status]?.push({ ...item, status, stateLabel: lifecycle.label, name: c.name, next: next ? `${next.label} · ${day(next.at)}` : lifecycle.detail });
     }
     const building = teamData.teams.filter(team => !team.registered_at);
     const invitations = teamData.invitations || [];
@@ -108,7 +110,7 @@ export function createDashboards({ client, state, escapeHtml: h, collaboration, 
     }
     const totals = competitions.reduce((acc, c) => ({ registrations: acc.registrations + Number(c.individual_count) + Number(c.team_count), participants: acc.participants + Number(c.individual_count) + Number(c.team_participant_count), teams: acc.teams + Number(c.team_count) }), { registrations: 0, participants: 0, teams: 0 });
     const deadlines = competitions.flatMap(c => deadlineItems(c, rounds.filter(round => round.competition_id === c.id), now, 'Registration closes')).sort((a, b) => Date.parse(a.at) - Date.parse(b.at)).filter(item => Date.parse(item.at) <= now + 14 * 86400000).slice(0, 8).map(item => ({ ...item, href: workspacePath(item.slug) }));
-    const cards = competitions.length ? `<div class="dashboard-competition-list">${competitions.map(c => { const ownRounds = rounds.filter(round => round.competition_id === c.id); const status = statusOf(c, ownRounds, now); const nextDate = deadlineItems(c, ownRounds, now, 'Registration closes')[0]; return competitionCard({ status, name: c.name, detail: `${c.access_role === 'owner' ? 'Owner' : 'Manager'} · ${Number(c.individual_count) + Number(c.team_count)} registrations · ${Number(c.individual_count) + Number(c.team_participant_count)} participants · ${c.team_count} teams`, next: status === 'draft' ? 'Draft' : nextDate ? `${nextDate.label} · ${day(nextDate.at)}` : status === 'completed' ? 'Competition complete' : 'No upcoming date', href: workspacePath(c.slug), editHref: `/organiser/competition/${encodeURIComponent(c.slug)}` }); }).join('')}</div>` : empty('No competitions yet.', 'Create a competition to start your organiser workspace.');
+    const cards = competitions.length ? `<div class="dashboard-competition-list">${competitions.map(c => { const ownRounds = rounds.filter(round => round.competition_id === c.id); const status = statusOf(c, ownRounds, now); const lifecycle = competitionLifecycle(c, ownRounds, now); const nextDate = deadlineItems(c, ownRounds, now, 'Registration closes')[0]; return competitionCard({ status, stateLabel: lifecycle.label, name: c.name, detail: `${c.access_role === 'owner' ? 'Owner' : 'Manager'} · ${Number(c.individual_count) + Number(c.team_participant_count)} participants · ${c.team_count} teams`, next: nextDate ? `${nextDate.label} · ${day(nextDate.at)}` : lifecycle.detail, href: workspacePath(c.slug), editHref: `/organiser/competition/${encodeURIComponent(c.slug)}` }); }).join('')}</div>` : empty('No competitions yet.', 'Create a competition to start your organiser workspace.');
     const hero = `<div class="dashboard-hero dashboard-hero-organiser"><div><span class="eyebrow">Your portfolio</span><strong>${competitions.length ? `${competitions.length} ${competitions.length === 1 ? 'competition' : 'competitions'} in your care.` : 'Build your first competition.'}</strong><p>Registration totals update from confirmed entries.</p></div><div class="dashboard-metrics">${metric('Registrations', totals.registrations, 'individuals and teams')}${metric('Participants', totals.participants, 'people registered')}${metric('Teams', totals.teams, 'registered teams')}</div></div>`;
     const main = `${section('organiser-competitions', 'Overview', 'Managed competitions', cards, `${competitions.length} total`)}${section('organiser-deadlines', 'Next dates', 'Upcoming deadlines', deadlineList(deadlines, 'Dates within the next 14 days will appear here.'), 'Next 14 days')}${section('organiser-activity', 'Latest changes', 'Recent activity', activityList(data.recent_activity || []))}`;
     const questionNotices = openQuestions.map(question => { const c = competitions.find(item => item.id === question.competition_id); return { title: c?.name || 'Competition', body: question.body, link_path: `/competition/${c?.slug}/questions/${question.id}`, created_at: question.created_at }; });

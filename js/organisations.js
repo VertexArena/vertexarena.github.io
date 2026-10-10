@@ -1,3 +1,5 @@
+import { markFormSaved } from './experience.js';
+
 export function createOrganisations({ client, state, escapeHtml: h, safeUrl, avatar, peopleResults, socialRow, setStatus, setSubmitting, navigate, render, competitionList }) {
   const imageTypes = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
   const result = async query => {
@@ -129,6 +131,7 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
         : client.from('organisations').insert({ ...details, management_profile_id: state.session.user.id }).select().single());
       persisted = true;
       updateOwnIdentity(saved);
+      markFormSaved(form);
       if (form.dataset.oldLogo && details.logo_path !== form.dataset.oldLogo) await client.storage.from('organisation-logos').remove([form.dataset.oldLogo]);
       await render();
       setStatus(document.querySelector('[data-org-status]'), 'Organisation saved.', 'success');
@@ -178,6 +181,7 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
       if (isDirectory) searchForm.addEventListener('submit', e => { e.preventDefault(); clearTimeout(timer); run(); });
     }
     const form = document.querySelector('[data-organisation-form]');
+    document.querySelector('[data-invite-suggestions]')?.setAttribute('role', 'group');
     form?.addEventListener('submit', event => { event.preventDefault(); save(form); });
     form?.elements.slug.addEventListener('input', event => { document.querySelector('[data-slug-preview]').textContent = event.target.value || 'your-slug'; });
     form?.elements.logo.addEventListener('change', event => {

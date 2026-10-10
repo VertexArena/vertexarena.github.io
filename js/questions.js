@@ -1,3 +1,5 @@
+import { markFormSaved } from './experience.js';
+
 export function createQuestions({ client, state, escapeHtml: h, refresh }) {
   const result = async query => { const { data, error, count } = await query; if (error) throw error; return { data, count }; };
   const date = value => new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
@@ -66,7 +68,7 @@ export function createQuestions({ client, state, escapeHtml: h, refresh }) {
     const focusedId = location.pathname.split('/')[4];
     const data = await load(competitionId, focusedId);
     if (!list.isConnected || active?.competition.id !== competitionId || data.missing) return;
-    const drafts = [...list.querySelectorAll('[data-qa-reply-form]')].map(form => ({ id: form.dataset.qaReplyForm, message: form.elements.message.value, replyId: form.elements.reply_id.value }));
+    const drafts = [...list.querySelectorAll('[data-qa-reply-form]')].map(form => ({ id: form.dataset.qaReplyForm, message: form.elements.message.value, replyId: form.elements.reply_id.value, dirty: form.previousElementSibling?.matches('.form-recovery-note:not([hidden])') }));
     active.rows = data.rows; active.total = data.total;
     list.innerHTML = listHtml(data, focusedId);
     for (const draft of drafts) {
@@ -74,6 +76,7 @@ export function createQuestions({ client, state, escapeHtml: h, refresh }) {
       if (!form) continue;
       form.elements.message.value = draft.message;
       form.elements.reply_id.value = draft.replyId;
+      if (draft.dirty) queueMicrotask(() => form.dispatchEvent(new Event('vertex:form-changed')));
       if (draft.replyId) { form.querySelector('button[type="submit"]').textContent = 'Save reply'; form.querySelector('[data-qa-cancel]').hidden = false; }
     }
     document.querySelector('.qa-list-head span').textContent = `${data.total} question${data.total === 1 ? '' : 's'}`;
@@ -113,6 +116,7 @@ export function createQuestions({ client, state, escapeHtml: h, refresh }) {
         replyId ? { target_reply_id: replyId, message: form.elements.message.value } : { target_question_id: form.dataset.qaReplyForm, message: form.elements.message.value });
       button.disabled = false;
       if (error) { status.textContent = failure(error); status.dataset.type = 'error'; return; }
+      markFormSaved(form);
       await sync();
       const updated = document.querySelector(`[data-qa-reply-form="${form.dataset.qaReplyForm}"]`);
       if (updated) { updated.reset(); updated.elements.reply_id.value = ''; updated.querySelector('button[type="submit"]').textContent = 'Post reply'; updated.querySelector('[data-qa-cancel]').hidden = true; }

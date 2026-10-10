@@ -1,3 +1,5 @@
+import { markFormSaved } from './experience.js';
+
 export function createMeetings({ client, state, escapeHtml: h, refresh, navigate }) {
   const result = async query => { const { data, error } = await query; if (error) throw error; return data; };
   const formatDate = value => new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
@@ -14,7 +16,8 @@ export function createMeetings({ client, state, escapeHtml: h, refresh, navigate
   const unavailable = message => ({ title: 'Meeting unavailable - Vertex', content: `<div class="page notice-page"><h1>Meeting unavailable.</h1><p>${h(message)}</p><a class="button secondary" data-link href="/dashboard">Return to dashboard</a></div>` });
   function meetingCard(row, competition, manager) {
     const href = `/competition/${competition.slug}/meeting/${row.slug}`;
-    return `<article class="meeting-card"><div><span class="meeting-card-date">${h(formatDate(row.starts_at))}</span><h3>${h(row.name)}</h3><p>${h(competition.name)}</p></div><div class="meeting-card-actions"><a class="button primary" data-link href="${href}">Open meeting <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>${manager ? `<button class="button quiet" type="button" data-meeting-roster="${h(row.id)}" aria-expanded="false">View assigned people</button>` : ''}</div>${manager ? `<div class="meeting-roster" data-roster-for="${h(row.id)}" hidden></div>` : ''}</article>`;
+    const past = Date.parse(row.starts_at) < Date.now();
+    return `<article class="meeting-card" data-meeting-time="${past ? 'past' : 'upcoming'}"><div><span class="meeting-time-state">${past ? 'Scheduled start has passed' : 'Upcoming meeting'}</span><span class="meeting-card-date">${h(formatDate(row.starts_at))}</span><h3>${h(row.name)}</h3><p>${h(competition.name)}</p></div><div class="meeting-card-actions"><a class="button ${past ? 'secondary' : 'primary'}" data-link href="${href}">Open meeting <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>${manager ? `<button class="button quiet" type="button" data-meeting-roster="${h(row.id)}" aria-expanded="false">View assigned people</button>` : ''}</div>${manager ? `<div class="meeting-roster" data-roster-for="${h(row.id)}" hidden></div>` : ''}</article>`;
   }
 
   async function resolve(path) {
@@ -103,6 +106,7 @@ export function createMeetings({ client, state, escapeHtml: h, refresh, navigate
       try {
         await result(client.rpc('create_competition_meeting', { target_competition_id: active.competition.id, meeting_name: String(values.get('name')).trim(), meeting_starts_at: time.toISOString(), participant_ids: [...picks.participants.keys()], team_ids: [...picks.teams.keys()] }));
         flash = 'Meeting created. Assigned people have been notified.';
+        markFormSaved(form);
         await refresh();
       } catch (error) { status.textContent = failure(error); button.disabled = false; }
     });

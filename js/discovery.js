@@ -1,10 +1,11 @@
 import { fields } from './competition-model.js';
 import { ageMismatch } from './eligibility.js';
 import { createRecommendations } from './recommendations.js';
+import { competitionLifecycle } from './lifecycle.js';
 
 export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
   const pageSize = 12;
-  const columns = 'id,name,slug,description,field_tags,team_mode,minimum_age,maximum_age,prize_details,registration_opens_at,registration_closes_at,starts_at,banner_kind,banner_colour,banner_colour_end,banner_path,organisations(name,slug)';
+  const columns = 'id,name,slug,status,description,field_tags,team_mode,minimum_age,maximum_age,prize_details,registration_opens_at,registration_closes_at,starts_at,banner_kind,banner_colour,banner_colour_end,banner_path,organisations(name,slug),competition_rounds(name,slug,sequence,opens_at,submission_deadline,leaderboard_releases_at,leaderboard_state)';
   const filtered = () => Boolean(queryText() || selectedFields().length || mode() !== 'all' || onlySaved() || pageNumber());
   const recommendations = createRecommendations({ client, state, h, card, imageUrl, columns, filtered });
   const date = value => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Date not set';
@@ -24,6 +25,8 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
     return ageMismatch(c, state.profile.birthday);
   }
   function registration(c) {
+    const lifecycle = competitionLifecycle(c);
+    if (!['registration-open', 'upcoming'].includes(lifecycle.key)) return lifecycle;
     const now = Date.now();
     if (now < Date.parse(c.registration_opens_at)) return { label: 'Opens soon', detail: `Registration opens ${date(c.registration_opens_at)}` };
     if (now >= Date.parse(c.registration_closes_at)) return { label: 'Closed', detail: `Registration closed ${date(c.registration_closes_at)}` };
@@ -37,11 +40,13 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
     return data.signedUrl;
   }
   function artwork(c, url) {
-    return `<div class="discovery-art" style="background:${h(bannerStyle(c))}">${url ? `<img src="${h(url)}" alt="" loading="lazy">` : `<span class="discovery-art-mark" aria-hidden="true">V<span>/${h(c.field_tags[0] || 'open')}</span></span>`}</div>`;
+    return `<div class="discovery-art" style="background:${h(bannerStyle(c))}">${url ? `<img src="${h(url)}" alt="" loading="lazy" data-banner-image>` : ''}<span class="discovery-art-mark" aria-hidden="true">V<span>/${h(c.field_tags[0] || 'open')}</span></span></div>`;
   }
   function card(c, saved, url, reasons = []) {
     const status = registration(c), mismatch = eligibility(c), org = c.organisations;
-    return `<article class="discovery-card">${artwork(c, url)}<div class="discovery-card-content"><div class="discovery-card-top"><span class="discovery-state ${status.label === 'Registration open' ? 'is-open' : ''}">${h(status.label)}</span>${state.profile?.account_type === 'participant' ? bookmark(c, saved) : ''}</div><h3><a data-link href="/competition/${h(c.slug)}">${h(c.name)}</a></h3><p class="discovery-org">${org ? h(org.name) : 'Independent organiser'}</p><p class="discovery-description">${h(c.description)}</p><div class="discovery-tags">${c.field_tags.slice(0, 3).map(f => `<span>${h(f)}</span>`).join('')}</div><dl class="discovery-meta"><div><dt>Entry</dt><dd>${h(c.team_mode === 'both' ? 'Individual or team' : c.team_mode === 'team' ? 'Team' : 'Individual')}</dd></div><div><dt>Deadline</dt><dd>${h(date(c.registration_closes_at))}</dd></div><div><dt>Prize</dt><dd>${h(c.prize_details)}</dd></div></dl>${reasons.length ? `<ul class="recommendation-reasons">${reasons.map(reason => `<li>${h(reason)}</li>`).join('')}</ul>` : ''}${mismatch ? `<p class="discovery-age" role="note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i>${h(mismatch)}</p>` : ''}<div class="discovery-card-actions"><button type="button" class="discovery-preview-button" data-preview="${h(c.id)}">Quick preview</button><a data-link href="/competition/${h(c.slug)}">Full details <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div></article>`;
+    const lifecycle = competitionLifecycle(c);
+    const dateLabel = ['upcoming', 'registration-open'].includes(lifecycle.key) ? 'Registration deadline' : 'Registration closed';
+    return `<article class="discovery-card" data-lifecycle="${h(lifecycle.key)}">${artwork(c, url)}<div class="discovery-card-content"><div class="discovery-card-top"><span class="discovery-state lifecycle-status ${h(lifecycle.key)} ${status.label === 'Registration open' ? 'is-open' : ''}">${h(status.label)}</span>${state.profile?.account_type === 'participant' ? bookmark(c, saved) : ''}</div><h3><a data-link href="/competition/${h(c.slug)}">${h(c.name)}</a></h3><p class="discovery-org">${org ? h(org.name) : 'Independent organiser'}</p><p class="discovery-description">${h(c.description)}</p><div class="discovery-tags">${c.field_tags.slice(0, 3).map(f => `<span>${h(f)}</span>`).join('')}</div><dl class="discovery-meta"><div><dt>Entry</dt><dd>${h(c.team_mode === 'both' ? 'Individual or team' : c.team_mode === 'team' ? 'Team' : 'Individual')}</dd></div><div><dt>${dateLabel}</dt><dd>${h(date(c.registration_closes_at))}</dd></div><div><dt>Prize</dt><dd>${h(c.prize_details)}</dd></div></dl>${reasons.length ? `<ul class="recommendation-reasons">${reasons.map(reason => `<li>${h(reason)}</li>`).join('')}</ul>` : ''}${mismatch ? `<p class="discovery-age" role="note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i>${h(mismatch)}</p>` : ''}<div class="discovery-card-actions"><button type="button" class="discovery-preview-button" data-preview="${h(c.id)}">Quick preview</button><a data-link href="${h(['completed','awaiting-results'].includes(lifecycle.key) ? lifecycle.href : `/competition/${c.slug}`)}">${h(['completed','awaiting-results'].includes(lifecycle.key) ? lifecycle.action : 'Full details')} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div></article>`;
   }
   function controls() {
     const chosen = selectedFields();
@@ -130,6 +135,8 @@ export function createDiscovery({ client, state, escapeHtml: h, navigate }) {
   function bind() {
     const root = document.querySelector('.discovery-v2');
     if (root) {
+      root.addEventListener('load', event => { if (event.target.matches('img[data-banner-image]')) event.target.nextElementSibling.hidden = true; }, true);
+      root.addEventListener('error', event => { if (event.target.matches('img[data-banner-image]')) { event.target.hidden = true; event.target.nextElementSibling.hidden = false; } }, true);
       let debounce, generation = 0;
       const refresh = () => { const token = ++generation; clearTimeout(debounce); debounce = setTimeout(() => { if (token === generation) load(root); }, 180); };
       root.querySelector('[name="q"]').addEventListener('input', e => { updateUrl({ q: e.target.value }); refresh(); });

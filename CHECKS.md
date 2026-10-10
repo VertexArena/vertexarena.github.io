@@ -1,56 +1,43 @@
-# Milestone 21 — your device review
+# Vertex refinement: your device review
 
-Automated browser tests cover application behavior, permission boundaries,
-responsive routes, both themes, keyboard controls, error recovery, large lists,
-Realtime cleanup, installation and real encrypted push delivery. Review these
-remaining device and presentation details on the deployed Vertex site.
+Browser checks cover existing-account views, both themes, phone/tablet reflow,
+keyboard focus, native validation, local draft protection and file-type controls.
+These checks cover details that need your usual hardware and assistive tools.
 
-## Readability and input
+## Readability
 
-- [ ] Open discovery and a competition on your usual phone. Check that names,
-      dates, prizes and action labels remain readable without sideways scrolling.
-- [ ] Switch light/dark mode. Inspect icons, active tabs, muted text and result
-      badges. Increase browser zoom to 200% and check that controls remain usable.
-- [ ] Navigate with Tab and Shift+Tab. Open and close a competition preview with
-      the keyboard. Check that focus is visible and returns to a useful control.
-- [ ] With your screen reader, check form labels, errors, unread notification
-      count, team membership and advancement status. Confirm announcements of
-      updates are understandable and do not repeat the entire page unnecessarily.
+- [ ] On your phone, open discovery in bright light. Read status, registration
+      dates, prizes and file-type choices without enlarging individual elements.
+- [ ] Increase your browser zoom to 200%. Review a dense organiser page and
+      check that text and controls remain comfortable to use.
+- [ ] In dark mode, inspect selected tabs, warning states and muted help text
+      on your actual display. Check that each status is understandable without colour.
 
-## Meeting hardware
+## Editing and accessibility
 
-- [ ] Assign two of your test accounts to one meeting. Join from two different
-      browser profiles or devices. Confirm camera, microphone, sound and leaving
-      work with your browser's actual permission prompts.
-- [ ] Try the same meeting URL as an unassigned participant. Vertex should deny
-      access before loading the room. Jitsi's host may ask its moderator to sign
-      in; check that behavior using your usual meeting account.
+- [ ] With your screen reader, open profile and organisation settings. Check
+      that labels announce separately from longer descriptions and privacy notes.
+- [ ] On a phone with the on-screen keyboard open, edit a description and a
+      datetime. Check that the focused field and relevant feedback stay visible.
+- [ ] Compose a real announcement or question when you next need one. Navigate
+      away and cancel the discard prompt. Confirm the full draft is still present.
+- [ ] During normal judging, leave more than one row unfinished. Save one row
+      and confirm that other unfinished marks remain until you save or discard them.
 
-## Certificate output
+## Your actual competition data
 
-- [ ] Use your own template and a long participant full name. Inspect the preview,
-      downloaded image and PDF at full size. Confirm line wrapping, font, colour,
-      placement and names match your intended artwork.
-- [ ] Open the PDF in your normal viewer and print-preview it. Check margins and
-      image sharpness. A team member's certificate must use that member's name.
+- [ ] Review a genuinely completed competition with published final results.
+      Confirm its results action is more prominent than old registration dates.
+- [ ] Review long participant names, team names, filenames and titles in your
+      real data. Confirm they wrap without covering nearby actions.
+- [ ] When you next create certificate artwork, inspect long names, field
+      dragging, keyboard controls and your printed PDF on your device.
+- [ ] In the installed app, review title-bar theme, safe-area spacing and the
+      on-screen keyboard. A physical installed-app review was not repeated here.
 
-## Installed app and operating-system notifications
+## Management limitation
 
-- [ ] Install Vertex from the footer's **Vertex app** page. Check home-screen or
-      launcher icon, splash screen and application name on your device.
-- [ ] Open installed Vertex and switch themes. Check the actual window/title bar
-      follows the theme, then close and reopen the app.
-- [ ] Enable notifications in installed Vertex. Send an announcement from an
-      organiser account. Check the native alert, then click it and confirm Vertex
-      opens the correct competition update.
-- [ ] Repeat with results and a meeting assignment. Test your operating system's
-      notification permission settings, including denial and re-enablement.
-- [ ] On iPhone/iPad, install through Safari's Add to Home Screen and open from
-      that icon before enabling push. Review the physical device's presentation.
-- [ ] Disconnect the network and open a nested route. Read the offline guidance,
-      reconnect and use **Try again**. When a later release offers **Reload to
-      update**, save your work first and check that reload opens the new version.
-
-Fresh-project Supabase validation was skipped at your request. No new-project
-bootstrap test is claimed. Prize distribution intentionally remains Coming Soon,
-as required by the specification.
+Competition deletion is not available yet. It needs a verified owner-only
+Supabase function that safely removes unused drafts and preserves published
+history. Connector access failed during this refinement; no RLS or schema change
+was applied. See UX-REFINEMENT.md for the required database work.

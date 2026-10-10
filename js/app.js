@@ -1,5 +1,6 @@
 import { createCertificates } from './certificates.js';
 import { startErrorFeedback } from './errors.js';
+import { bindExperience, createFormRecovery, markFormSaved } from './experience.js';
 import { createCompetitions } from './competitions.js';
 import { createDiscovery } from './discovery.js';
 import { createRegistration } from './registration.js';
@@ -33,6 +34,7 @@ let cleanup = () => {};
 let initialRender = true;
 let renderRevision = 0;
 let localAuthChange = false;
+const formRecovery = createFormRecovery();
 
 const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -264,6 +266,7 @@ async function saveProfile(form) {
     state.profile = data;
     if (uploadedPath && oldPath && oldPath !== uploadedPath) await supabase.storage.from('profile-pictures').remove([oldPath]);
     setStatus(status, 'Profile saved.', 'success');
+    markFormSaved(form);
     history.replaceState({}, '', '/profile/edit');
     await render();
     requestAnimationFrame(() => setStatus(document.querySelector('[data-form-status]'), 'Profile saved.', 'success'));
@@ -275,6 +278,7 @@ async function saveProfile(form) {
 }
 
 async function logout() {
+  if (!competitions.canLeave() || !certificates.canLeave() || !formRecovery.canLeave()) return;
   await pwa.beforeLogout().catch(console.error);
   if (supabase) await supabase.auth.signOut();
   state.session = null;
@@ -319,6 +323,19 @@ function bind() {
     menu.setAttribute('aria-label', `${open ? 'Close' : 'Open'} navigation`);
     menu.innerHTML = `<i class="fa-solid ${open ? 'fa-xmark' : 'fa-bars'}" aria-hidden="true"></i>`;
     document.body.classList.toggle('nav-open', open);
+    drawer.inert = !open;
+    document.querySelector('#main-content').inert = open;
+    document.querySelector('.footer')?.toggleAttribute('inert', open);
+    if (open) requestAnimationFrame(() => { if (drawer.dataset.open === 'true') drawer.querySelector('a,button')?.focus(); });
+    else menu.focus();
+  });
+  if (drawer) drawer.inert = true;
+  drawer?.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); menu.click(); return; }
+    if (event.key !== 'Tab') return;
+    const controls = [...drawer.querySelectorAll('a,button:not(:disabled)')];
+    if (event.shiftKey && document.activeElement === controls[0]) { event.preventDefault(); controls.at(-1)?.focus(); }
+    else if (!event.shiftKey && document.activeElement === controls.at(-1)) { event.preventDefault(); controls[0]?.focus(); }
   });
   document.querySelectorAll('[data-password-toggle]').forEach(button => button.addEventListener('click', () => {
     const input = button.parentElement.querySelector('input');
@@ -524,11 +541,22 @@ async function resolveRoute(path) {
   return null;
 }
 
-async function render() {
+async function render(options = {}) {
+  if (!options.force && formRecovery.shouldDeferRefresh()) {
+    const main = document.querySelector('#main-content');
+    if (main && !main.querySelector('[data-pending-refresh]')) {
+      const notice = document.createElement('aside'); notice.dataset.pendingRefresh = ''; notice.className = 'lifecycle-context';
+      const text = document.createElement('p'); text.textContent = 'Updates are available. Your unsaved work is still here.';
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'button secondary'; button.textContent = 'Refresh page';
+      button.addEventListener('click', () => { if (formRecovery.canLeave()) render({ force: true }); }); notice.append(text, button); main.prepend(notice);
+    }
+    return;
+  }
   const revision = ++renderRevision;
   cleanup(); cleanup = () => {}; document.body.classList.remove('nav-open');
   const path = location.pathname;
   app.setAttribute('aria-busy', 'true');
+  document.querySelector('#main-content')?.setAttribute('inert', '');
   document.querySelector('[data-route-progress]')?.removeAttribute('hidden');
   try {
     if (!state.authReady) app.innerHTML = shell(loadingView('Checking your session'), path, true);
@@ -546,6 +574,8 @@ async function render() {
     app.setAttribute('aria-busy', 'false');
     lastAllowedPath = location.pathname + location.search;
     bind();
+    formRecovery.watch(document.querySelector('#main-content'));
+    const experienceCleanup = bindExperience(document.querySelector('#main-content'));
     if (route && /^\/competition\/[a-z0-9-]+\/team$/.test(path)) cleanup = teams.subscribe(path);
     if (route && /^\/competition\/[a-z0-9-]+\/announcements(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = announcements.subscribe(path);
     if (route && /^\/competition\/[a-z0-9-]+\/questions(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = questions.subscribe(path);
@@ -563,8 +593,8 @@ async function render() {
     }
     const previousCleanup = cleanup;
     const achievementCleanup = achievements.bind();
-    cleanup = () => { previousCleanup(); achievementCleanup(); };
-    if (window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.from('.hero-copy > *, .page-head, .profile-identity > *', { y: 22, opacity: 0, duration: .7, stagger: .07, ease: 'power3.out' });
+    cleanup = () => { previousCleanup(); achievementCleanup(); experienceCleanup(); };
+    if (window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.from('.hero-copy > *, .page-head, .profile-identity > *', { y: 12, duration: .45, stagger: .04, ease: 'power3.out', clearProps: 'transform' });
   } catch (error) {
     if (revision !== renderRevision) return;
     console.error(error);
@@ -578,10 +608,10 @@ async function render() {
 
 let lastAllowedPath = location.pathname + location.search;
 function navigate(path) {
-  if (!competitions.canLeave() || !certificates.canLeave()) return;
+  if (!competitions.canLeave() || !certificates.canLeave() || !formRecovery.canLeave()) return;
   history.pushState({}, '', path);
   lastAllowedPath = path;
-  render();
+  render({ force: true });
 }
 
 document.addEventListener('click', event => {
@@ -592,10 +622,14 @@ document.addEventListener('click', event => {
   event.preventDefault(); navigate(url.pathname + url.search);
 });
 
+addEventListener('resize', () => {
+  if (innerWidth > 820 && document.querySelector('.drawer')?.dataset.open === 'true') document.querySelector('[data-menu]')?.click();
+});
+
 addEventListener('popstate', () => {
-  if (!certificates.canLeave()) { history.pushState({}, '', lastAllowedPath); return; }
+  if (!competitions.canLeave() || !certificates.canLeave() || !formRecovery.canLeave()) { history.pushState({}, '', lastAllowedPath); return; }
   lastAllowedPath = location.pathname + location.search;
-  render();
+  render({ force: true });
 });
 
 const recovered = sessionStorage.getItem('vertex-recovery-route');

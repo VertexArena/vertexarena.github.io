@@ -1,3 +1,5 @@
+import { markFormSaved } from './experience.js';
+
 export function createScoring({ client, state, escapeHtml: h, refresh }) {
   let active = null;
   let filter = '', order = 'score', page = 0, expanded = null;
@@ -74,14 +76,14 @@ export function createScoring({ client, state, escapeHtml: h, refresh }) {
       const items = [...form.querySelectorAll('[data-criterion-id]')].map(input => ({ criterion_id: input.dataset.criterionId, marks: input.value === '' ? null : Number(input.value) }));
       if (items.some((item,index) => item.marks !== null && (!Number.isFinite(item.marks) || item.marks < 0 || item.marks > Number(active.data.criteria[index].max_marks) || Math.round(item.marks * 100) !== item.marks * 100))) { status.textContent = 'Marks must stay within each criterion maximum and use at most two decimals.'; return; }
       button.disabled = true; status.textContent = 'Saving marks…';
-      try { await result(client.rpc('save_round_scores', { target_round_id: active.selected.id, target_participant_id: form.elements.namedItem('participant_id').value || null, target_team_id: form.elements.namedItem('team_id').value || null, score_items: items })); await refresh(); }
+      try { await result(client.rpc('save_round_scores', { target_round_id: active.selected.id, target_participant_id: form.elements.namedItem('participant_id').value || null, target_team_id: form.elements.namedItem('team_id').value || null, score_items: items })); markFormSaved(form); await refresh(); if (form.isConnected) { button.disabled = false; status.textContent = 'Marks saved. Save other changes before refreshing totals.'; } }
       catch (error) { status.textContent = message(error); button.disabled = false; }
     });
     document.querySelector('[data-criterion-form]')?.addEventListener('submit', async event => {
       event.preventDefault(); const form = event.target, status = form.querySelector('[data-criterion-status]'), button = form.querySelector('button[type=submit]');
       if (!form.reportValidity()) return;
       button.disabled = true; status.textContent = 'Saving criterion…';
-      try { await result(client.rpc('save_scoring_criterion', { target_round_id: active.selected.id, target_criterion_id: form.elements.namedItem('id').value || null, criterion_name: form.elements.namedItem('name').value, criterion_max: Number(form.elements.namedItem('maximum').value), criterion_description: form.elements.namedItem('description').value })); await refresh(); }
+      try { await result(client.rpc('save_scoring_criterion', { target_round_id: active.selected.id, target_criterion_id: form.elements.namedItem('id').value || null, criterion_name: form.elements.namedItem('name').value, criterion_max: Number(form.elements.namedItem('maximum').value), criterion_description: form.elements.namedItem('description').value })); markFormSaved(form); await refresh(); }
       catch (error) { status.textContent = message(error); button.disabled = false; }
     });
     document.querySelector('[data-cancel-criterion]')?.addEventListener('click', () => resetCriterion());
