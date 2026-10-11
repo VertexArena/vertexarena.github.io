@@ -1,7 +1,6 @@
 .advancement-page { max-width: 1320px; padding-top: clamp(32px,5vw,62px); padding-bottom: 100px; }
 .advancement-page .back-link { display: inline-flex; margin-bottom: 28px; }
 .advancement-page .page-head { max-width: 800px; margin-bottom: 30px; }
-.advancement-page .page-head h1 { font-size: clamp(2.7rem,6vw,4.8rem); }
 .advancement-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin: 10px 0 22px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); }
 .advancement-summary > div { display: grid; gap: 7px; padding: 23px clamp(18px,3vw,32px); border-right: 1px solid var(--border); }
 .advancement-summary > div:last-child { border: 0; }
@@ -64,7 +63,7 @@
 .progress-step > strong { align-self: start; font: 600 .8rem var(--mono); color: var(--accent); }
 .progress-step.eliminated > strong, .progress-step.pending > strong { color: var(--muted); }
 .progress-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
-.progress-tags span { padding: 5px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-strong); font-size: .7rem; text-transform: capitalize; }
+.progress-tags span { padding: 5px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-strong); font-size: .7rem;  }
 @media (max-width: 930px) { .advancement-layout { grid-template-columns: 1fr; } }
 @media (max-width: 620px) { .advancement-summary { grid-template-columns: 1fr; } .advancement-summary > div { border-right: 0; border-bottom: 1px solid var(--border); } .advancement-summary > div:last-child { border: 0; } .advancement-row { grid-template-columns: 28px minmax(0,1fr) 62px; gap: 8px; } .advancement-outcome { grid-column: 2 / -1; justify-self: start; } .progress-step { grid-template-columns: 37px minmax(0,1fr); gap: 12px; } .progress-step > strong { grid-column: 2; } }
 @media (prefers-reduced-motion: reduce) { .advancement-page *, .advancement-page *::before, .advancement-page *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }

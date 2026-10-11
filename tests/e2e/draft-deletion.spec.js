@@ -23,7 +23,7 @@ test('saved-draft deletion confirmation is accessible and never mutates existing
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
   await expect(page).toHaveURL('/organiser'); await settled();
   const draft = page.locator('.dashboard-competition').filter({ has: page.locator('.dashboard-state', { hasText: /^Draft$/ }) }).first();
-  const draftHref = (await draft.locator('h3 a').getAttribute('href')).replace(/\/workspace$/, '');
+  const draftHref = (await draft.getAttribute('href')).replace(/\/workspace$/, '');
   await page.goto(draftHref); await settled();
   const deleteButton = page.getByRole('button', { name: 'Delete draft', exact: true });
   await expect(deleteButton).toBeVisible();

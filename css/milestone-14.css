@@ -1,7 +1,6 @@
 .scoring-page { max-width: 1320px; padding-top: clamp(32px, 5vw, 62px); padding-bottom: 100px; }
 .scoring-page .back-link { display: inline-flex; margin-bottom: 28px; }
 .scoring-page .page-head { max-width: 790px; margin-bottom: 30px; }
-.scoring-page .page-head h1 { font-size: clamp(2.7rem, 6vw, 4.8rem); }
 .scoring-rounds { display: flex; gap: 9px; overflow-x: auto; padding: 2px 2px 16px; margin-bottom: 8px; }
 .scoring-round { display: inline-flex; align-items: center; gap: 11px; flex: none; padding: 12px 17px; border: 1px solid var(--border); border-radius: 11px; color: var(--text); background: var(--surface); text-decoration: none; font-size: .82rem; font-weight: 600; }
 .scoring-round span { color: var(--accent); font: 600 .73rem var(--mono); }

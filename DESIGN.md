@@ -54,7 +54,8 @@ The grid is not a blueprint. Do not add measurements, nodes, routes, arrows, dia
 - Identity family: Geist Mono for the `VERTEX` wordmark only, plus genuinely useful compact data in later milestones.
 - Fallback: Inter and system sans serif; `ui-monospace` for mono fallback.
 - Display headings: weight 600–700, tight tracking between `-0.045em` and `-0.07em`, line-height `0.85–1.0`.
-- Page titles: `clamp(2.6rem, 7vw, 5.8rem)`.
+- Utility page titles: `clamp(2rem, 3.7vw, 3.25rem)` with 1.12 line-height.
+- Public landing/display typography retains the larger expressive scale.
 - Section titles: `clamp(2.2rem, 5vw, 4.7rem)`.
 - Body copy: 16px base with line-height 1.6–1.75.
 - Eyebrows: 12–13px, sentence case, modest tracking, no decorative prefix.
@@ -84,7 +85,9 @@ Derived accent tints may create soft atmospheric light or active surfaces. They 
 - Header: 76px desktop and 68px mobile.
 - Touch targets: at least 44×44px.
 - Body text measure: generally no more than 65 characters per line.
-- Page sections: 76–132px responsive vertical space.
+- Marketing sections: 76–132px responsive vertical space.
+- Utility pages: 32px top / 64px bottom; phones: 24px top / 48px bottom.
+- Shared utility headings and their content have a 32px gap.
 - Use larger gaps between ideas and smaller gaps within one idea.
 - Do not fill empty space with labels, rules, badges, or geometry merely to make the page appear designed.
 
@@ -113,7 +116,7 @@ Derived accent tints may create soft atmospheric light or active surfaces. They 
 
 ### Header and navigation
 
-The header stays calm and translucent enough to preserve context while scrolling. Active navigation uses a soft accent surface and accent text, not an extending rail. Header actions remain right-aligned at every responsive width. Discover is the single catalogue destination; field exploration is never a separate navigation route. Authentication previews replace the repeated header brand with a clear “Back to Vertex” action while retaining the stable navigation frame.
+The header stays calm and translucent enough to preserve context while scrolling. Active navigation uses a soft accent surface and accent text, not an extending rail. Header actions remain right-aligned at every responsive width. Discover is the single catalogue destination; field exploration is never a separate navigation route. Header and footer logos are the only navigation to the homepage. Dashboard comes first for every signed-in role; ordinary login opens it. Explicit protected destinations remain preserved. Account editing, public profile and logout are grouped in a native account disclosure, with equivalent mobile drawer actions.
 
 ### Theme toggle
 
@@ -146,11 +149,11 @@ Use calm surfaces, one border, moderate radius, and enough internal whitespace. 
 
 ### Field selection, tags, and filters
 
-Field exploration lives inside Discover as a labelled multi-select group. Each option is a native button with a visible icon, text label, check state, and `aria-pressed`; selecting fields changes only the presentation state until catalogue filtering belongs to an implemented milestone. Use small rounded rectangles for later tags only when the compact shape matches the content. Active state uses accent text plus a soft accent surface. Do not make static coverage labels resemble clickable controls.
+Field exploration lives inside Discover as a labelled multi-select group. Catalogue filters use labelled native checkboxes with a visible checked state; selecting fields filters the actual catalogue. The public landing field explorer retains native buttons where independently toggling a field is its action. Use small rounded rectangles for later tags only when the compact shape matches the content. Active state uses accent text plus a soft accent surface. Do not make static coverage labels resemble clickable controls.
 
 ### Forms
 
-Labels remain visible above controls. Inputs use the surface colour, a quiet border, control radius, and strong focus ring. Helper and error text sit directly below the relevant field. Placeholder text never replaces a label.
+Labels remain visible above controls. Inputs use the theme background colour, a semantic control border, 10px control radius and strong focus ring. Text/date/search/select controls share 48px minimum height, 1rem font and 12px/14px padding. Compound controls have one outer focus boundary. Helper and error text sit directly below the relevant field. Placeholder text never replaces a label.
 
 ### Empty states
 
@@ -191,7 +194,8 @@ Loading states preserve the final layout and remain visually quiet. Error states
 - The wordmark may hide only below 370px when space is constrained.
 - Three-column content becomes a spacious vertical sequence on tablet.
 - Field options move from four columns to two, then one.
-- Large headings reflow; they are not reduced to ordinary body scale merely to preserve a desktop composition.
+- Large marketing headings reflow. Utility headings use their shared smaller scale for readable workspaces.
+- Competition navigation uses desktop section links and a labelled native section picker below 600px.
 
 ## Accessibility
 
@@ -242,3 +246,90 @@ in the public preview. Dates stay beside their meaning, with local time zone sho
 Existing Geist typography, blue accent, quiet surfaces and 12–18px corners continue.
 On mobile, steps wrap and timeline fields become one column. Banner captions use
 an opaque dark treatment so user-selected colours and images cannot erase labels.
+
+## Human-centred refinement contract, 11 October 2026
+
+ENERGY 1, RHYTHM 2, MOTION 1 for operational refinements. Existing landing
+identity and user-approved theme motion remain. This contract owns shared
+controls and navigation across all completed features.
+
+### Ownership
+
+- `css/styles.css` supplies brand foundations, buttons, the shell and landing
+  composition. `css/experience.css` supplies accessibility and interaction
+  feedback. `css/components.css`, loaded last, owns shared controls, utility
+  headings, contextual navigation, compact callouts and startup states.
+- Milestone styles own feature layouts and genuinely specialised controls.
+  Do not repeat border, font, focus or generic heading rules in each feature sheet.
+- `js/presentation.js` owns display labels, role dashboard destinations and
+  competition section order. Stored enum values, routes, usernames and authored
+  text remain unchanged. Do not use CSS capitalization to hide raw database text.
+
+### Forms and feedback
+
+Text, search, date/time, number, URL, email, password, select and textarea controls
+share a 48 px minimum height, 1 px semantic border, 1rem font and 12/14 px padding.
+Compound username/password/search controls have one outer boundary and focus ring.
+File selectors, colour pickers, checkboxes, radio buttons and certificate canvas
+tools retain the affordances their functions need.
+
+Every control needs a visible label, keyboard focus, disabled treatment and a
+useful error. Help text is described separately from the label. Invalid submissions
+offer a linked summary that focuses the affected field. Success/error feedback
+includes words and a live status; colour alone is insufficient. Unsaved work must
+survive cancelled navigation, section changes and refresh prompts.
+
+### Navigation and interactions
+
+- Ordinary login opens Dashboard. It is the first primary and mobile navigation
+  item for every role. An explicit protected-page destination still takes the
+  user back to that page. Refresh keeps the current route and session.
+- Organisers use `/organiser`; participants and organisations use `/dashboard`.
+  The organisation dashboard shows its profile, associations and competitions
+  without granting organiser powers. Signup still completes profile setup.
+- Header and footer logos open `/`. There is no separate Home link or button.
+  Signed-in landing actions offer Open dashboard instead of Create account.
+- Competition pages share one section order and selected state. Desktop uses
+  links; phones use a labelled native section picker to avoid several rows of tabs.
+  The picker uses the same route and unsaved-work guards as other navigation.
+- Saved editors join section navigation. New unsaved competitions have no
+  workspace links until their first successful save. Meeting rooms retain their
+  full-screen experience. Permission failures offer Back to competition.
+- Single-destination cards are full native anchors with visible hover/focus.
+  Dashboard arrows reinforce the destination; they are not the only click target.
+  Discovery cards keep bookmarks and previews as separate controls. Never wrap
+  buttons in anchors or attach a hidden click-only action to an article.
+- The desktop account disclosure offers editing, public profile and logout.
+  Escape restores summary focus; clicking or focusing outside closes it.
+  At the mobile-navigation breakpoint, account actions live in the drawer.
+
+### Meaningful states
+
+Lifecycle comes from actual publication and round state, not an old planned date.
+Discovery, dashboard and organisation cards use the same vocabulary. Empty
+submissions/judging explain eligibility; no search matches suggests clearing the
+query. Human labels include Programming, General STEM, Age, Pending, Owner and
+Not published. User-authored names retain their spelling.
+
+### Startup and motion
+
+The splash extends the mountain identity with a summit contour, wordmark and
+live boot status. One short entrance establishes the mark; a small busy indicator
+appears only while real initialization is pending. It expresses activity, not a
+fabricated percentage. There is no minimum display time, extra fetch or ornamental
+waiting period. Failed module loading provides a focused Try again action that
+reloads the original route.
+
+The offline fallback keeps this logo navigation and accessible theme contrast.
+It remains self-contained so unavailable shared assets cannot hide recovery.
+
+Other motion remains restrained control feedback. Reduced motion removes the
+summit entrance, busy-indicator animation and splash transition without blocking
+functionality. Native scrolling, readable text and existing GSAP interactions stay.
+
+### Review standard
+
+Review screenshots as well as DOM assertions: both themes, 320/390 px phones,
+tablet and desktop, empty/populated states, keyboard and failed network recovery.
+Use authorised data for visual audits; never invent activity to fill space.
+See `UX-REFINEMENT.md` for evidence/limits and `CHECKS.md` for device review.

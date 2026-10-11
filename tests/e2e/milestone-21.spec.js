@@ -36,7 +36,7 @@ test('release public routes, contrast, responsive zoom, keyboard and deferred li
   await page.screenshot({ path: info.outputPath('mobile-dark.png'), fullPage: true });
   await page.goto('/randomgarbage');
   await review(page, 'invalid-route', info);
-  await page.getByRole('link', { name: 'Return home' }).click();
+  await page.locator('.header .brand').click();
   await expect(page).toHaveURL('/');
   await page.keyboard.press('Tab');
   await page.keyboard.press('Enter');

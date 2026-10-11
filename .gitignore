@@ -2,6 +2,8 @@ node_modules/
 playwright-report/
 test-results/
 test-results-regression/
+test-results-ux-audit/
+test-results-offline-audit/
 .test-data/
 .env
 supabase/.temp/

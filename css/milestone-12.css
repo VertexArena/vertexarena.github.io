@@ -1,7 +1,6 @@
 .meeting-page { max-width: 1220px; padding-top: clamp(32px, 5vw, 62px); padding-bottom: 96px; }
 .meeting-page .back-link { display: inline-flex; margin-bottom: 30px; }
 .meeting-page .page-head { max-width: 800px; margin-bottom: 34px; }
-.meeting-page .page-head h1 { font-size: clamp(2.55rem, 6vw, 4.6rem); }
 .meeting-layout { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); align-items: start; gap: clamp(24px, 4vw, 58px); }
 .meeting-create, .meeting-existing { min-width: 0; }
 .meeting-create { padding: clamp(20px, 3vw, 32px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-low); }

@@ -1,3 +1,4 @@
+import { displayLabel } from './presentation.js';
 export function createOrganiserCollaboration({ client, state, escapeHtml: h, setStatus, refresh }) {
   const result = async query => { const { data, error } = await query; if (error) throw error; return data; };
   const date = value => new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
@@ -23,7 +24,7 @@ export function createOrganiserCollaboration({ client, state, escapeHtml: h, set
     const ids = [...new Set([c.owner_id, ...members.map(m => m.organiser_id), ...invitations.map(i => i.organiser_id)])];
     const profiles = ids.length ? await result(client.from('public_profiles').select('id,full_name,username').in('id', ids)) : [];
     const byId = new Map(profiles.map(profile => [profile.id, profile]));
-    const memberRow = (id, role, joinedAt) => `<div class="collaboration-row">${person(byId.get(id))}<div class="collaboration-role"><span class="account-badge">${h(role)}</span>${joinedAt ? `<small>Joined ${h(date(joinedAt))}</small>` : '<small>Permanent owner</small>'}</div>${role === 'manager' && (owner || id === state.session.user.id) ? `<button type="button" class="button quiet" data-collab-action="remove" data-id="${h(id)}" data-competition-id="${h(c.id)}">${owner ? 'Remove manager' : 'Leave team'}</button>` : ''}</div>`;
+    const memberRow = (id, role, joinedAt) => `<div class="collaboration-row">${person(byId.get(id))}<div class="collaboration-role"><span class="account-badge">${h(displayLabel(role))}</span>${joinedAt ? `<small>Joined ${h(date(joinedAt))}</small>` : '<small>Permanent owner</small>'}</div>${role === 'manager' && (owner || id === state.session.user.id) ? `<button type="button" class="button quiet" data-collab-action="remove" data-id="${h(id)}" data-competition-id="${h(c.id)}">${owner ? 'Remove manager' : 'Leave team'}</button>` : ''}</div>`;
     const active = memberRow(c.owner_id, 'Owner', null) + members.map(m => memberRow(m.organiser_id, 'manager', m.joined_at)).join('');
     const pending = invitations.filter(i => i.status === 'pending' && Date.parse(i.expires_at) > Date.now());
     const pendingRows = pending.length ? pending.map(i => `<div class="collaboration-row">${person(byId.get(i.organiser_id))}<div class="collaboration-role"><span class="account-badge">Pending</span><small>Expires ${h(date(i.expires_at))}</small></div><button type="button" class="button quiet" data-collab-action="cancel" data-id="${h(i.id)}">Cancel invitation</button></div>`).join('') : '<p class="team-empty">No pending invitations.</p>';

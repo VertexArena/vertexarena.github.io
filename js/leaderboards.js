@@ -66,13 +66,18 @@ export function createLeaderboards({ client, state, escapeHtml: h, refresh }) {
 
   async function resolve(route) {
     const manager = route.match(/^\/organiser\/competition\/([a-z0-9]+(?:-[a-z0-9]+)*)\/leaderboards$/);
+    const index = route.match(/^\/competition\/([a-z0-9]+(?:-[a-z0-9]+)*)\/leaderboard$/);
     const publicMatch = route.match(/^\/competition\/([a-z0-9]+(?:-[a-z0-9]+)*)\/leaderboard\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
-    if (!manager && !publicMatch) return undefined;
+    if (!manager && !publicMatch && !index) return undefined;
     if (manager && !state.session) return { protected: true };
-    const slug = (manager || publicMatch)[1];
+    const slug = (manager || publicMatch || index)[1];
     const c = await result(client.from('competitions').select('id,name,slug,status').eq('slug',slug).maybeSingle());
     if (!c) return null;
     const rounds = await result(client.from('competition_rounds').select('id,name,slug,sequence,submission_deadline,judging_state,leaderboard_state').eq('competition_id',c.id).order('sequence'));
+    if (index) {
+      const current = rounds.filter(round => round.leaderboard_state === 'published').at(-1) || rounds.find(round => round.leaderboard_state === 'scheduled') || rounds[0];
+      return current ? { redirect: publicPath(c.slug,current.slug)+location.search } : null;
+    }
     if (manager && !await result(client.rpc('can_manage_competition',{target_competition_id:c.id}))) return { title: 'Leaderboards unavailable - Vertex', content: '<div class="page notice-page"><h1>Leaderboards unavailable.</h1><p>Only competition organisers can manage result publication.</p></div>' };
     const round = manager ? rounds.find(row => row.slug === new URLSearchParams(location.search).get('round')) || rounds[0] : rounds.find(row => row.slug === publicMatch[2]);
     if (!round) return null;

@@ -73,7 +73,7 @@ test('organiser card navigation and file-type selection preserve unsaved local w
   const picker = page.locator('.file-type-picker'); await expect(picker).toBeVisible();
   await picker.getByRole('checkbox', { name: 'ZIP archive' }).check();
   await expect(page.locator('[name="mime_types"]')).toHaveValue(/application\/zip/);
-  page.once('dialog', dialog => dialog.dismiss()); await page.getByRole('navigation', { name: 'Competition sections', exact: true }).getByRole('link', { name: 'Results', exact: true }).click();
+  page.once('dialog', dialog => dialog.dismiss()); await page.getByRole('navigation', { name: 'Competition sections', exact: true }).getByRole('link', { name: 'Leaderboards', exact: true }).click();
   await expect(picker).toBeVisible(); await picker.getByRole('checkbox', { name: 'ZIP archive' }).uncheck();
   await page.getByText('Advanced file types', { exact: true }).click(); await expect(page.getByLabel('Allowed MIME types')).toBeVisible();
   for (const [width, height] of [[320,700],[768,1024],[740,390]]) { await page.setViewportSize({width,height}); await snapshot(page, `submission-reflow-${width}`, info); }
@@ -99,10 +99,11 @@ for (const role of ['organiser','participant','organisation']) test(`existing ${
   await settled(page);
   const nameField = role === 'organisation' ? 'name' : 'full_name';
   const name = await page.locator(`[name="${nameField}"]`).inputValue().catch(() => null);
-  const routes = role === 'organisation' ? ['/organisation/edit','/organisations','/notifications','/app'] : role === 'organiser' ? ['/profile/edit','/organiser','/organiser/competition/new','/organisations','/notifications','/app'] : ['/profile/edit','/dashboard','/discover','/notifications','/app'];
+  const publicProfile = role === 'organisation' ? await page.locator('.organisation-manage .profile-preview a[href^="/organisation/"]').getAttribute('href') : await page.locator('[data-public-profile-link]').getAttribute('href');
+  const routes = role === 'organisation' ? ['/dashboard','/organisation/edit','/organisations','/notifications','/app'] : role === 'organiser' ? ['/profile/edit','/organiser','/organiser/competition/new','/organisations','/notifications','/app'] : ['/profile/edit','/dashboard','/discover','/notifications','/app'];
   await page.goto('/discover'); await settled(page); await expect(page.locator('.discovery-card').first()).toBeVisible({ timeout: 20000 });
   const competitionPath = await page.locator('.discovery-card h3 a').first().getAttribute('href'); const slug = competitionPath.split('/').at(-1);
-  routes.push(competitionPath, `${competitionPath}/register`, `${competitionPath}/team`, `${competitionPath}/announcements`, `${competitionPath}/questions`, `${competitionPath}/meetings`, `${competitionPath}/submissions`, `${competitionPath}/progress`, `${competitionPath}/certificates`);
+  routes.push('/people',publicProfile,competitionPath, `${competitionPath}/register`, `${competitionPath}/team`, `${competitionPath}/announcements`, `${competitionPath}/questions`, `${competitionPath}/meetings`, `${competitionPath}/submissions`, `${competitionPath}/progress`, `${competitionPath}/certificates`,`${competitionPath}/leaderboard`);
   if (role === 'organiser') routes.push(...['workspace','participants','organisers','meetings','submissions','scoring','advancement','leaderboards','certificates'].map(section => `/organiser/competition/${slug}/${section}`), `/organiser/competition/${slug}`);
   await info.attach('visited-routes', { body: JSON.stringify(routes), contentType: 'application/json' });
   for (const theme of ['light','dark']) {
@@ -117,8 +118,8 @@ for (const role of ['organiser','participant','organisation']) test(`existing ${
   if (name) {
     const input = page.locator(`[name="${nameField}"]`); await input.fill(`${name} draft`);
     await expect(page.locator('.form-recovery-note:visible')).toContainText('Unsaved changes');
-    page.once('dialog', dialog => dialog.dismiss()); await page.locator('a.brand').click(); await expect(page).toHaveURL(new RegExp(`${own}$`));
-    await input.fill(name); await page.locator('a.brand').click(); await expect(page).toHaveURL('/');
+    page.once('dialog', dialog => dialog.dismiss()); await page.locator('.header a.brand').click(); await expect(page).toHaveURL(new RegExp(`${own}$`));
+    await input.fill(name); await page.locator('.header a.brand').click(); await expect(page).toHaveURL('/');
   }
   await page.goto(own); await settled(page);
   await page.getByRole('button', { name: 'Log out', exact: true }).last().click();

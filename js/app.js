@@ -1,6 +1,7 @@
 import { createCertificates } from './certificates.js';
 import { startErrorFeedback } from './errors.js';
 import { bindExperience, createFormRecovery, markFormSaved } from './experience.js';
+import { displayLabel, dashboardPath } from './presentation.js';
 import { createCompetitions } from './competitions.js';
 import { createDiscovery } from './discovery.js';
 import { createRegistration } from './registration.js';
@@ -29,7 +30,7 @@ const supabase = config?.SUPABASE_PROJECT_URL && config?.SUPABASE_ANON_KEY
   : null;
 
 const state = { session: null, profile: null, authReady: false };
-const publicNav = [['/', 'Home'], ['/discover', 'Discover'], ['/people', 'People'], ['/organisations', 'Organisations']];
+const publicNav = [['/discover', 'Discover'], ['/people', 'People'], ['/organisations', 'Organisations']];
 let cleanup = () => {};
 let initialRender = true;
 let renderRevision = 0;
@@ -68,25 +69,23 @@ function avatar(profile, className = '') {
 
 function header(path) {
   const dark = document.documentElement.dataset.theme === 'dark';
-  const authPage = ['/login', '/signup'].includes(path);
-  const identity = authPage
-    ? `<a class="back-home" data-link href="/" aria-label="Back to Vertex"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Vertex</span></a>`
-    : `<a class="brand" data-link href="/" aria-label="Vertex home"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></a>`;
+  const identity = `<a class="brand" data-link href="/" aria-label="Vertex home"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></a>`;
   const organisationAccount = state.profile?.account_type === 'organisation';
   const accountPath = organisationAccount ? '/organisation/edit' : '/profile/edit';
   const accountLabel = organisationAccount ? 'Edit organisation' : 'Edit profile';
+  const publicAccountPath = organisationAccount ? (state.profile?.organisation?.slug ? `/organisation/${encodeURIComponent(state.profile.organisation.slug)}` : null) : (state.profile?.username ? `/profile/@${encodeURIComponent(state.profile.username)}` : null);
   const accountAction = state.session
-    ? `<a class="account-link" data-link href="${accountPath}" aria-label="${organisationAccount ? 'Edit organisation' : 'Edit your profile'}">${avatar(state.profile, 'avatar-small')}<span>${escapeHtml(state.profile?.full_name || 'Complete profile')}</span></a>`
+    ? `<details class="account-menu"><summary class="account-link" aria-label="Account menu for ${escapeHtml(state.profile?.full_name || 'your account')}">${avatar(state.profile, 'avatar-small')}<span class="account-name">${escapeHtml(state.profile?.full_name || 'Your account')}</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary><div class="account-menu-panel"><a data-link href="${accountPath}">${accountLabel}</a>${publicAccountPath ? `<a data-link href="${publicAccountPath}">${organisationAccount ? 'View organisation' : 'View public profile'}</a>` : ''}<button type="button" data-logout>Log out</button></div></details>`
     : `<a class="button quiet login" data-link href="/login" ${path === '/login' ? 'aria-current="page"' : ''}>Log in</a>`;
   const drawerAccount = state.session
     ? `<a class="button primary" data-link href="${accountPath}">${accountLabel}</a><button class="button secondary" type="button" data-logout>Log out</button>`
     : `<a class="button primary" data-link href="/login">Log in</a>`;
-  const navigation = state.profile?.account_type === 'participant' ? [...publicNav, ['/dashboard', 'Dashboard']] : state.profile?.account_type === 'organiser' ? [...publicNav, ['/organiser', 'Dashboard']] : publicNav;
+  const navigation = state.session ? [[dashboardPath(state.profile?.account_type), 'Dashboard'], ...publicNav] : publicNav;
   return `<header class="header"><div class="header-in">${identity}<nav class="nav" aria-label="Primary">${navigation.map(item => link(...item, path)).join('')}</nav><div class="actions">${notifications.headerAction()}${accountAction}<button class="theme-toggle" data-theme type="button" role="switch" aria-checked="${dark}" aria-label="Switch to ${dark ? 'light' : 'dark'} mode"><span class="theme-scene" aria-hidden="true"><span class="theme-clouds"></span><span class="theme-stars"><i></i><i></i><i></i></span><span class="theme-orbit"><span class="theme-orb"><span class="theme-moon"><i></i><i></i><i></i></span></span></span></span></button><button class="icon menu" data-menu aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button></div></div></header><nav class="drawer" data-open="false" aria-label="Mobile">${navigation.map(item => link(...item, path)).join('')}${state.session ? `<a data-link href="/notifications">Notifications</a>` : ''}${drawerAccount}</nav>`;
 }
 
 function footer() {
-  return `<footer class="footer"><div class="footer-in"><div class="brand"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></div><span>Student competitions, clearly organised.</span><a data-link href="/discover">Discover</a><a class="footer-app-link" data-link href="/app">Vertex app</a></div></footer>`;
+  return `<footer class="footer"><div class="footer-in"><a class="brand" data-link href="/" aria-label="Vertex home"><img src="/assets/logo.png" alt=""><span class="word">VERTEX</span></a><span>Student competitions, clearly organised.</span><a data-link href="/discover">Discover</a><a class="footer-app-link" data-link href="/app">Vertex app</a></div></footer>`;
 }
 
 function shell(content, path, noFooter = false) {
@@ -94,7 +93,8 @@ function shell(content, path, noFooter = false) {
 }
 
 function home() {
-  return `<section class="hero"><canvas class="opportunity-grid" aria-hidden="true"></canvas><div class="hero-in"><div class="hero-copy"><span class="eyebrow">A world of student competitions</span><h1>Find your next <span>challenge.</span></h1><p>Explore ideas across every field, follow what sparks your curiosity, and find the opportunity worth pursuing.</p><div class="hero-buttons"><a class="button primary" data-link href="/discover">Explore competitions <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="button secondary" data-link href="/signup">Create account</a></div></div><p class="hero-aside">New directions are always waiting just beyond the familiar.</p></div></section><section class="section story-section"><div class="story-heading"><span class="eyebrow">Why Vertex exists</span><h2>Opportunity should be easier to see.</h2></div><div class="story-copy"><p class="story-lead">The right competition can change what a student believes they are capable of.</p><p>Yet opportunities are often scattered across school notices, social posts, forms, and disconnected websites. Vertex gives that landscape one calm place—so curiosity can become a decision instead of a search through noise.</p></div></section><section class="journey-section"><div class="section"><div class="journey-heading"><span class="eyebrow">The competition journey</span><h2>Clarity at every meaningful moment.</h2><p>A competition is more than a deadline. It is a sequence of choices, effort, feedback, and growth.</p></div><ol class="journey"><li><span class="journey-number">01</span><div><h3>Discover what draws you in.</h3><p>See enough context to recognise the challenge that fits your interests and ambition.</p></div></li><li><span class="journey-number">02</span><div><h3>Know what comes next.</h3><p>Keep the important moments of participation understandable as the competition unfolds.</p></div></li><li><span class="journey-number">03</span><div><h3>Carry the outcome forward.</h3><p>Let every result become part of a lasting record of effort, progress, and achievement.</p></div></li></ol></div></section><section class="section audience-section"><div class="intro"><span class="eyebrow">Built for both sides</span><h2>Students explore. Organisers create the opportunity.</h2></div><div class="audience-grid"><article class="audience-card student-card"><span class="audience-icon"><i class="fa-solid fa-compass" aria-hidden="true"></i></span><div><h3>For students</h3><p>Vertex makes the wider competition landscape easier to understand, helping students move from “What is out there?” to “This is worth trying.”</p></div></article><article class="audience-card organiser-card"><span class="audience-icon"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i></span><div><h3>For organisers</h3><p>Vertex gives each competition a credible, coherent home where expectations stay clear and the work of participants can be treated with care.</p></div></article></div></section><section class="difference-section"><div class="section difference-in"><div><span class="eyebrow">What makes Vertex different</span><h2>The challenge stays at the centre.</h2></div><div class="difference-copy"><p>Vertex is not a feed competing for attention and not a collection of disconnected forms. It is designed around the arc of a real competition.</p><p>Discovery leads naturally toward participation, participation toward an outcome, and every outcome toward the next possibility.</p></div></div></section><section class="section closing-section"><div class="closing-card"><span class="eyebrow">Your next direction</span><h2>See what might be worth pursuing.</h2><p>Begin with the open catalogue, or create an account when you are ready to make Vertex your own.</p><div class="hero-buttons"><a class="button primary" data-link href="/discover">Explore competitions <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="button secondary" data-link href="/signup">Create account</a></div></div></section>`;
+  const accountCta = state.session ? `<a class="button secondary" data-link href="${dashboardPath(state.profile?.account_type)}">Open dashboard</a>` : '<a class="button secondary" data-link href="/signup">Create account</a>';
+  return `<section class="hero"><canvas class="opportunity-grid" aria-hidden="true"></canvas><div class="hero-in"><div class="hero-copy"><span class="eyebrow">A world of student competitions</span><h1>Find your next <span>challenge.</span></h1><p>Explore ideas across every field, follow what sparks your curiosity, and find the opportunity worth pursuing.</p><div class="hero-buttons"><a class="button primary" data-link href="/discover">Explore competitions <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>${accountCta}</div></div><p class="hero-aside">New directions are always waiting just beyond the familiar.</p></div></section><section class="section story-section"><div class="story-heading"><span class="eyebrow">Why Vertex exists</span><h2>Opportunity should be easier to see.</h2></div><div class="story-copy"><p class="story-lead">The right competition can change what a student believes they are capable of.</p><p>Yet opportunities are often scattered across school notices, social posts, forms, and disconnected websites. Vertex gives that landscape one calm place—so curiosity can become a decision instead of a search through noise.</p></div></section><section class="journey-section"><div class="section"><div class="journey-heading"><span class="eyebrow">The competition journey</span><h2>Clarity at every meaningful moment.</h2><p>A competition is more than a deadline. It is a sequence of choices, effort, feedback, and growth.</p></div><ol class="journey"><li><span class="journey-number">01</span><div><h3>Discover what draws you in.</h3><p>See enough context to recognise the challenge that fits your interests and ambition.</p></div></li><li><span class="journey-number">02</span><div><h3>Know what comes next.</h3><p>Keep the important moments of participation understandable as the competition unfolds.</p></div></li><li><span class="journey-number">03</span><div><h3>Carry the outcome forward.</h3><p>Let every result become part of a lasting record of effort, progress, and achievement.</p></div></li></ol></div></section><section class="section audience-section"><div class="intro"><span class="eyebrow">Built for both sides</span><h2>Students explore. Organisers create the opportunity.</h2></div><div class="audience-grid"><article class="audience-card student-card"><span class="audience-icon"><i class="fa-solid fa-compass" aria-hidden="true"></i></span><div><h3>For students</h3><p>Vertex makes the wider competition landscape easier to understand, helping students move from “What is out there?” to “This is worth trying.”</p></div></article><article class="audience-card organiser-card"><span class="audience-icon"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i></span><div><h3>For organisers</h3><p>Vertex gives each competition a credible, coherent home where expectations stay clear and the work of participants can be treated with care.</p></div></article></div></section><section class="difference-section"><div class="section difference-in"><div><span class="eyebrow">What makes Vertex different</span><h2>The challenge stays at the centre.</h2></div><div class="difference-copy"><p>Vertex is not a feed competing for attention and not a collection of disconnected forms. It is designed around the arc of a real competition.</p><p>Discovery leads naturally toward participation, participation toward an outcome, and every outcome toward the next possibility.</p></div></div></section><section class="section closing-section"><div class="closing-card"><span class="eyebrow">Your next direction</span><h2>See what might be worth pursuing.</h2><p>${state.session ? "Review your dashboard or explore the competition catalogue." : "Begin with the open catalogue, or create an account when you are ready to make Vertex your own."}</p><div class="hero-buttons"><a class="button primary" data-link href="/discover">Explore competitions <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>${accountCta}</div></div></section>`;
 }
 
 function authView(mode) {
@@ -113,7 +113,7 @@ function signupFields() {
 function profileForm(profile) {
   const socials = Array.isArray(profile.social_links) ? profile.social_links : [];
   const rows = [...socials, ...Array(Math.max(2 - socials.length, 0)).fill({ label: '', url: '' })];
-  return `<div class="profile-edit page"><div class="page-head compact-head"><span class="eyebrow">Your Vertex identity</span><h1>Edit profile.</h1><p>Keep public details useful and current. Birthday remains private and only supports eligibility checks.</p></div><div class="profile-edit-grid"><aside class="profile-preview" aria-label="Profile preview"><div class="profile-preview-top">${avatar(profile, 'avatar-large')}<div><strong data-preview-name>${escapeHtml(profile.full_name || 'Your name')}</strong><span data-preview-username>@${escapeHtml(profile.username || 'username')}</span></div></div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(profile.account_type)}</span><p>Your public identity updates when changes save.</p>${profile.account_type === 'organisation' ? '<a class="button secondary" data-link href="/organisation/edit">Manage organisation</a>' : profile.account_type === 'organiser' ? '<a class="button primary" data-link href="/organiser">Manage competitions</a><a class="button secondary" data-link href="/organisations">Your organisations & invitations</a>' : ''}<a class="text-link" data-public-profile-link data-link href="${profile.username ? `/profile/@${encodeURIComponent(profile.username)}` : '/profile/edit'}">View public profile</a></aside><section class="form-surface"><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-profile-form><fieldset><legend>Identity</legend><div class="avatar-upload"><div data-avatar-preview>${avatar(profile, 'avatar-medium')}</div><label class="button secondary upload-button"><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose picture</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100" value="${escapeHtml(profile.full_name)}"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" value="${escapeHtml(profile.username)}"></span></label></div>${profile.account_type === 'participant' ? `<label class="field"><span>Date of birth <small>Private</small></span><input name="birthday" type="date" autocomplete="bday" required value="${escapeHtml(profile.birthday)}"><small>Never shown on your public profile.</small></label>` : ''}</fieldset><fieldset><legend>About</legend><label class="field"><span>Bio</span><textarea name="bio" maxlength="1000" rows="5" placeholder="What do you study, build, or organise?">${escapeHtml(profile.bio)}</textarea><small><span data-bio-count>${String(profile.bio || '').length}</span>/1000</small></label><div class="form-grid"><label class="field"><span>School or affiliation <small>Optional</small></span><input name="affiliation" maxlength="160" value="${escapeHtml(profile.affiliation)}"></label><label class="field"><span>Location <small>Optional</small></span><input name="location" maxlength="120" value="${escapeHtml(profile.location)}"></label></div></fieldset><fieldset><legend>Social links</legend><p class="field-intro">Add up to eight public links. Only secure HTTP links are accepted.</p><div class="social-list" data-social-list>${rows.map(socialRow).join('')}</div><button class="button secondary add-social" type="button" data-add-social><i class="fa-solid fa-plus" aria-hidden="true"></i> Add link</button></fieldset><div class="form-actions"><button class="button primary" type="submit" data-submit>Save profile</button><button class="button quiet" type="button" data-logout>Log out</button></div></form></section></div></div>`;
+  return `<div class="profile-edit page"><div class="page-head compact-head"><span class="eyebrow">Your Vertex identity</span><h1>Edit profile.</h1><p>Keep public details useful and current. Birthday remains private and only supports eligibility checks.</p></div><div class="profile-edit-grid"><aside class="profile-preview" aria-label="Profile preview"><div class="profile-preview-top">${avatar(profile, 'avatar-large')}<div><strong data-preview-name>${escapeHtml(profile.full_name || 'Your name')}</strong><span data-preview-username>@${escapeHtml(profile.username || 'username')}</span></div></div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(displayLabel(profile.account_type))}</span><p>Your public identity updates when changes save.</p>${profile.account_type === 'organisation' ? '<a class="button secondary" data-link href="/organisation/edit">Manage organisation</a>' : profile.account_type === 'organiser' ? '<a class="button primary" data-link href="/organiser">Manage competitions</a><a class="button secondary" data-link href="/organisations">Your organisations & invitations</a>' : ''}<a class="text-link" data-public-profile-link data-link href="${profile.username ? `/profile/@${encodeURIComponent(profile.username)}` : '/profile/edit'}">View public profile</a></aside><section class="form-surface"><div class="form-status" data-form-status role="status" aria-live="polite"></div><form class="form-stack" data-profile-form><fieldset><legend>Identity</legend><div class="avatar-upload"><div data-avatar-preview>${avatar(profile, 'avatar-medium')}</div><label class="button secondary upload-button"><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif"><i class="fa-solid fa-camera" aria-hidden="true"></i> Choose picture</label><small>JPG, PNG, WebP, or GIF. Maximum 5 MB.</small></div><div class="form-grid"><label class="field"><span>Full name</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="100" value="${escapeHtml(profile.full_name)}"></label><label class="field"><span>Username</span><span class="username-field"><span aria-hidden="true">@</span><input name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" value="${escapeHtml(profile.username)}"></span></label></div>${profile.account_type === 'participant' ? `<label class="field"><span>Date of birth <small>Private</small></span><input name="birthday" type="date" autocomplete="bday" required value="${escapeHtml(profile.birthday)}"><small>Never shown on your public profile.</small></label>` : ''}</fieldset><fieldset><legend>About</legend><label class="field"><span>Bio</span><textarea name="bio" maxlength="1000" rows="5" placeholder="What do you study, build, or organise?">${escapeHtml(profile.bio)}</textarea><small><span data-bio-count>${String(profile.bio || '').length}</span>/1000</small></label><div class="form-grid"><label class="field"><span>School or affiliation <small>Optional</small></span><input name="affiliation" maxlength="160" value="${escapeHtml(profile.affiliation)}"></label><label class="field"><span>Location <small>Optional</small></span><input name="location" maxlength="120" value="${escapeHtml(profile.location)}"></label></div></fieldset><fieldset><legend>Social links</legend><p class="field-intro">Add up to eight public links. Only secure HTTP links are accepted.</p><div class="social-list" data-social-list>${rows.map(socialRow).join('')}</div><button class="button secondary add-social" type="button" data-add-social><i class="fa-solid fa-plus" aria-hidden="true"></i> Add link</button></fieldset><div class="form-actions"><button class="button primary" type="submit" data-submit>Save profile</button><button class="button quiet" type="button" data-logout>Log out</button></div></form></section></div></div>`;
 }
 
 function socialRow(item = { label: '', url: '' }) {
@@ -122,7 +122,7 @@ function socialRow(item = { label: '', url: '' }) {
 
 function publicProfileView(profile) {
   const socials = Array.isArray(profile.social_links) ? profile.social_links.filter(item => safeUrl(item.url)) : [];
-  return `<div class="public-profile page"><a class="back-link" data-link href="/people"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Find people</a><article class="profile-hero"><div class="profile-identity">${avatar(profile, 'avatar-hero')}<div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(profile.account_type)}</span><h1>${escapeHtml(profile.full_name)}</h1><p class="profile-username">@${escapeHtml(profile.username)}</p></div></div><div class="profile-detail"><p class="profile-bio">${escapeHtml(profile.bio || 'No bio added yet.')}</p>${profile.affiliation || profile.location ? `<dl>${profile.affiliation ? `<div><dt>Affiliation</dt><dd>${escapeHtml(profile.affiliation)}</dd></div>` : ''}${profile.location ? `<div><dt>Location</dt><dd>${escapeHtml(profile.location)}</dd></div>` : ''}</dl>` : ''}${socials.length ? `<nav class="social-links" aria-label="Social links">${socials.map(item => `<a href="${escapeHtml(safeUrl(item.url))}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(item.label || new URL(item.url).hostname)}</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>`).join('')}</nav>` : ''}<p class="joined">Joined Vertex ${new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(new Date(profile.created_at))}</p></div></article></div>`;
+  return `<div class="public-profile page"><a class="back-link" data-link href="/people"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Find people</a><article class="profile-hero"><div class="profile-identity">${avatar(profile, 'avatar-hero')}<div><span class="account-badge"><i class="fa-solid ${profile.account_type === 'organiser' ? 'fa-lightbulb' : 'fa-compass'}" aria-hidden="true"></i>${escapeHtml(displayLabel(profile.account_type))}</span><h1>${escapeHtml(profile.full_name)}</h1><p class="profile-username">@${escapeHtml(profile.username)}</p></div></div><div class="profile-detail"><p class="profile-bio">${escapeHtml(profile.bio || 'No bio added yet.')}</p>${profile.affiliation || profile.location ? `<dl>${profile.affiliation ? `<div><dt>Affiliation</dt><dd>${escapeHtml(profile.affiliation)}</dd></div>` : ''}${profile.location ? `<div><dt>Location</dt><dd>${escapeHtml(profile.location)}</dd></div>` : ''}</dl>` : ''}${socials.length ? `<nav class="social-links" aria-label="Social links">${socials.map(item => `<a href="${escapeHtml(safeUrl(item.url))}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(item.label || new URL(item.url).hostname)}</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>`).join('')}</nav>` : ''}<p class="joined">Joined Vertex ${new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(new Date(profile.created_at))}</p></div></article></div>`;
 }
 
 function peopleView() {
@@ -131,11 +131,11 @@ function peopleView() {
 
 function peopleResults(rows) {
   if (!rows.length) return `<div class="empty compact-empty"><span class="empty-marker" aria-hidden="true"><i class="fa-solid fa-user-group"></i></span><div><h2>No public profiles match.</h2><p>Check spelling or try a shorter username.</p></div></div>`;
-  return rows.filter(profile => profile.account_type !== 'organisation').map(profile => `<a class="person-row" data-link href="/profile/@${encodeURIComponent(profile.username)}">${avatar(profile, 'avatar-medium')}<span><strong>${escapeHtml(profile.full_name)}</strong><small>@${escapeHtml(profile.username)}</small>${profile.affiliation ? `<em>${escapeHtml(profile.affiliation)}</em>` : ''}</span><span class="account-badge">${escapeHtml(profile.account_type)}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`).join('');
+  return rows.filter(profile => profile.account_type !== 'organisation').map(profile => `<a class="person-row" data-link href="/profile/@${encodeURIComponent(profile.username)}">${avatar(profile, 'avatar-medium')}<span><strong>${escapeHtml(profile.full_name)}</strong><small>@${escapeHtml(profile.username)}</small>${profile.affiliation ? `<em>${escapeHtml(profile.affiliation)}</em>` : ''}</span><span class="account-badge">${escapeHtml(displayLabel(profile.account_type))}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>`).join('');
 }
 
 function notFound() {
-  return `<section class="notfound"><canvas class="nf-canvas" aria-hidden="true"></canvas><div class="fallback" aria-hidden="true"></div><div class="nf-content"><span class="code">404</span><span class="eyebrow">Route not found</span><h1>This path left the field.</h1><p>Nothing lives at this address. Return home or reopen discovery to find a valid route.</p><div class="nf-actions"><a class="button primary" data-link href="/"><i class="fa-solid fa-house" aria-hidden="true"></i> Return home</a><a class="button secondary" data-link href="/discover">Open discovery</a></div></div></section>`;
+  return `<section class="notfound"><canvas class="nf-canvas" aria-hidden="true"></canvas><div class="fallback" aria-hidden="true"></div><div class="nf-content"><span class="code">404</span><span class="eyebrow">Route not found</span><h1>This path left the field.</h1><p>Nothing lives at this address. Open discovery to find a competition or use the logo to return to Vertex.</p><div class="nf-actions"><a class="button primary" data-link href="/discover">Discover competitions</a></div></div></section>`;
 }
 
 function loadingView(label = 'Opening Vertex') {
@@ -223,9 +223,9 @@ async function submitAuth(form) {
       if (error) throw error;
       state.session = data.session;
       await loadOwnProfile();
-      const destination = sessionStorage.getItem('vertex-return-path') || new URLSearchParams(location.search).get('returnTo') || (state.profile?.account_type === 'organisation' ? '/organisation/edit' : '/profile/edit');
+      const destination = sessionStorage.getItem('vertex-return-path') || new URLSearchParams(location.search).get('returnTo') || dashboardPath(state.profile?.account_type);
       sessionStorage.removeItem('vertex-return-path');
-      navigate(destination.startsWith('/') && !destination.startsWith('//') ? destination : '/profile/edit');
+      navigate(destination.startsWith('/') && !destination.startsWith('//') ? destination : dashboardPath(state.profile?.account_type));
     }
   } catch (error) {
     setStatus(status, authMessage(error), 'error');
@@ -575,7 +575,7 @@ async function render(options = {}) {
     lastAllowedPath = location.pathname + location.search;
     bind();
     formRecovery.watch(document.querySelector('#main-content'));
-    const experienceCleanup = bindExperience(document.querySelector('#main-content'));
+    const experienceCleanup = bindExperience(document.querySelector('#main-content'), { accountType: state.profile?.account_type, navigate });
     if (route && /^\/competition\/[a-z0-9-]+\/team$/.test(path)) cleanup = teams.subscribe(path);
     if (route && /^\/competition\/[a-z0-9-]+\/announcements(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = announcements.subscribe(path);
     if (route && /^\/competition\/[a-z0-9-]+\/questions(?:\/[0-9a-f-]{36})?$/.test(path)) cleanup = questions.subscribe(path);
@@ -622,6 +622,19 @@ document.addEventListener('click', event => {
   event.preventDefault(); navigate(url.pathname + url.search);
 });
 
+document.addEventListener('click', event => {
+  const menu = document.querySelector('.account-menu[open]');
+  if (menu && !menu.contains(event.target)) menu.open = false;
+});
+document.addEventListener('focusin', event => {
+  const menu = document.querySelector('.account-menu[open]');
+  if (menu && !menu.contains(event.target)) menu.open = false;
+});
+document.addEventListener('keydown', event => {
+  const menu = document.querySelector('.account-menu[open]');
+  if (event.key === 'Escape' && menu) { menu.open = false; menu.querySelector('summary').focus(); }
+});
+
 addEventListener('resize', () => {
   if (innerWidth > 820 && document.querySelector('.drawer')?.dataset.open === 'true') document.querySelector('[data-menu]')?.click();
 });
@@ -636,6 +649,8 @@ const recovered = sessionStorage.getItem('vertex-recovery-route');
 if (recovered) { sessionStorage.removeItem('vertex-recovery-route'); history.replaceState({}, '', recovered); }
 
 async function bootstrap() {
+  const bootStatus = document.querySelector('[data-boot-status]');
+  if (bootStatus) bootStatus.textContent = 'Checking your session';
   if (!supabase) { state.authReady = true; return render(); }
   const { data, error } = await supabase.auth.getSession();
   if (error) console.error(error);
@@ -645,6 +660,7 @@ async function bootstrap() {
     try { await loadOwnProfile(); } catch (profileError) { console.error(profileError); }
   }
   notifications.start(state.session?.user.id);
+  if (bootStatus) bootStatus.textContent = 'Opening your page';
   state.authReady = true;
   supabase.auth.onAuthStateChange((event, session) => {
     const previousUser = state.session?.user.id || null;
@@ -670,7 +686,6 @@ async function bootstrap() {
       if ((state.session?.user.id || null) === userId) await render();
     }, 0);
   });
-  await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));
   await render();
 }
 
@@ -678,8 +693,7 @@ startErrorFeedback();
 pwa.start();
 bootstrap().finally(async () => {
   const splash = document.querySelector('#vertex-splash');
-  await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - performance.now())));
   splash?.classList.add('splash-finished');
   document.querySelector('#app')?.removeAttribute('inert');
-  setTimeout(() => splash?.remove(), 260);
+  setTimeout(() => splash?.remove(), 180);
 });

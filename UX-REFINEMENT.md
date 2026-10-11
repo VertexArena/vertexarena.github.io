@@ -1,4 +1,90 @@
-# Human-centred refinement, 10 October 2026
+# Human-centred refinement
+
+## Consistency and first-time use audit, 11 October 2026
+
+The six user screenshots were examples for an application-wide review. Inspect
+the shared shell and the public, organiser, participant and organisation routes,
+then implement the common causes. Apply antislop during implementation. Preserve
+the existing landing identity, colour palette, typefaces, actual data and permissions.
+ENERGY 1, RHYTHM 2, MOTION 1 for these utility refinements.
+
+### Implemented decisions
+
+| Finding | Shared correction and reason |
+| --- | --- |
+| Native black selects and conflicting field styles | Shared control contract in components.css replaces duplicate feature rules. Inputs/selects/search/date fields share height, border, typography, padding and focus; compound fields have one frame. Specialised file/colour/canvas controls retain needed affordances. |
+| Oversized utility titles and detached callout copy | Shared utility heading scale and spacing; compact registration/entry callouts. Keep the public landing composition expressive without applying its scale to workspaces. |
+| Organiser card arrow is too small a destination | Whole dashboard card is one native anchor; title, blank space and arrow open the same workspace with one keyboard stop. Deadline/result rows also expose their whole destination. Preserve separate bookmark/preview actions on discovery cards. |
+| Inconsistent overview buttons versus section tabs | One public/manager section model, current state and ordering. Stable Leaderboards index selects the appropriate existing round route. Phones use a labelled native picker; cancelled unsaved navigation restores its selection. |
+| Home precedes account work; organisation lacks dashboard | Dashboard first for every signed-in role and ordinary login destination. Organisation gets a real read-only association/competition overview. Protected return destinations and signup setup remain. Logos provide home access. |
+| Logout requires hunting through profile settings | Native account disclosure exposes profile editing, public profile and logout. Escape/outside interaction closes it; mobile drawer retains equivalent account actions. |
+| Enum values presented as prose | presentation.js maps role, invitation, field and result labels; Age explicitly capitalised. Routes, enum values, usernames and authored names remain intact. |
+| Organisation cards emphasise old registration deadlines | Use the same authoritative competition lifecycle as discovery/dashboard cards. Published final state is required before describing a competition as completed. |
+| Empty entries look like failed search | Judging, submission review and meeting selection distinguish empty eligibility from an actual unmatched query and explain the next step. |
+| Generic startup with forced waiting | Vertex summit contour, wordmark and live status. Remove both 850ms minimum waits; motion stops under reduced-motion preference. Failed module import offers focused Try again recovery at the original URL. |
+| Offline shell has different home/contrast behaviour | Its brand becomes the home link; dark primary-button text follows the main application's readable ink treatment. Retry remains a real reload action. |
+
+The maintained component contract is in DESIGN.md. The pre-existing landing
+design thesis and motif are retained there; operational refinements update the
+shared navigation, form, heading and spacing rules instead of replacing the brand.
+The worker shell version advances to pick up the changed static assets.
+No schema, RPC, RLS or Storage change is required for this frontend work.
+
+### Verification
+
+- Comprehensive role route audit passed in real Chrome through the local HTTP
+  server: 186 screenshots and Axe audits, 84 organiser / 51 participant /
+  51 organisation. Desktop light, desktop dark and 390px mobile, direct routes
+  and account editing/dirty-navigation/logout were exercised.
+- Ten focused regression tests passed for public routes, validation/drawer,
+  lifecycle, draft confirmation/recovery, organiser file-type controls, dashboard
+  landing/card navigation, startup recovery and reduced-motion splash.
+- Final suite after account-menu/responsive refinements: five tests passed in
+  1.3 minutes, with 30 captures. It exercises all role defaults, first nav item,
+  persisted refresh/direct dashboard, whole-card pointer action, shared judging
+  control metrics, human labels, stable leaderboard navigation, native mobile
+  section selection, account disclosure in both themes/Escape focus, 320/768/900px
+  reflow, actual import failure/retry and reduced motion. Zero Axe violations in
+  audited states; no page errors or application mutation requests in role tests.
+- Screenshots inspected for actual hierarchy/wrapping/spacing, including the
+  new account menu, narrow public overview, mobile leaderboard picker, organisation
+  dashboard, timeline, judging and meeting forms, registration callout and both
+  splash themes. Passing DOM checks alone was not treated as visual acceptance.
+- JavaScript syntax, diff whitespace and release validation passed. All 41
+  immutable migrations remain consolidated; the browser key remains anon.
+- Final organiser rerun passed in 35.8 seconds after clarifying the empty meeting
+  attendee state. A separate offline recovery test passed in 1.8 seconds, with
+  light/dark 320px captures and zero Axe findings. Screens were inspected.
+
+Tests use only user-authorised existing accounts. Application writes are blocked;
+no test accounts, new entries, uploads, result publication or deletions were made.
+An initial overly broad theme-toggle selector matched both html and button; it
+was corrected and the complete final suite passed. Earlier broad-brand selector
+and restricted-announcement test expectations were also corrected. Those failed
+test runs are diagnostic evidence, not reported as passes.
+
+Limits: existing accounts have no confirmed entries, scores or certificate artwork.
+The corresponding empty/permission views and controls were audited, but populated
+team/submission/judging/certificate transactions and real meeting media were not
+recreated. Physical screen reader, native mobile keyboard, installed PWA and push
+delivery still require device review. No fresh Supabase project was created, as
+requested. CHECKS.md contains clear steps for these manual reviews.
+
+### Delivery gate extension
+
+- Hard gate PASS for tested views: real destinations/actions, actual authorised
+  data, keyboard/focus, both themes, accessible contrast, 320px reflow, genuine
+  error/empty/loading feedback and real Chrome screenshots. Tests and limits are
+  recorded above; no claim of a fresh transactional full-product regression.
+- Purpose gate PASS: retain mandated blue/Geist/Mono/brand; remove meaningless
+  callout stripe and duplicate section buttons; no new glass, glow, decorative
+  assets, fabricated activity, icons or unrelated library.
+- Liveliness/craftsmanship PASS: declared restrained dials, one splash signature,
+  genuine loading feedback only while boot is pending, reduced motion, clear
+  next-step copy, one shared component owner and explicit design reasons above.
+  Existing user-approved landing/theme motion remains unchanged.
+
+## Refinement and draft deletion, 10 October 2026
 
 ## Direction and scope
 

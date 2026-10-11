@@ -1,3 +1,5 @@
+import { competitionSections } from './presentation.js';
+
 const protectedForms = '[data-profile-form],[data-organisation-form],[data-submission-form],[data-submission-config],[data-criterion-form],[data-score-form],[data-meeting-form],[data-announcement-form],[data-qa-question-form],[data-qa-reply-form],[data-publication-form],[data-category-form]';
 const fingerprint = form => JSON.stringify([...form.querySelectorAll('input,textarea,select')].filter(field => !field.disabled && !['hidden','search','submit','button'].includes(field.type)).map(field => [field.name || field.dataset.criterionId || field.type, field.type === 'file' ? [...field.files].map(file => `${file.name}:${file.size}:${file.lastModified}`) : ['checkbox','radio'].includes(field.type) ? field.checked : field.value]));
 
@@ -27,7 +29,7 @@ export function createFormRecovery() {
 export const markFormSaved = form => form?.dispatchEvent(new Event('vertex:form-saved'));
 export const markFormChanged = form => form?.dispatchEvent(new Event('vertex:form-changed'));
 
-export function bindExperience(root) {
+export function bindExperience(root, { accountType, navigate } = {}) {
   const controller = new AbortController();
   const on = (type, callback) => root.addEventListener(type, callback, { capture: true, signal: controller.signal });
   const describeFields = () => root.querySelectorAll('label.field').forEach(label => {
@@ -42,15 +44,37 @@ export function bindExperience(root) {
   });
   describeFields();
   const fieldsObserver = new MutationObserver(describeFields); fieldsObserver.observe(root, { childList: true, subtree: true });
-  const match = location.pathname.match(/^\/(organiser\/)?competition\/([a-z0-9-]+)(?:\/(.*))?$/);
-  if (match && !root.querySelector('.competition-community-links,.meeting-room-page')) {
-    const manager = Boolean(match[1]); const slug = match[2];
-    const base = `${manager ? '/organiser' : ''}/competition/${slug}`;
-    const sections = manager ? [['workspace','Overview'],['participants','Entries'],['submissions','Submissions'],['scoring','Judging'],['leaderboards','Results'],['certificates','Certificates']] : [['','Overview'],['announcements','Updates'],['questions','Questions'],['meetings','Meetings'],['submissions','Submissions'],['certificates','Certificates']];
-    const nav = document.createElement('nav'); nav.className = 'competition-context-nav'; nav.setAttribute('aria-label', 'Competition sections');
-    for (const [section, label] of sections) { const anchor = document.createElement('a'); anchor.href = `${base}${section ? `/${section}` : ''}`; anchor.dataset.link = ''; anchor.textContent = label; if (location.pathname === new URL(anchor.href).pathname || (section === 'submissions' && match[3]?.startsWith('submissions/'))) anchor.setAttribute('aria-current', 'page'); nav.append(anchor); }
-    const page = root.querySelector('.page'); if (page) { const back = page.querySelector(':scope > .back-link'); if (back) back.after(nav); else page.prepend(nav); }
-  }
+  const navigation = () => {
+    const sections = competitionSections(location.pathname, accountType);
+    if (!sections || root.querySelector('.meeting-room-page')) return;
+    const page = root.querySelector('.page'); if (!page) return;
+    if (/unavailable|account required/i.test(page.querySelector('h1')?.textContent || '')) {
+      if (!page.querySelector('.back-link')) {
+        const match = location.pathname.match(/\/competition\/([a-z0-9-]+)/);
+        const back = document.createElement('a'); back.className = 'back-link'; back.dataset.link = '';
+        back.href = `/competition/${match[1]}`; back.textContent = 'Back to competition'; page.prepend(back);
+      }
+      return;
+    }
+    const nav = root.querySelector('.competition-context-nav') || document.createElement('nav');
+    nav.className = 'competition-context-nav'; nav.setAttribute('aria-label', 'Competition sections'); nav.replaceChildren();
+    const links = document.createElement('div'); links.className = 'competition-context-links';
+    const label = document.createElement('label'); label.className = 'field competition-section-picker';
+    const caption = document.createElement('span'); caption.textContent = 'Competition section';
+    const picker = document.createElement('select'); picker.name = 'competition-section';
+    const current = sections.find(section => section.current);
+    if (!current) { const option = new Option(page.querySelector('h1')?.textContent.replace(/\.$/,'') || 'Current page', location.pathname, true, true); option.disabled = true; picker.add(option); }
+    for (const section of sections) {
+      const anchor = document.createElement('a'); anchor.href = section.href; anchor.dataset.link = ''; anchor.textContent = section.label;
+      if (section.current) anchor.setAttribute('aria-current', 'page'); links.append(anchor);
+      picker.add(new Option(section.label,section.href,false,Boolean(section.current)));
+    }
+    const initial = picker.value;
+    picker.addEventListener('change', () => { const previous = location.pathname; navigate?.(picker.value); if (location.pathname === previous) picker.value = initial; });
+    label.append(caption,picker); nav.append(links,label);
+    const back = page.querySelector(':scope > .back-link'); if (back) back.after(nav); else page.prepend(nav);
+  };
+  navigation(); on('vertex:competition-saved', navigation);
   let queued = false;
   on('invalid', event => {
     const field = event.target; if (!field.form || !field.matches('input,select,textarea')) return;

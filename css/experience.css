@@ -7,7 +7,6 @@
 :where(button, .button, select, input, textarea) { transition: background-color var(--interaction-fast), border-color var(--interaction-fast), color var(--interaction-fast), box-shadow var(--interaction-fast); }
 :where(button, .button):disabled { cursor: not-allowed; transform: none; opacity: .6; }
 :where(button, .button)[aria-busy='true'] { cursor: progress; }
-.shell :is(input, textarea, select):not([type='checkbox'],[type='radio'],[type='color'],[type='file'],[type='hidden']) { border-color: var(--control-border); }
 :where(input, textarea, select):focus-visible { border-color: var(--focus-ring); }
 :focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; scroll-margin-block: calc(var(--header) + 24px) 80px; }
 :where(a, button, input, textarea, select, summary) { scroll-margin-block: calc(var(--header) + 24px) 80px; }
@@ -56,9 +55,6 @@
 .criterion-actions { width: 96px; }
 .criterion-actions button, .certificate-toolbar button, .editor-canvas-controls button { min-width: 44px; min-height: 44px; }
 .discovery-fields label { min-height: 44px; display: inline-flex; align-items: center; }
-.competition-context-nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; margin: 0 0 24px; border-bottom: 1px solid var(--border); }
-.competition-context-nav a { padding: 11px 13px; min-height: 44px; border-radius: 8px; font-size: .85rem; color: var(--state-ink); display: inline-flex; align-items: center; }
-.competition-context-nav a[aria-current='page'] { color: var(--accent-strong); background: var(--accent-soft); font-weight: 650; }
 .draft-management { margin-top: 32px; padding: 24px; border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .draft-management h2 { font-size: 1.15rem; margin: 0 0 8px; }
 .draft-management p { max-width: 65ch; margin: 0; color: var(--muted); line-height: 1.6; }
@@ -87,12 +83,8 @@
   .shell :is(input, textarea, select):not([type='checkbox'],[type='radio'],[type='color']) { font-size: 1rem; }
   .lifecycle-context { align-items: stretch; flex-direction: column; gap: 16px; padding: 16px; }
   .lifecycle-context .button { justify-content: center; }
-  .competition-community-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .competition-community-links .button { min-width: 0; white-space: normal; text-align: center; }
   :where(.notice-actions a, .notice-actions button, .discovery-card-actions a, .discovery-preview-button) { min-height: 44px; }
   .global-error { bottom: max(16px, env(safe-area-inset-bottom)); }
-  .competition-context-nav { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); }
-  .competition-context-nav a { justify-content: center; padding-inline: 5px; font-size: .8rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; }

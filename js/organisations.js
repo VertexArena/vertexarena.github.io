@@ -88,6 +88,14 @@ export function createOrganisations({ client, state, escapeHtml: h, safeUrl, ava
   }
 
   async function resolve(path) {
+    if (path === '/dashboard' && state.profile?.account_type === 'organisation') {
+      const org = await result(client.from('organisations').select('*').eq('management_profile_id',state.session.user.id).maybeSingle());
+      const rows = org ? await memberships(() => client.from('organisation_memberships').select('*').eq('organisation_id',org.id)) : [];
+      const accepted = rows.filter(row => row.status === 'accepted');
+      const profiles = accepted.length ? await result(client.from('public_profiles').select('*').in('id',accepted.map(row => row.organiser_id))) : [];
+      const pending = rows.filter(row => row.status === 'pending' && Date.parse(row.expires_at) > Date.now()).length;
+      return { title: 'Organisation dashboard - Vertex', content: `<div class="page operational-dashboard organisation-dashboard"><div class="dashboard-heading"><div><span class="eyebrow">Organisation dashboard</span><h1>${h(org?.name || 'Your organisation')}</h1><p>See your organisers and associated competitions. Linked organisers manage competition activity through their own accounts.</p></div><a class="button primary" data-link href="/organisation/edit">${org ? 'Edit organisation' : 'Set up organisation'}</a></div>${org ? `<div class="dashboard-main"><section class="dashboard-section"><div class="dashboard-section-head"><h2>Associated organisers</h2><a class="text-link" data-link href="/organisation/edit">Manage associations</a></div>${pending ? `<p>${pending} ${pending === 1 ? 'invitation awaits' : 'invitations await'} a response.</p>` : ''}<div class="people-results">${profiles.length ? peopleResults(profiles) : empty('No associated organisers yet.','Invite organisers from your organisation settings. They appear here after accepting.')}</div></section><section class="dashboard-section"><div class="dashboard-section-head"><h2>Associated competitions</h2><a class="text-link" data-link href="/organisation/${h(org.slug)}">View public profile</a></div>${await competitionList(org.id)}</section></div>` : empty('Create your public profile.','Add your organisation name and description before associating organisers and their competitions.')}</div>` };
+    }
     if (path === '/organisations') return { content: await directoryView(), title: 'Organisations - Vertex' };
     if (path === '/organisation/edit') {
       if (!state.session) return { protected: true };

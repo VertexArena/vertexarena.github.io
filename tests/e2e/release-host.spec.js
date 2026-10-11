@@ -27,7 +27,7 @@ test('published release boots with real libraries and recovers nested routes', a
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`${origin}/randomgarbage`);
   await expect(page.getByRole('heading', { name: 'This path left the field.' })).toBeVisible();
-  await page.getByRole('link', { name: 'Return home' }).click();
+  await page.locator('.header .brand').click();
   await expect(page.getByRole('heading', { name: 'Find your next challenge.' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   await page.screenshot({ path: info.outputPath('production-mobile.png'), fullPage: true });

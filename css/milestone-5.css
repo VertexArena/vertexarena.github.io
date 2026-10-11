@@ -6,10 +6,7 @@
 .discovery-controls { display: grid; grid-template-columns: minmax(250px, 1fr) 190px 190px auto; align-items: end; gap: 14px; padding: 26px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
 .discovery-search { position: relative; display: block; }
 .discovery-search i { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: var(--muted); }
-.discovery-search input, .discovery-mode select, .discovery-sort select { width: 100%; min-height: 50px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); font: inherit; }
-.discovery-search input { padding: 0 16px 0 46px; }
 .discovery-mode, .discovery-sort { display: grid; gap: 5px; color: var(--muted); font-size: .78rem; font-weight: 650; }
-.discovery-mode select, .discovery-sort select { padding: 0 12px; font-size: .9rem; }
 .discovery-saved { min-height: 50px; display: flex; gap: 9px; align-items: center; padding: 0 9px; white-space: nowrap; font-size: .88rem; font-weight: 600; }
 .discovery-saved input { accent-color: var(--accent); width: 17px; height: 17px; }
 .discovery-fields { grid-column: 1 / -1; min-width: 0; padding: 18px 0 0; border: 0; border-top: 1px solid var(--border); }

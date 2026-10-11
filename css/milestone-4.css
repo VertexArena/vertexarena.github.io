@@ -15,11 +15,9 @@
 [data-editor-panel] legend { margin-bottom: 16px; font-weight: 600; }
 [data-editor-panel] h3 { margin: 0; }
 [data-editor-panel] .field-intro { margin: -4px 0 0; line-height: 1.65; }
-.field select { width: 100%; min-height: 48px; padding: 11px 12px; border: 1px solid var(--border); border-radius: 11px; background: var(--bg); color: var(--text); }
-.field input[type="color"] { padding: 5px; height: 48px; cursor: pointer; }
 .field input[type="datetime-local"] { min-width: 0; width: 100%; }
 .field-tag-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
-.field-tag-grid .check-field { margin: 0; text-transform: capitalize; }
+.field-tag-grid .check-field { margin: 0;  }
 .editor-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; padding-top: 28px; margin-top: 28px; border-top: 1px solid var(--border); }
 .editor-lock { padding: 14px 18px; background: var(--soft); border-radius: 12px; line-height: 1.6; font-size: .9rem; }
 .editor-lock i { margin-right: 8px; }

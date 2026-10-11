@@ -303,7 +303,7 @@ export function createSubmissions({ client, state, escapeHtml: h, refresh }) {
       }));
       if (!list.isConnected) return;
       reviewPage = page; active.review = response;
-      list.innerHTML = response.entries.length ? response.entries.map(reviewCard).join('') : empty('No entries match.', 'Change filters or wait for registration.');
+      list.innerHTML = response.entries.length ? response.entries.map(reviewCard).join('') : empty('No entries to show.', 'Confirmed entries appear here when eligible for this round. Clear filters if you expected an entry.');
       root.querySelector('[data-review-total]').textContent = response.total;
       const nav = root.querySelector('[data-review-pagination]');
       nav.innerHTML = response.total > 25 ? `<span>Page ${page + 1} of ${Math.ceil(response.total / 25)}</span><button class="button quiet" type="button" data-review-page="${page - 1}" ${page === 0 ? 'disabled' : ''}>Previous</button><button class="button quiet" type="button" data-review-page="${page + 1}" ${page >= Math.ceil(response.total / 25) - 1 ? 'disabled' : ''}>Next</button>` : '';

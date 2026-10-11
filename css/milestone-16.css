@@ -1,7 +1,6 @@
 .leaderboard-page { max-width: 1320px; padding-top: clamp(32px,5vw,62px); padding-bottom: 100px; }
 .leaderboard-page .back-link { display: inline-flex; margin-bottom: 28px; }
 .leaderboard-page .page-head { max-width: 800px; margin-bottom: 32px; }
-.leaderboard-page .page-head h1 { font-size: clamp(2.7rem,6vw,4.8rem); }
 .leaderboard-rounds { display: flex; gap: 9px; overflow-x: auto; padding: 2px 2px 15px; margin: 0 0 23px; }
 .leaderboard-round { flex: none; display: grid; grid-template-columns: auto auto; gap: 4px 10px; min-width: 126px; padding: 11px 16px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); color: var(--text); text-decoration: none; }
 .leaderboard-round.active { border-color: var(--accent); background: var(--accent-soft); }

@@ -1,7 +1,6 @@
 .submission-page { max-width: 1260px; padding-top: clamp(32px, 5vw, 64px); padding-bottom: 100px; }
 .submission-page .back-link { display: inline-flex; margin-bottom: 30px; }
 .submission-page .page-head { max-width: 810px; margin-bottom: 35px; }
-.submission-page .page-head h1 { font-size: clamp(2.75rem, 6vw, 4.8rem); }
 .submission-round-list { display: grid; gap: 13px; }
 .submission-round-card { display: flex; align-items: center; gap: 23px; min-width: 0; padding: clamp(18px, 3vw, 27px); border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-low); }
 .submission-round-number { align-self: stretch; display: grid; place-items: center; flex: 0 0 56px; border-right: 1px solid var(--border); padding-right: 16px; color: var(--accent); font: 600 1.1rem var(--mono); }

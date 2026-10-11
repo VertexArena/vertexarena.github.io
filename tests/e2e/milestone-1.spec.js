@@ -3,7 +3,7 @@ import { test, expect } from './helpers/test.js';
 test.describe('Milestone 1', () => {
   test('home shell, narrative, living grid, and persistent theme', async ({ page }, info) => {
     await page.goto('/');
-    await expect(page.getByRole('link', { name: 'Vertex home' })).toBeVisible();
+    await expect(page.locator('.header .brand')).toBeVisible();
     await expect(page.getByRole('heading', { name: /Find your next challenge/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Opportunity should be easier to see.' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Clarity at every meaningful moment.' })).toBeVisible();
@@ -61,8 +61,8 @@ test.describe('Milestone 1', () => {
     const homeActions = await page.locator('.actions').boundingBox();
     const homeHeader = await page.locator('.header-in').boundingBox();
     await page.goto('/login');
-    await expect(page.locator('.header .brand')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Back to Vertex' })).toBeVisible();
+    await expect(page.locator('.header .brand')).toHaveCount(1);
+    await expect(page.locator('.header .brand')).toHaveAttribute('href','/');
     const loginActions = await page.locator('.actions').boundingBox();
     const loginHeader = await page.locator('.header-in').boundingBox();
     expect(Math.abs(homeActions.x + homeActions.width - (loginActions.x + loginActions.width))).toBeLessThan(1);
@@ -106,7 +106,7 @@ test.describe('Milestone 1', () => {
     expect(second).toBe(first);
     await page.goto('/randomgarbage');
     await expect(page.locator('.fallback')).toBeVisible();
-    await page.getByRole('link', { name: /Return home/ }).click();
+    await page.locator('.header .brand').click();
     await page.getByRole('link', { name: /Explore competitions/ }).first().click();
     await expect(page.getByRole('heading', { name: 'Find your next challenge.' })).toBeVisible();
   });

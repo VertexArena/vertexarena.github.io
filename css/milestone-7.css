@@ -40,7 +40,7 @@
 .team-suggestions .person-row { width: 100%; text-align: left; }
 .team-sent-list { display: grid; gap: 8px; margin-top: 24px; }
 .team-sent-row { display: flex; align-items: center; gap: 8px; padding: 11px 0; border-top: 1px solid var(--border); }
-.team-invite-state { color: var(--muted); font-size: .8rem; text-transform: capitalize; }
+.team-invite-state { color: var(--muted); font-size: .8rem;  }
 .team-sent-row .button { margin-left: auto; }
 .team-start { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, .55fr); gap: 24px; margin: 24px 0 70px; align-items: start; }
 .team-inbox { margin-bottom: 20px; }
